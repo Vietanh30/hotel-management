@@ -4,6 +4,8 @@ import { faPhone, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import iconVietNam from "../../assets/Header/iconVietNam.svg";
 import flagVietnam from "../../assets/Header/flagsVietnam.svg";
+import { Link } from 'react-router-dom';
+import path from '../../constants/path';
 
 function Header() {
     const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -23,7 +25,7 @@ function Header() {
                         <FontAwesomeIcon icon={faYoutube} size="lg" />
                     </div>
                 </div>
-                <div className="flex flex-col items-center">
+                <Link to={path.home} className="flex flex-col items-center cursor-pointer">
                     <div className='text-[#B5986D] text-4xl font-bold'>
                         Nhóm 7
                     </div>
@@ -32,7 +34,7 @@ function Header() {
                         <img src={flagVietnam} alt="Vietnam Flag" />
                         <div className='w-11 border-b border-[#B5986D]'></div>
                     </div>
-                </div>
+                </Link>
                 <div className='flex items-center gap-4 w-1/3 justify-end'>
                     <img src={iconVietNam} alt="Vietnam Icon" />
                     <div className='flex items-center gap-4 relative'>

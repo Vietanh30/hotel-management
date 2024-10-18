@@ -3,6 +3,8 @@ const path = {
     home: '/',
     about: '/about',
     login: '/login',
+    register: '/register',
+    booking: '/booking',
     // checkout: '/checkout',
     // products: '/products',
     // historyOrder: '/history-order',
