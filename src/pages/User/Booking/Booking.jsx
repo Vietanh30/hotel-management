@@ -26,12 +26,7 @@ function Booking() {
               <div className="col-span-1 w-full bg-white rounded p-4 mb-8">
                 <CardRoomBooking />
               </div>
-              <div className="col-span-1 w-full bg-white rounded p-4 mb-8">
-                <CardRoomBooking />
-              </div>
-              <div className="col-span-1 w-full bg-white rounded p-4 mb-8">
-                <CardRoomBooking />
-              </div>
+             
             </div>
             <div
               className="col-span-3"

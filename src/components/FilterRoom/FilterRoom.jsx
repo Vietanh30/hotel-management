@@ -1,6 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 
 function FilterRoom() {
+    const [checkInDate, setCheckInDate] = useState("");
+    const [checkOutDate, setCheckOutDate] = useState("");
+
+    const handleCheckInChange = (e) => {
+        const selectedDate = e.target.value;
+        setCheckInDate(selectedDate);
+        
+        // Đặt ngày trả phòng tối thiểu là ngày nhận phòng + 1
+        const nextDay = new Date(selectedDate);
+        nextDay.setDate(nextDay.getDate() + 1);
+        setCheckOutDate(nextDay.toISOString().split("T")[0]);
+    };
   return (
     <>
       <div className="grid grid-cols-11 gap-3 items-end justify-center">
@@ -19,26 +31,32 @@ function FilterRoom() {
         </div>
         <div className='col-span-2'>
             <label htmlFor="check-in" className="font-inter font-semibold mb-2 text-sm">
-            Ngày nhận phòng
+                Ngày nhận phòng
             </label>
             <div className="flex items-center mt-3">
-            <input
-                id="check-in"
-                type="date"
-                className="border w-full bg-[#f5f5f5] rounded text-sm p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            />
+                <input
+                    id="check-in"
+                    type="date"
+                    min={new Date().toISOString().split("T")[0]} // Ngày nhỏ nhất là hôm nay
+                    value={checkInDate}
+                    onChange={handleCheckInChange}
+                    className="border w-full bg-[#f5f5f5] rounded text-sm p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                />
             </div>
         </div>
         <div className='col-span-2'>
-            <label htmlFor="check-in" className="font-inter font-semibold mb-2 text-sm">
-            Ngày nhận phòng
+            <label htmlFor="check-out" className="font-inter font-semibold mb-2 text-sm">
+                Ngày trả phòng
             </label>
             <div className="flex items-center mt-3">
-            <input
-                id="check-in"
-                type="date"
-                className="border w-full bg-[#f5f5f5] rounded text-sm p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            />
+                <input
+                    id="check-out"
+                    type="date"
+                    min={checkInDate ? new Date(new Date(checkInDate).getTime() + 86400000).toISOString().split("T")[0] : ""}
+                    value={checkOutDate}
+                    onChange={(e) => setCheckOutDate(e.target.value)}
+                    className="border w-full bg-[#f5f5f5] rounded text-sm p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                />
             </div>
         </div>
         <div className='col-span-2'>

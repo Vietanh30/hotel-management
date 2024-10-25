@@ -3,10 +3,13 @@ export const LocalStorageEventTarget = new EventTarget();
 export const setAccessTokenToLS = (access_token) => {
   localStorage.setItem("access_token", access_token);
 };
-
+export const setRoleTokenToLS = (role) => {
+  localStorage.setItem("role", role);
+};
 export const clearLS = () => {
   localStorage.removeItem("access_token");
-  localStorage.removeItem("profile");
+  localStorage.removeItem("role");
+  // localStorage.removeItem("profile");
   const clearLSEvent = new Event("clearLS");
   LocalStorageEventTarget.dispatchEvent(clearLSEvent);
 };
