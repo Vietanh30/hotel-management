@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
-import imgInputFile from '../../assets/TypeRoom/imgInputFile.svg'
+import imgInputFile from '../../assets/TypeRoom/imgInputFile.svg';
+
 function ImageUploader({ onImagesChange }) {
     const fileInputRef = useRef(null);
 
@@ -12,8 +13,9 @@ function ImageUploader({ onImagesChange }) {
         const newImages = files.map(file => ({
             name: file.name,
             url: URL.createObjectURL(file),
+            file: file, // Include the raw file object
         }));
-        onImagesChange(newImages); // Gửi danh sách hình ảnh đã chọn về component cha
+        onImagesChange(newImages); // Send the list of selected images back to the parent component        
     };
 
     return (

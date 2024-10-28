@@ -65,11 +65,16 @@ function AddTypeRoom({ isOpen, onClose }) {
 
         // Thêm hình ảnh vào FormData
         images.forEach(image => {
-            formData.append('images', image.file); // Giả sử `image.file` chứa đối tượng File
+            formData.append('images', image.file);
         });
 
         try {
             // Gọi API
+            console.log(images);
+            
+            for (const [key, value] of formData.entries()) {
+                console.log(key, value);
+            }            
             const responeAddTypeRoom = await adminApi.addTypeRoom(accessToken, formData);
             console.log(responeAddTypeRoom);
             
@@ -91,7 +96,7 @@ function AddTypeRoom({ isOpen, onClose }) {
         }
     };
 
-    const handleImagesChange = (newImages) => {
+    const handleImagesChange = (newImages, files) => {
         setImages(prevImages => [...prevImages, ...newImages]);
     };
 
@@ -189,7 +194,7 @@ function AddTypeRoom({ isOpen, onClose }) {
                         />
                     </div>
                     <div className="col-span-2">
-                        <ImageUploader onImagesChange={handleImagesChange} />
+                        <ImageUploader onImagesChange={handleImagesChange}  />
                         <div className="mt-5">
                             <h2 className="font-semibold text-xl">Hình đã chọn:</h2>
                             {images.length > 0 ? (
@@ -199,7 +204,7 @@ function AddTypeRoom({ isOpen, onClose }) {
                                             <img
                                                 src={image.url}
                                                 alt={image.name}
-                                                className="w-16 h-auto object-cover mr-2 rounded-lg"
+                                                className="w-16 h-16 object-cover mr-2 rounded-lg"
                                             />
                                             <div className="w-full px-3">
                                                 <div className="flex mb-2 items-center justify-between">

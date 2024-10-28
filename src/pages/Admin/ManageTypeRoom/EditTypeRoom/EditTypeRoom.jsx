@@ -12,13 +12,23 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
     
     const [name, setName] = useState(initialData?.name || '');
     const [area, setArea] = useState(initialData?.area || '');
-    const [selectedBeds, setSelectedBeds] = useState(initialData?.bed || []);
-    const [amenities, setAmenities] = useState(initialData?.amenity || []);
+    const [selectedBeds, setSelectedBeds] = useState(initialData?.bed?.map(bed =>({
+        value: bed.id, label: bed.name
+    })) || []);
+    const [amenities, setAmenities] = useState(initialData?.amenity?.map(amenity => ({
+        value: amenity.id,
+        label: amenity.name
+    })) || []);
     const [description, setDescription] = useState(initialData?.description || '');
-    const [images, setImages] = useState(initialData?.images || []);
+    const [images, setImages] = useState(
+        initialData?.images?.map((image, index) => ({
+            name: `Hình ${index + 1}`,
+            url: image
+        })) || []
+    );
     const [bedOptions, setBedOptions] = useState([]);
     const [amenityOptions, setAmenityOptions] = useState([]);
-    console.log(amenityOptions)
+
     const fetchData = async () => {
         try {
             const [responseBed, responseAmenity] = await Promise.all([
@@ -41,9 +51,15 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
             setName(initialData.name || '');
             setArea(initialData.area || '');
             setSelectedBeds(initialData.bed || []);
-            setAmenities(initialData.amenity || []);
+            setAmenities(initialData.amenity?.map(amenity => ({
+                value: amenity.id,
+                label: amenity.name
+            })) || []);
             setDescription(initialData.description || '');
-            setImages(initialData.images || []);
+            setImages(initialData.images?.map((img, index) => ({
+                name: `Hình ${index + 1}`,
+                url: img
+            })) || []);
         }
     }, [initialData]);
 
@@ -101,14 +117,32 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
     };
 
     const handleBedChange = (selectedOption) => {
+        console.log("selectoption",selectedOption);
+        console.log("selectbed",selectedBeds)
         if (selectedOption) {
-            const existingBed = selectedBeds.find(bed => bed.bedId === selectedOption.value);
-            if (existingBed) {
-                const updatedBed = { ...existingBed, quantity: existingBed.quantity + 1 };
-                setSelectedBeds(prev => prev.map(bed => (bed.bedId === existingBed.bedId ? updatedBed : bed)));
+            const existingBedIndex = selectedBeds.findIndex(bed => bed.value === selectedOption.bedId);
+            console.log(existingBedIndex)
+            if (existingBedIndex > -1) {
+                // If the bed already exists, increment the quantity
+                console.log("update",updatedBed);
+                
+                const updatedBed = {
+                    ...selectedBeds[existingBedIndex],
+                    quantity: selectedBeds[existingBedIndex].quantity + 1
+                };
+                setSelectedBeds(prev => {
+                    const newSelectedBeds = [...prev];
+                    newSelectedBeds[existingBedIndex] = updatedBed; // Update the existing bed
+                    return newSelectedBeds;
+                });
             } else {
+                // If it's a new bed, create a new entry
                 const bedName = bedOptions.find(bed => bed.bedId === selectedOption.value)?.name || 'Không rõ';
-                const newBed = { bedId: selectedOption.value, quantity: 1, name: bedName };
+                const newBed = { 
+                    value: selectedOption.value, 
+                    quantity: 1, 
+                    name: bedName 
+                };
                 setSelectedBeds(prev => [...prev, newBed]);
             }
         }
@@ -158,7 +192,7 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
                         {selectedBeds.length > 0 && (
                             <div className="mb-4">
                                 <div className="mt-2 flex items-center gap-1 w-full flex-wrap">
-                                    {selectedBeds.map((bed, index) => (
+                                    {selectedBeds.map((bed) => (
                                         <li key={`${bed.bedId}-${bed.quantity}`} className="flex justify-between items-center gap-2 border rounded px-2 py-1 text-sm">
                                             <span>{`${bed.name} (${bed.quantity})`}</span>
                                             <button onClick={() => handleRemoveBed(bed)} className="text-red-600">
@@ -195,13 +229,13 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
                                     {images.map((image, index) => (
                                         <li key={index} className="flex items-center justify-between mt-2 p-3 border rounded-lg bg-[#FAFAFA]">
                                             <img
-                                                src={image.url}
+                                                src={image.url}  // Sử dụng image.url để hiển thị
                                                 alt={image.name}
-                                                className="w-16 h-auto object-cover mr-2 rounded-lg"
+                                                className="w-16 h-16 object-cover mr-2 rounded-lg"
                                             />
                                             <div className="w-full px-3">
                                                 <div className="flex mb-2 items-center justify-between">
-                                                    <span>{image.name}</span>
+                                                    <span className='line-clamp-1'>{image.name}</span>
                                                     <button
                                                         className="text-white rounded-full ml-2 px-2 py-1 bg-red-600 text-xs"
                                                         onClick={() => handleRemoveImage(image.name)}
