@@ -4,8 +4,11 @@ import { vi } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from "react-router-dom";
+import path from "../../constants/path";
 
 const CalendarModal = ({ isOpen, onClose }) => {
+  const navigate = useNavigate()
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -27,6 +30,9 @@ const CalendarModal = ({ isOpen, onClose }) => {
     };
   }, [isOpen]);
 
+  const handleSearchCalender = () =>{
+    navigate(path.booking)
+  }
   if (!isOpen) return null;
 
   return (
@@ -101,7 +107,7 @@ const CalendarModal = ({ isOpen, onClose }) => {
         </div>
         <div className="flex justify-end w-full px-4">
             <button
-            onClick={onClose}
+            onClick={handleSearchCalender}
             className="mt-4 bg-[#f2a900] text-white py-2 px-4 rounded hover:bg-[#f2a900] focus:bg-[#f2a900] font-inter font-semibold"
             >
             Đặt Phòng

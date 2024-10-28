@@ -1,6 +1,21 @@
 import React from "react";
+import { clearLS, getAccessTokenFromLS } from "../../utils/auth";
+import { useNavigate } from "react-router-dom";
+import path from "../../constants/path";
 
 function Navbar() {
+  const navigate = useNavigate()
+  const accessToken = getAccessTokenFromLS();
+
+  const handleAuthToggle = () => {
+    if (accessToken) {
+      clearLS()
+      navigate(path.login)
+    } else {
+      navigate(path.login)
+    }
+  };
+
   return (
     <div className="bg-[#F5E8D0] sticky top-0 py-4 z-20">
       <div className="container mx-auto flex justify-between items-center">
@@ -18,8 +33,17 @@ function Navbar() {
             placeholder="Tìm kiếm..."
             className="border border-gray-300 rounded-md py-1 px-2 focus:outline-none focus:ring focus:ring-[#B5986D] w-48"
           />
-          <button className="bg-[#B5986D] text-white rounded-md py-2 px-4 hover:bg-[#8A6A4E]">Đăng nhập</button>
-          <button className="bg-[#B5986D] text-white rounded-md py-2 px-4 hover:bg-[#8A6A4E]">Đăng ký</button>
+          <button 
+            className="bg-[#B5986D] text-white rounded-md py-2 px-4 hover:bg-[#8A6A4E]"
+            onClick={handleAuthToggle}
+          >
+            {accessToken ? 'Đăng xuất' : 'Đăng nhập'}
+          </button>
+          {!accessToken && (
+            <button className="bg-[#B5986D] text-white rounded-md py-2 px-4 hover:bg-[#8A6A4E]">
+              Đăng ký
+            </button>
+          )}
         </div>
       </div>
     </div>

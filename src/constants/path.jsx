@@ -1,5 +1,5 @@
 const path = {
-    // user
+    //! user
     home: '/',
     about: '/about',
     login: '/login',
@@ -16,9 +16,10 @@ const path = {
     // cart: '/cart',
     // register: '/register',
 
-    // // admin
-    // loginAdmin: '/login-admin',
-    // dashboard: '/dashboard',
+    //! admin
+    loginAdmin: '/login-admin',
+    dashboard: '/dashboard',
+    manageTypeRoom: '/manage-type-room',
     // allProduct: '/all-product',
     // allCategories: '/all-categories',
     // orderList: '/order-list',

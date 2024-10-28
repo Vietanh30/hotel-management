@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "name": "Tu quần áo",
+        "image": "tu-quan-ao.png"
+    },
+    {
+        "id": 2,
+        "name": "Máy sấy tóc",
+        "image": "may-say-toc.png"
+    },
+    {
+        "id": 3,
+        "name": "Ga trải giường, gối",
+        "image": "ga-trai-giuong.png"
+    },
+    {
+        "id": 4,
+        "name": "Phòng có bồn tắm",
+        "image": "phong-co-bon-tam.png"
+    },
+    {
+        "id": 5,
+        "name": "Phòng không hút thuốc",
+        "image": "phong-khong-hut-thuoc.png"
+    },
+    {
+        "id": 6,
+        "name": "Wifi",
+        "image": "wifi.png"
+    },
+    {
+        "id": 7,
+        "name": "Đồ phòng tắm",
+        "image": "do-phong-tam.png"
+    },
+    {
+        "id": 8,
+        "name": "Quầy bar mini",
+        "image": "quay-bar-mini.png"
+    },
+    {
+        "id": 9,
+        "name": "Điều hòa",
+        "image": "dieu-hoa.png"
+    },
+    {
+        "id": 10,
+        "name": "Đèn bàn",
+        "image": "den-ban.png"
+    },
+    {
+        "id": 11,
+        "name": "Điện thoại",
+        "image": "dien-thoai.png"
+    },
+    {
+        "id": 12,
+        "name": "Bàn làm việc",
+        "image": "ban-lam-viec.png"
+    }
+]

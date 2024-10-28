@@ -7,6 +7,9 @@ import Register from "./pages/User/Register/Register";
 import Booking from "./pages/User/Booking/Booking";
 import ForgotPassword from "./pages/User/ForgotPassword/ForgotPassword";
 import Checkout from "./pages/User/Checkout/Checkout";
+import LoginAdmin from "./pages/Admin/LoginAdmin/LoginAdmin";
+import Dashboard from "./pages/Admin/Dashboard/Dashboad";
+import ManageTypeRoom from "./pages/Admin/ManageTypeRoom/ManageTypeRoom";
 
 function App() {  
   return (
@@ -20,6 +23,11 @@ function App() {
           <Route path={path.booking} element={<Booking />} />
           <Route path={path.checkout} element={<Checkout />} />
           
+          //! Admin
+          <Route path={path.loginAdmin} element={<LoginAdmin />} />
+          <Route path={path.dashboard} element={<Dashboard />} />
+          <Route path={path.manageTypeRoom} element={<ManageTypeRoom />} />
+
         </Routes>
       </Router>
   );
