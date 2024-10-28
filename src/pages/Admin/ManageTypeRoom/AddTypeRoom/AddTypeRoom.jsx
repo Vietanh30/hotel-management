@@ -7,7 +7,7 @@ import adminApi from '../../../../api/adminApi';
 import { getAccessTokenFromLS } from '../../../../utils/auth';
 import Swal from 'sweetalert2';  // Import SweetAlert2
 
-function AddTypeRoom({ isOpen, onClose }) {
+function AddTypeRoom({ isOpen, onClose, fetchData }) {
     const accessToken = getAccessTokenFromLS();
     const [name, setName] = useState('');
     const [area, setArea] = useState('');
@@ -18,7 +18,7 @@ function AddTypeRoom({ isOpen, onClose }) {
     const [bedOptions, setBedOptions] = useState([]);
     const [amenityOptions, setAmenityOptions] = useState([]);
 
-    const fetchData = async () => {
+    const fetchDataTypeRoom = async () => {
         try {
             const responseBed = await adminApi.getAllBed(accessToken);
             const responseAmenity = await adminApi.getAllAmenity(accessToken);
@@ -30,7 +30,7 @@ function AddTypeRoom({ isOpen, onClose }) {
     };
 
     useEffect(() => {
-        fetchData();
+        fetchDataTypeRoom();
     }, [accessToken]);
 
     const handleAdd = async () => {
@@ -77,14 +77,23 @@ function AddTypeRoom({ isOpen, onClose }) {
             }            
             const responeAddTypeRoom = await adminApi.addTypeRoom(accessToken, formData);
             console.log(responeAddTypeRoom);
-            
-            Swal.fire({
-                title: 'Thành công!',
-                text: 'Hạng phòng đã được thêm thành công.',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            });
-            onClose(); // Đóng modal sau khi thêm thành công
+            if(responeAddTypeRoom.data.statusCode === 201){
+                fetchData()
+                Swal.fire({
+                    title: 'Thành công!',
+                    text: 'Hạng phòng đã được thêm thành công.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+                onClose(); // Đóng modal sau khi thêm thành công
+                    // Reset state variables to clear inputs
+                setName('');
+                setArea('');
+                setSelectedBeds([]);
+                setAmenities([]);
+                setDescription('');
+                setImages([]);
+            }
         } catch (error) {
             console.error('Error adding type room:', error);
             Swal.fire({
@@ -159,8 +168,7 @@ function AddTypeRoom({ isOpen, onClose }) {
                             className="mb-4"
                             isClearable={true}
                         />
-                        
-                        <div className={selectedBeds.length ? 'mb-4' : ''}>
+                        <div className={selectedBeds.length > 0 ? 'mb-4' : 'hidden'}>
                             <div className="mt-2 flex items-center gap-1 w-full flex-wrap">
                                 {selectedBeds.map((bed, index) => {
                                     const [id, quantity] = bed.split(':');

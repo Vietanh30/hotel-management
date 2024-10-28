@@ -7,9 +7,10 @@ import adminApi from '../../../../api/adminApi';
 import { getAccessTokenFromLS } from '../../../../utils/auth';
 import Swal from 'sweetalert2';
 
-function EditTypeRoom({ isOpen, onClose, initialData }) {
+function EditTypeRoom({ isOpen, onClose, initialData, fetchData }) { 
+    console.log(initialData)   
     const accessToken = getAccessTokenFromLS();
-    
+    const [idTypeRoom, setIdTypeRoom] = useState(initialData?.id || '');
     const [name, setName] = useState(initialData?.name || '');
     const [area, setArea] = useState(initialData?.area || '');
     const [selectedBeds, setSelectedBeds] = useState(initialData?.bed?.map(bed =>({
@@ -23,13 +24,15 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
     const [images, setImages] = useState(
         initialData?.images?.map((image, index) => ({
             name: `Hình ${index + 1}`,
-            url: image
+            url: image.path,
+            id: image.id
         })) || []
     );
+    console.log(images)
     const [bedOptions, setBedOptions] = useState([]);
     const [amenityOptions, setAmenityOptions] = useState([]);
 
-    const fetchData = async () => {
+    const fetchDataTypeRoom = async () => {
         try {
             const [responseBed, responseAmenity] = await Promise.all([
                 adminApi.getAllBed(accessToken),
@@ -43,11 +46,12 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
     };
 
     useEffect(() => {
-        fetchData();
+        fetchDataTypeRoom();
     }, [accessToken]);
 
     useEffect(() => {
         if (initialData) {
+            setIdTypeRoom(initialData.id || '');
             setName(initialData.name || '');
             setArea(initialData.area || '');
             setSelectedBeds(initialData.bed || []);
@@ -58,7 +62,8 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
             setDescription(initialData.description || '');
             setImages(initialData.images?.map((img, index) => ({
                 name: `Hình ${index + 1}`,
-                url: img
+                url: img.path,
+                id: img.id
             })) || []);
         }
     }, [initialData]);
@@ -79,17 +84,30 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
 
         const formData = new FormData();
         formData.append('name', name);
-        formData.append('bed', JSON.stringify(bedData));
+        formData.append('bed', bedData);
         formData.append('area', area);
-        formData.append('amenityId', JSON.stringify(selectedAmenitiesIds));
+        formData.append('amenityId', selectedAmenitiesIds);
         formData.append('description', description);
 
-        images.forEach(image => {
-            formData.append('images', image.file);
-        });
-
+        // Find new images that are not already in initialData.images
+        const newImages = images.filter(
+            img => !initialData.images.some(initImg => initImg.path === img.url)
+        );
+        console.log("bcd", newImages)
+        console.log("abc",initialData.images)
+        // Append images to formData based on whether there are new images
+        if (newImages.length > 0) {
+            newImages.forEach(image => formData.append('images', image.file));
+        }
+        formData.append('rankId', idTypeRoom);
+        formData.append('imageId', images.map(image => image.id));
         try {
+            
+            for (const [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
             await adminApi.editTypeRoom(accessToken, formData);
+            fetchData()
             Swal.fire({
                 title: 'Thành công!',
                 text: 'Hạng phòng đã được chỉnh sửa thành công.',
@@ -110,6 +128,7 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
 
     const handleImagesChange = (newImages) => {
         setImages(prevImages => [...prevImages, ...newImages]);
+
     };
 
     const handleRemoveImage = (imageName) => {
@@ -117,19 +136,29 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
     };
 
     const handleBedChange = (selectedOption) => {
-        console.log("selectoption",selectedOption);
-        console.log("selectbed",selectedBeds)
+        console.log("Selected Option:", selectedOption);
+        console.log("Current Selected Beds:", selectedBeds);
+    
         if (selectedOption) {
-            const existingBedIndex = selectedBeds.findIndex(bed => bed.value === selectedOption.bedId);
-            console.log(existingBedIndex)
+            // Check the structure of selectedOption
+            console.log("Selected Option Value:", selectedOption.value);
+            
+            // Find the index of the existing bed based on the value
+            const existingBedIndex = selectedBeds.findIndex(bed => {
+                console.log("Comparing with Bed:", bed); // Log each bed being compared
+                return bed.bedId === selectedOption.value;
+            });
+    
+            console.log("Existing Bed Index:", existingBedIndex);
+    
             if (existingBedIndex > -1) {
                 // If the bed already exists, increment the quantity
-                console.log("update",updatedBed);
-                
                 const updatedBed = {
                     ...selectedBeds[existingBedIndex],
                     quantity: selectedBeds[existingBedIndex].quantity + 1
                 };
+                console.log("Updated Bed:", updatedBed);
+    
                 setSelectedBeds(prev => {
                     const newSelectedBeds = [...prev];
                     newSelectedBeds[existingBedIndex] = updatedBed; // Update the existing bed
@@ -137,13 +166,14 @@ function EditTypeRoom({ isOpen, onClose, initialData }) {
                 });
             } else {
                 // If it's a new bed, create a new entry
-                const bedName = bedOptions.find(bed => bed.bedId === selectedOption.value)?.name || 'Không rõ';
+                const bedName = bedOptions.find(bed => bed.id === selectedOption.value)?.name || 'Không rõ';
                 const newBed = { 
-                    value: selectedOption.value, 
+                    bedId: selectedOption.value, 
                     quantity: 1, 
                     name: bedName 
                 };
                 setSelectedBeds(prev => [...prev, newBed]);
+                console.log("Added New Bed:", newBed);
             }
         }
     };

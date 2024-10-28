@@ -3,7 +3,8 @@ import { http } from "../constants/config";
 export const URL_GET_ALL_TYPE_ROOM = "rank/admin";
 export const URL_GET_ALL_BED = "rank/bed";
 export const URL_GET_ALL_AMENITY = "rank/amenity";
-export const URL_ADD_TYPE_ROOM = "rank/";
+export const URL_ADD_TYPE_ROOM = "rank/create";
+export const URL_EDIT_TYPE_ROOM = "rank/edit";
 export const URL_GET_ALL_ROOM = "room/";
 
 const adminApi = {
@@ -17,6 +18,14 @@ const adminApi = {
   },
   addTypeRoom: function (accessToken, formData) {
     return http.post(URL_ADD_TYPE_ROOM, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  editTypeRoom: function (accessToken, formData) {
+    return http.put(URL_EDIT_TYPE_ROOM, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${accessToken}`,

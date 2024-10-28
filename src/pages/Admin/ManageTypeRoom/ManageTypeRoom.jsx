@@ -5,7 +5,6 @@ import DataTable from 'react-data-table-component';
 import React, { useState, useMemo, useEffect } from 'react';
 import AddTypeRoom from "./AddTypeRoom/AddTypeRoom";
 import EditTypeRoom from "./EditTypeRoom/EditTypeRoom";
-import TypeRoomDetail from "./TypeRoomDetail/TypeRoomDetail";
 import adminApi from "../../../api/adminApi";
 import { getAccessTokenFromLS } from "../../../utils/auth";
 
@@ -17,28 +16,24 @@ function ManageTypeRoom() {
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [typeRoom, setTypeRoom] = useState([]); // State để lưu dữ liệu từ API
     const [loading, setLoading] = useState(true); // State xử lý trạng thái tải
-    console.log(isEditModalOpen)
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const accessToken = getAccessTokenFromLS();
-                const response = await adminApi.getAllTypeRoom(accessToken);
-                console.log(response);
-                if(response.data.statusCode === 200){
-                    setTypeRoom(response.data.data); // Giả sử response.data chứa danh sách hạng phòng
-
-                }
-                
-            } catch (error) {
-                console.log(error);
-                console.error("Error fetching data:", error);
-            } finally {
-                setLoading(false); // Đảm bảo loading được tắt
+    const fetchData = async () => {
+        try {
+            const accessToken = getAccessTokenFromLS();
+            const response = await adminApi.getAllTypeRoom(accessToken);
+            if (response.data.statusCode === 200) {
+                setTypeRoom(response.data.data);
             }
-        };
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchData();
-    }, []); // Chạy một lần khi component mount
+    }, []); // Fetch data when the component mounts
+
 
     const filteredData = useMemo(() => {
         return typeRoom.filter(item =>
@@ -172,9 +167,8 @@ function ManageTypeRoom() {
                 </div>
             </div>
 
-            <AddTypeRoom isOpen={isAddModalOpen} onClose={closeAddModal} />
-            <EditTypeRoom isOpen={isEditModalOpen} onClose={closeEditModal} initialData={selectedRoomType} />
-            <TypeRoomDetail isOpen={isDetailModalOpen} onClose={closeDetailModal} roomType={selectedRoomType} />
+            <AddTypeRoom isOpen={isAddModalOpen} onClose={closeAddModal} fetchData={fetchData} />
+            <EditTypeRoom isOpen={isEditModalOpen} onClose={closeEditModal} initialData={selectedRoomType} fetchData={fetchData} />
         </>
     );
 }
