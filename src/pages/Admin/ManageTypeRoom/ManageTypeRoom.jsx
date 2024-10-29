@@ -7,15 +7,16 @@ import AddTypeRoom from "./AddTypeRoom/AddTypeRoom";
 import EditTypeRoom from "./EditTypeRoom/EditTypeRoom";
 import adminApi from "../../../api/adminApi";
 import { getAccessTokenFromLS } from "../../../utils/auth";
+import Swal from 'sweetalert2';
 
 function ManageTypeRoom() {
     const [searchText, setSearchText] = useState('');
     const [selectedRoomType, setSelectedRoomType] = useState(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const [typeRoom, setTypeRoom] = useState([]); // State để lưu dữ liệu từ API
-    const [loading, setLoading] = useState(true); // State xử lý trạng thái tải
+    const [typeRoom, setTypeRoom] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     const fetchData = async () => {
         try {
             const accessToken = getAccessTokenFromLS();
@@ -32,8 +33,7 @@ function ManageTypeRoom() {
 
     useEffect(() => {
         fetchData();
-    }, []); // Fetch data when the component mounts
-
+    }, []);
 
     const filteredData = useMemo(() => {
         return typeRoom.filter(item =>
@@ -50,24 +50,48 @@ function ManageTypeRoom() {
     };
     const closeEditModal = () => setIsEditModalOpen(false);
 
-    const openDetailModal = (roomType) => {
-        setSelectedRoomType(roomType);
-        setIsDetailModalOpen(true);
+    const handleDelete = async (roomType) => {
+        const action = roomType.active ? 'dừng hoạt động' : 'khôi phục';
+        const apiAction = roomType.active ? 'Dừng' : 'Khôi phục';
+
+        const result = await Swal.fire({
+            title: `Bạn có chắc chắn muốn ${action} hạng phòng này?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Có',
+            cancelButtonText: 'Không'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const accessToken = getAccessTokenFromLS();
+                await adminApi.activeTypeRoom(roomType.id, accessToken,);
+                fetchData(); // Refresh the data after the operation
+                Swal.fire(
+                    'Thành công!',
+                    `Hạng phòng đã được ${apiAction} thành công.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error("Error updating type room:", error);
+                Swal.fire(
+                    'Lỗi!',
+                    'Có lỗi xảy ra khi cập nhật trạng thái hạng phòng.',
+                    'error'
+                );
+            }
+        }
     };
-    const closeDetailModal = () => setIsDetailModalOpen(false);
 
     const columns = [
         {
             name: 'Hành động',
             cell: row => (
                 <div>
-                    <button onClick={() => openDetailModal(row)} className="text-blue-500 hover:underline">
-                        <FontAwesomeIcon icon={faEye} />
-                    </button>
                     <button onClick={() => openEditModal(row)} className="text-yellow-500 hover:underline mx-2">
                         <FontAwesomeIcon icon={faPencilAlt} />
                     </button>
-                    <button className="text-red-500 hover:underline">
+                    <button onClick={() => handleDelete(row)} className="text-red-500 hover:underline">
                         <FontAwesomeIcon icon={faTrash} />
                     </button>
                 </div>
@@ -76,7 +100,7 @@ function ManageTypeRoom() {
         },
         {
             name: 'STT',
-            selector: (row, index) => index + 1, // Sử dụng index để hiển thị STT
+            selector: (row, index) => index + 1,
             sortable: true,
             width: '80px'
         },
@@ -103,6 +127,7 @@ function ManageTypeRoom() {
                 </div>
             ),
         },
+        { name: 'Trạng thái', selector: row => row.active === true ? 'Đang hoạt động' : 'Dừng hoạt động', sortable: true, width: '180px' },
         {
             name: 'Mô tả',
             selector: row => row.description,
@@ -116,10 +141,10 @@ function ManageTypeRoom() {
     ];
 
     if (loading) {
-        return <div className="text-center">Đang tải dữ liệu...</div>; // Thông báo khi đang tải
+        return <div className="text-center">Đang tải dữ liệu...</div>;
     }
 
-    return ( 
+    return (
         <>
             <Sidebar />
             <div className="p-4 sm:ml-60">
@@ -134,7 +159,7 @@ function ManageTypeRoom() {
                             </button>
                         </div>
                     </div>
-                    <div className=" mt-6">
+                    <div className="mt-6">
                         <input
                             type="text"
                             placeholder="Tìm kiếm hạng phòng..."
@@ -149,10 +174,10 @@ function ManageTypeRoom() {
                             highlightOnHover
                             striped
                             customStyles={{
-                                headRow: { style: { fontSize: '15px', fontWeight: 'bold', backgroundColor: '#edce94', } },
-                                rows: { style: { fontSize: '14px', fontWeight: '500', fontFamily: 'inter', } },
+                                headRow: { style: { fontSize: '15px', fontWeight: 'bold', backgroundColor: '#edce94', borderStartStartRadius: '15px', borderStartEndRadius: '15px' } },
+                                rows: { style: { fontSize: '14px', fontWeight: '500', fontFamily: 'inter', paddingTop: '6px', paddingBottom: '6px' } },
                             }}
-                            noDataComponent={<div className="text-center bg-[#000] w-full p-3 text-white">Không có hạng phòng nào.</div>}
+                            noDataComponent={<div className="text-center bg-[#000] w-full p-3 text-white">Không tìm thấy hạng phòng nào.</div>}
                             paginationComponentOptions={{
                                 rowsPerPageText: 'Hiển thị',
                                 rangeSeparatorText: 'trên',
@@ -161,7 +186,7 @@ function ManageTypeRoom() {
                                 selectAllRowsItemText: 'Tất cả',
                             }}
                             paginationPerPage={10}
-                            paginationRowsPerPageOptions={[5,10, 25, 50, 100]}
+                            paginationRowsPerPageOptions={[5, 10, 25, 50, 100]}
                         />
                     </div>
                 </div>

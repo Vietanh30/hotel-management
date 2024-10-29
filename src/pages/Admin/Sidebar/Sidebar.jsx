@@ -95,7 +95,7 @@ function Sidebar() {
                             </Link>
                         </li>
                         <li>
-                            <Link to="/service-management" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <Link to={path.manageService} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
                                 <FontAwesomeIcon icon={faConciergeBell } className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý dịch vụ</span>
                             </Link>

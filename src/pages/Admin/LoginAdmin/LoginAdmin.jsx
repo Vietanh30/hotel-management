@@ -69,7 +69,7 @@ function LoginAdmin() {
                 setAccessTokenToLS(response.data.data.accessToken);
                 setRoleTokenToLS(response.data.data.roles[0])                
                 // Uncomment the line below to navigate to the home page after login
-                // navigate(path.home);
+                navigate(path.dashboard);
             }
         } catch (error) {
             let errorMessage = 'Đăng nhập không thành công! Vui lòng kiểm tra lại thông tin.';

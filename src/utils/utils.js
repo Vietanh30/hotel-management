@@ -40,3 +40,10 @@ export const formatDateToYYYYMMDD = (dateString) => {
   // Trả về chuỗi theo định dạng "yyyy-MM-dd"
   return `${year}-${month}-${day}`;
 };
+export function convertToTimeValue(timeString) {
+  // Tách chuỗi thời gian thành giờ, phút và giây
+  const [hours, minutes, seconds] = timeString.split(":");
+
+  // Trả về định dạng HH:mm
+  return `${hours}:${minutes}`;
+}

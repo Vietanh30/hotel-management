@@ -20,6 +20,7 @@ const path = {
     loginAdmin: '/login-admin',
     dashboard: '/dashboard',
     manageTypeRoom: '/manage-type-room',
+    manageService: '/manage-service',
     // allProduct: '/all-product',
     // allCategories: '/all-categories',
     // orderList: '/order-list',

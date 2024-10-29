@@ -10,6 +10,7 @@ import Checkout from "./pages/User/Checkout/Checkout";
 import LoginAdmin from "./pages/Admin/LoginAdmin/LoginAdmin";
 import Dashboard from "./pages/Admin/Dashboard/Dashboad";
 import ManageTypeRoom from "./pages/Admin/ManageTypeRoom/ManageTypeRoom";
+import ManageService from "./pages/Admin/ManageService/ManageService";
 
 function App() {  
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path={path.loginAdmin} element={<LoginAdmin />} />
           <Route path={path.dashboard} element={<Dashboard />} />
           <Route path={path.manageTypeRoom} element={<ManageTypeRoom />} />
+          <Route path={path.manageService} element={<ManageService />} />
 
         </Routes>
       </Router>
