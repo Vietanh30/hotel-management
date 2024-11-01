@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faList, faConciergeBell , faBed, faUserGroup, faCalendarCheck, faChartLine, faCommentDots } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faList, faConciergeBell , faBed, faUserGroup, faCalendarCheck, faChartLine, faCommentDots, faDoorOpen, faUser } from '@fortawesome/free-solid-svg-icons';
 import path from "../../../constants/path";
 import { Link } from "react-router-dom";
 import flagVietnam from "../../../assets/Header/flagsVietnam.svg";
@@ -101,15 +101,27 @@ function Sidebar() {
                             </Link>
                         </li>
                         <li>
-                            <Link to="/room-management" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <Link to={path.manageRoom} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
                                 <FontAwesomeIcon icon={faBed} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý phòng</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to="/staff-management" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <Link to={path.manageNumberRoom} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <FontAwesomeIcon icon={faDoorOpen} className="mr-2" />
+                            <span className="flex-1 ms-3 whitespace-nowrap">Quản lý số phòng</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to={path.manageStaff} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
                                 <FontAwesomeIcon icon={faUserGroup} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý nhân viên</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to={path.manageCustomer} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                                <FontAwesomeIcon icon={faUser} className="mr-2" />
+                                <span className="flex-1 ms-3 whitespace-nowrap">Quản lý khách hàng</span>
                             </Link>
                         </li>
                         <li>

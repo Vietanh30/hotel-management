@@ -3,29 +3,36 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import DataTable from 'react-data-table-component';
 import React, { useState, useMemo, useEffect } from 'react';
-import adminApi from "../../../api/adminApi";
+import adminApi from "../../../api/adminApi"; // Giả sử có API quản lý phòng
 import { getAccessTokenFromLS } from "../../../utils/auth";
 import Swal from 'sweetalert2';
-import AddRoom from "./AddRoom/AddRoom";
+import AddNumberRoom from "./AddNumberRoom/AddNumberRoom";
+import EditNumberRoom from "./EditNumberRoom/EditNumberRoom";
 
-function ManageRoom() {
+function ManageNumberRoom() {
     const [searchText, setSearchText] = useState('');
-    const [selectedRoom, setSelectedRoom] = useState(null);
+    const [selectedNumberRoom, setSelectedNumberRoom] = useState(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [rooms, setRooms] = useState([]);
+    const [numberRoomList, setNumberRoomList] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
         try {
             const accessToken = getAccessTokenFromLS();
-            const response = await adminApi.getAllRoom(accessToken);
+            const response = await adminApi.getAllNumberRoom(accessToken); // API lấy danh sách số phòng
             if (response.data.statusCode === 200) {
-                setRooms(response.data.data);
+                setNumberRoomList(response.data.data);
                 console.log(response.data.data);
             }
         } catch (error) {
             console.error("Error fetching data:", error);
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Không thể tải danh sách số phòng.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
         } finally {
             setLoading(false);
         }
@@ -36,23 +43,28 @@ function ManageRoom() {
     }, []);
 
     const filteredData = useMemo(() => {
-        return rooms.filter(item =>
-            item.name.toLowerCase().includes(searchText.toLowerCase())
+        return numberRoomList.filter(item =>
+            item.roomNumber.toString().includes(searchText) ||
+            (item.roomCode && item.roomCode.toLowerCase().includes(searchText.toLowerCase())) ||
+            item.location.toLowerCase().includes(searchText.toLowerCase())
         );
-    }, [searchText, rooms]);
+    }, [searchText, numberRoomList]);
 
     const openAddModal = () => setIsAddModalOpen(true);
     const closeAddModal = () => setIsAddModalOpen(false);
 
-    const openEditModal = (room) => {
-        setSelectedRoom(room);
+    const openEditModal = (numberRoom) => {
+        setSelectedNumberRoom(numberRoom);
         setIsEditModalOpen(true);
     };
     const closeEditModal = () => setIsEditModalOpen(false);
 
-    const handleDelete = async (room) => {
+    const handleDelete = async (numberRoom) => {
+        const action = numberRoom.status === 'AVAILABLE' ? 'dừng hoạt động' : 'khôi phục';
+        const apiAction = numberRoom.status === 'AVAILABLE' ? 'dừng' : 'khôi phục';
+
         const result = await Swal.fire({
-            title: `Bạn có chắc chắn muốn xóa phòng này?`,
+            title: `Bạn có chắc chắn muốn ${action} số phòng này?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Có',
@@ -62,18 +74,19 @@ function ManageRoom() {
         if (result.isConfirmed) {
             try {
                 const accessToken = getAccessTokenFromLS();
-                await adminApi.activeRoom(room.id, accessToken);
+                const response = await adminApi.activeNumberRoom(numberRoom.id, accessToken); // API cập nhật trạng thái số phòng
+                console.log(response);
                 fetchData();
                 Swal.fire(
                     'Thành công!',
-                    'Phòng đã được xóa thành công.',
+                    `Số phòng đã được ${apiAction} thành công.`,
                     'success'
                 );
             } catch (error) {
-                console.error("Error deleting room:", error);
+                console.error("Error updating number room:", error);
                 Swal.fire(
                     'Lỗi!',
-                    'Có lỗi xảy ra khi xóa phòng.',
+                    'Có lỗi xảy ra khi cập nhật trạng thái số phòng.',
                     'error'
                 );
             }
@@ -95,61 +108,25 @@ function ManageRoom() {
             ),
         },
         {
-            name: 'STT',
-            selector: (row, index) => index + 1,
+            name: 'Số phòng',
+            selector: row => row.roomNumber,
             sortable: true,
         },
         {
-            name: 'Tên',
-            selector: row => row.name,
-            sortable: true,            
-            cell: row => (
-                <div className="">{row.name}</div>
-            ),
-            width:'10%'
+            name: 'Tầng',
+            selector: row => row.capacity,
+            sortable: true,
         },
-        { name: 'Giá', selector: row => row.price, sortable: true, },
-        { name: 'Số người lớn tối đa', selector: row => row.adultMax, sortable: true, },
-        { name: 'Số lượng', selector: row => row.quantity, sortable: true, },
+        {
+            name: 'Địa điểm',
+            selector: row => row.location,
+            sortable: true,
+        },
         {
             name: 'Trạng thái',
-            selector: 'active',
-            sortable: true,
-            cell: row => row.active ? 'Đang hoạt động' : 'Dừng hoạt động',
-        },
-        {
-            name: 'Danh mục',
-            selector: row => row.roomRank,
+            selector: row => row.status,
             sortable: true,
         },
-        {
-            name: 'Mô tả',
-            selector: row => row.description,
-            sortable: true,
-            cell: row => (
-                <div className="">{row.description}</div>
-            ),
-        },
-        {
-            name: 'Chính sách',
-            selector: row => row.policyList.map(policy => `${policy.type}: ${policy.content}`).join(', '),
-            sortable: true,
-            cell: row => (
-                <div className="space-y-1">
-                    {row.policyList.map((policy, index) => (
-                        <div key={index}>{`${policy.type}: ${policy.content}`}</div>
-                    ))}
-                </div>
-            ),
-        },
-        {
-            name: 'Chi tiết phòng',
-            selector: row => row.roomDetailList.map(detail => `Phòng ${detail.roomNumber} (${detail.status})`).join(', '),
-            sortable: true,
-            cell: row => (
-                <div className="">{row.roomDetailList.map(detail => `Phòng ${detail.roomNumber} (${detail.status})`).join(', ')}</div>
-            ),
-        }
     ];
 
     if (loading) {
@@ -163,30 +140,29 @@ function ManageRoom() {
                 <div className="p-4 mt-20">
                     <div className="w-full flex justify-between items-center">
                         <div className="font-semibold text-2xl font-inter">
-                            Quản lý phòng
+                            Quản lý số phòng
                         </div>
                         <div>
                             <button onClick={openAddModal} className="px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold">
-                                Thêm phòng
+                                Thêm số phòng
                             </button>
                         </div>
                     </div>
                     <div className="mt-6">
                         <input
                             type="text"
-                            placeholder="Tìm kiếm phòng..."
+                            placeholder="Tìm kiếm số phòng..."
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
-                            className="p-2 border border-gray-500 rounded w-56 float-end mb-4 text-sm"
+                            className="p-2 border border-gray-500 rounded w-56 flex float-end mb-4 text-sm"
                         />
                         <DataTable
-                            className="min-w-max overflow-auto"
                             columns={columns}
                             data={filteredData}
+                            className="min-w-full"
                             pagination
                             highlightOnHover
                             striped
-                            overflow={true}
                             customStyles={{
                                 headRow: { 
                                     style: { 
@@ -210,7 +186,7 @@ function ManageRoom() {
                                     } 
                                 },
                             }}
-                            noDataComponent={<div className="text-center bg-[#000] w-full p-3 text-white">Không tìm thấy phòng nào.</div>}
+                            noDataComponent={<div className="text-center bg-[#000] w-full p-3 text-white">Không tìm thấy số phòng nào.</div>}
                             paginationComponentOptions={{
                                 rowsPerPageText: 'Hiển thị',
                                 rangeSeparatorText: 'trên',
@@ -225,11 +201,11 @@ function ManageRoom() {
                 </div>
             </div>
 
-            {/* AddRoom and EditRoom components can be uncommented when implemented */}
-            <AddRoom isOpen={isAddModalOpen} onClose={closeAddModal} fetchData={fetchData} />
-            {/* <EditRoom isOpen={isEditModalOpen} onClose={closeEditModal} initialData={selectedRoom} fetchData={fetchData} /> */}
+            {/* Modal cho thêm và chỉnh sửa số phòng */}
+            <AddNumberRoom isOpen={isAddModalOpen} onClose={closeAddModal} fetchData={fetchData} />
+            <EditNumberRoom isOpen={isEditModalOpen} onClose={closeEditModal} numberRoomData={selectedNumberRoom} fetchData={fetchData} />
         </>
     );
 }
 
-export default ManageRoom;
+export default ManageNumberRoom;

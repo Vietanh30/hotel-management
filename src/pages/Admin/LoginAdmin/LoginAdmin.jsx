@@ -59,6 +59,7 @@ function LoginAdmin() {
         setLoading(true);
         try {
             const response = await authApi.login(formData.email, formData.password);
+            console.log(response);
             if (response.data.statusCode === 200) {
                 Swal.fire({
                     title: 'Thành công!',

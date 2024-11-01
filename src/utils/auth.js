@@ -6,6 +6,9 @@ export const setAccessTokenToLS = (access_token) => {
 export const setRoleTokenToLS = (role) => {
   localStorage.setItem("role", role);
 };
+export const getRoleFromLS = () => {
+  return localStorage.getItem("role") || "";
+};
 export const clearLS = () => {
   localStorage.removeItem("access_token");
   localStorage.removeItem("role");
@@ -14,8 +17,9 @@ export const clearLS = () => {
   LocalStorageEventTarget.dispatchEvent(clearLSEvent);
 };
 
-export const getAccessTokenFromLS = () =>
-  localStorage.getItem("access_token") || "";
+export const getAccessTokenFromLS = () => {
+  return localStorage.getItem("access_token") || "";
+};
 
 export const getProfileFromLS = () => {
   const result = localStorage.getItem("profile");
