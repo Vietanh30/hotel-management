@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import path from '../../constants/path';
 
 const PrivateRoute = ({ element: Component, roles, userRole }) => {
-  const [showAlert, setShowAlert] = useState(false);
+    console.log(roles);
+    console.log(userRole);
+    
   const isAuthorized = roles.includes(userRole);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthorized && !showAlert) {
+    if (!isAuthorized) {
       Swal.fire({
         title: 'Thông báo',
         text: 'Bạn cần đăng nhập để thực hiện thao tác này.',
@@ -17,17 +19,15 @@ const PrivateRoute = ({ element: Component, roles, userRole }) => {
         showCancelButton: true,
         confirmButtonText: 'Đăng nhập',
         cancelButtonText: 'Hủy',
+        backdrop: true,
+        allowOutsideClick: false,
       }).then((result) => {
         if (result.isConfirmed) {
           navigate(path.loginAdmin);
         }
       });
-
-      setShowAlert(true);
-    } else if (isAuthorized) {
-      setShowAlert(false); // Reset alert if authorized
     }
-  }, [isAuthorized, showAlert, navigate]);
+  }, [isAuthorized, navigate]); // Theo dõi isAuthorized và navigate
 
   // Nếu không có quyền truy cập, trả về null
   if (!isAuthorized) return null;

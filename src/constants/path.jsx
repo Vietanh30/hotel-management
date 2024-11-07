@@ -25,6 +25,7 @@ const path = {
     manageNumberRoom: '/manage-number-room',
     manageStaff: '/manage-staff',
     manageCustomer: '/manage-customer',
+    manageBooking: '/manage-booking',
     // allProduct: '/all-product',
     // allCategories: '/all-categories',
     // orderList: '/order-list',

@@ -60,12 +60,6 @@ function Login() {
         try {
             const response = await authApi.login(formData.email, formData.password);
             if (response.data.statusCode === 200) {
-                Swal.fire({
-                    title: 'Thành công!',
-                    text: response.data.message,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
                 setAccessTokenToLS(response.data.data.accessToken);
                 setRoleTokenToLS(response.data.data.roles[0])                
                 // Uncomment the line below to navigate to the home page after login

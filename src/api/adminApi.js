@@ -21,6 +21,7 @@ export const URL_EDIT_NUMBEROOM = "room/admin/room_number/edit";
 export const URL_ACTIVE_NUMBEROOM = "room/admin/room_number/remove_room";
 //!Room
 export const URL_GET_ALL_ROOM = "room/admin/getAll";
+export const URL_GET_ROOM_BY_ID = "room";
 export const URL_ADD_ROOM = "room/create";
 export const URL_EDIT_ROOM = "room/edit";
 export const URL_ACTIVE_ROOM = "admin/active";
@@ -131,6 +132,14 @@ const adminApi = {
   //! Phòng
   getAllRoom: function (accessToken) {
     return http.get(URL_GET_ALL_ROOM, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  getRoomById: function (accessToken, idRoom) {
+    console.log(idRoom);
+    return http.get(`${URL_GET_ROOM_BY_ID}/${idRoom}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

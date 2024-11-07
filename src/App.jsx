@@ -18,6 +18,7 @@ import ManageCustomer from "./pages/Admin/ManageCustomer/ManageCustomer";
 import PrivateRoute from "./components/PrivateRouter/PrivateRouter";
 import { getRoleFromLS } from "./utils/auth";
 import ManageNumberRoom from "./pages/Admin/ManageNumberRoom/ManageNumberRoom";
+import ManageBooking from "./pages/Admin/ManageBooking/ManageBooking";
 
 function App() {
   const [userRole, setUserRole] = useState(getRoleFromLS()); // Lấy userRole từ localStorage
@@ -49,7 +50,7 @@ function App() {
         <Route path={path.checkout} element={<Checkout />} />
 
         {/* Admin Routes */}
-        <Route path={path.loginAdmin} element={<LoginAdmin />} />
+        <Route path={path.loginAdmin} element={<LoginAdmin  setUserRole={setUserRole} />} />
 
         {/* Private Routes for Admin */}
         <Route
@@ -92,6 +93,12 @@ function App() {
           path={path.manageCustomer}
           element={
             <PrivateRoute element={ManageCustomer} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+          }
+        />
+        <Route
+          path={path.manageBooking}
+          element={
+            <PrivateRoute element={ManageBooking} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
           }
         />
       </Routes>

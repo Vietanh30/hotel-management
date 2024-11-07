@@ -10,7 +10,7 @@ import path from "../../../constants/path";
 import authApi from '../../../api/authApi'; // Import your API
 import { setAccessTokenToLS, setRoleTokenToLS } from '../../../utils/auth'; // Ensure this function exists
 
-function LoginAdmin() {
+function LoginAdmin({ setUserRole }) {
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
         email: '',
@@ -61,14 +61,9 @@ function LoginAdmin() {
             const response = await authApi.login(formData.email, formData.password);
             console.log(response);
             if (response.data.statusCode === 200) {
-                Swal.fire({
-                    title: 'Thành công!',
-                    text: response.data.message,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
                 setAccessTokenToLS(response.data.data.accessToken);
-                setRoleTokenToLS(response.data.data.roles[0])                
+                setRoleTokenToLS(response.data.data.roles[0])     
+                setUserRole(response.data.data.roles[0]);           
                 // Uncomment the line below to navigate to the home page after login
                 navigate(path.dashboard);
             }

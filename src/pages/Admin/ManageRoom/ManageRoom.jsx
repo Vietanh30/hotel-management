@@ -7,6 +7,7 @@ import adminApi from "../../../api/adminApi";
 import { getAccessTokenFromLS } from "../../../utils/auth";
 import Swal from 'sweetalert2';
 import AddRoom from "./AddRoom/AddRoom";
+import EditRoom from "./EditRoom/EditRoom";
 
 function ManageRoom() {
     const [searchText, setSearchText] = useState('');
@@ -45,6 +46,7 @@ function ManageRoom() {
     const closeAddModal = () => setIsAddModalOpen(false);
 
     const openEditModal = (room) => {
+        console.log(room)
         setSelectedRoom(room);
         setIsEditModalOpen(true);
     };
@@ -106,14 +108,14 @@ function ManageRoom() {
             cell: row => (
                 <div className="">{row.name}</div>
             ),
-            width:'10%'
+            width: '10%',
         },
         { name: 'Giá', selector: row => row.price, sortable: true, },
         { name: 'Số người lớn tối đa', selector: row => row.adultMax, sortable: true, },
         { name: 'Số lượng', selector: row => row.quantity, sortable: true, },
         {
             name: 'Trạng thái',
-            selector: 'active',
+            selector: row => row.active, // Updated to use a function
             sortable: true,
             cell: row => row.active ? 'Đang hoạt động' : 'Dừng hoạt động',
         },
@@ -204,9 +206,7 @@ function ManageRoom() {
                                         fontFamily: 'inter', 
                                         paddingTop: '6px', 
                                         paddingBottom: '6px', 
-                                        // overflow: 'hidden', // Prevent overflow
-                                        textOverflow: 'ellipsis', // Add ellipsis for overflowing text
-                                        // whiteSpace: 'nowrap' // Prevent text from wrapping
+                                        textOverflow: 'ellipsis', 
                                     } 
                                 },
                             }}
@@ -225,9 +225,9 @@ function ManageRoom() {
                 </div>
             </div>
 
-            {/* AddRoom and EditRoom components can be uncommented when implemented */}
-            <AddRoom isOpen={isAddModalOpen} onClose={closeAddModal} fetchData={fetchData} />
-            {/* <EditRoom isOpen={isEditModalOpen} onClose={closeEditModal} initialData={selectedRoom} fetchData={fetchData} /> */}
+            {/* Render modals conditionally */}
+            {isAddModalOpen && <AddRoom isOpen={isAddModalOpen} onClose={closeAddModal} fetchData={fetchData} />}
+            {isEditModalOpen && <EditRoom isOpen={isEditModalOpen} onClose={closeEditModal} roomData={selectedRoom} fetchData={fetchData} />}
         </>
     );
 }

@@ -8,7 +8,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 const AddNumberRoom = ({ isOpen, onClose, fetchData }) => {
     const accessToken = getAccessTokenFromLS();
     const [roomNumber, setRoomNumber] = useState('');
-    const [capacity, setCapacity] = useState(''); // Mặc định chọn 1
+    const [capacity, setCapacity] = useState('');
     const [location, setLocation] = useState('');
 
     const handleSubmit = async (e) => {
@@ -39,7 +39,7 @@ const AddNumberRoom = ({ isOpen, onClose, fetchData }) => {
                 onClose(); // Đóng modal
                 // Reset state variables
                 setRoomNumber('');
-                setCapacity(1); // Reset về giá trị mặc định
+                setCapacity(''); // Reset về giá trị mặc định
                 setLocation('');
             }
         } catch (error) {

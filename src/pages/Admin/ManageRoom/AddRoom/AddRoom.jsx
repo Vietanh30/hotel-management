@@ -13,7 +13,7 @@ function AddRoom({ isOpen, onClose, fetchData }) {
     const [adultNumber, setAdultNumber] = useState('');
     const [adultMax, setAdultMax] = useState('');
     const [roomRank, setRoomRank] = useState(null);
-    const [selectedServices, setSelectedServices] = useState([]); // Cho phép chọn nhiều dịch vụ
+    const [selectedServices, setSelectedServices] = useState([]);
     const [selectedPolicies, setSelectedPolicies] = useState([]);
     const [allServices, setAllServices] = useState([]);
     const [allPolicies, setAllPolicies] = useState([]);
@@ -50,7 +50,8 @@ function AddRoom({ isOpen, onClose, fetchData }) {
     }, [accessToken]);
 
     const handleAddRoom = async () => {
-        if (!name || !description || !price || !adultNumber || !adultMax || !roomRank || selectedServices.length === 0 || selectedPolicies.length === 0 || selectedAvailableRooms.length === 0) {
+        // Validate required fields
+        if (!name || !description || !price || !adultNumber || !adultMax || !roomRank) {
             Swal.fire({
                 title: 'Lỗi!',
                 text: 'Vui lòng điền tất cả các trường bắt buộc!',
@@ -60,29 +61,60 @@ function AddRoom({ isOpen, onClose, fetchData }) {
             return;
         }
 
-        const roomData = {
-            "name": name,
-            "description": description,
-            "price": parseFloat(price),
-            "adultNumber": parseInt(adultNumber),
-            "adultMax": parseInt(adultMax),
-            "roomRank": roomRank.value,
-            "serviceList": selectedServices.map(service => ({
-                "serviceId": service.value,
-                "price": parseInt(service.customPrice) // Giá người dùng nhập cho dịch vụ
-            })),
-            "policyList": selectedPolicies.map((policy) => ({
-                "typeId": policy.value,
-                "content": policy.content,
-                "description": policy.description,
-            })),
-            "roomList": selectedAvailableRooms.map(room => room.value),
-        };
+        // Validate selected services
+        if (selectedServices.length === 0 || selectedServices.some(service => !service.customPrice)) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Vui lòng chọn ít nhất một dịch vụ và điền giá cho tất cả các dịch vụ đã chọn!',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
 
+        // Validate selected policies
+        if (selectedPolicies.length === 0 || selectedPolicies.some(policy => !policy.content || !policy.description)) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Vui lòng chọn ít nhất một chính sách và điền nội dung cũng như mô tả cho tất cả các chính sách đã chọn!',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
+
+        // Validate selected rooms
+        if (selectedAvailableRooms.length === 0) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Vui lòng chọn ít nhất một số phòng!',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
+
+        const roomData = {
+            name,
+            description,
+            price: parseFloat(price),
+            adultNumber: parseInt(adultNumber),
+            adultMax: parseInt(adultMax),
+            roomRank: roomRank.value,
+            serviceList: selectedServices.map(service => ({
+                serviceId: service.value,
+                price: parseInt(service.customPrice)
+            })),
+            policyList: selectedPolicies.map((policy) => ({
+                typeId: policy.value,
+                content: policy.content,
+                description: policy.description,
+            })),
+            roomList: selectedAvailableRooms.map(room => room.value),
+        };
+        console.log(roomData)
         try {
-            console.log(roomData)
             const response = await adminApi.addRoom(accessToken, roomData);
-            console.log(response)
             if (response.data.statusCode === 201) {
                 fetchData();
                 Swal.fire({
@@ -99,7 +131,7 @@ function AddRoom({ isOpen, onClose, fetchData }) {
                 setAdultNumber('');
                 setAdultMax('');
                 setRoomRank(null);
-                setSelectedServices([]); // Reset dịch vụ đã chọn
+                setSelectedServices([]);
                 setSelectedPolicies([]);
                 setSelectedAvailableRooms([]);
             }
@@ -123,11 +155,11 @@ function AddRoom({ isOpen, onClose, fetchData }) {
     };
 
     const handleServiceChange = (selectedOptions) => {
-        setSelectedServices(selectedOptions); // Cập nhật danh sách dịch vụ đã chọn
+        setSelectedServices(selectedOptions);
     };
 
     const handleRemoveService = (index) => {
-        setSelectedServices((prev) => prev.filter((_, i) => i !== index)); // Xóa dịch vụ khỏi danh sách
+        setSelectedServices((prev) => prev.filter((_, i) => i !== index));
     };
 
     const availableServices = allServices.filter(service => !selectedServices.some(selected => selected.value === service.id));
@@ -193,14 +225,11 @@ function AddRoom({ isOpen, onClose, fetchData }) {
                             className="mb-4"
                         />
                         {selectedServices.map((service, index) => (
-                            <>
-                            <div className="flex items-center mb-2">
+                            <div key={index} className=" items-center mb-2">
                                 <span className="ml-2">{service.label}</span>
                                 <button onClick={() => handleRemoveService(index)} className="ml-2 text-red-500">
                                     Xóa
                                 </button>
-                                </div>
-                                <div key={index} className="flex items-center mb-2">
                                 <input
                                     type="number"
                                     placeholder="Giá"
@@ -210,11 +239,9 @@ function AddRoom({ isOpen, onClose, fetchData }) {
                                         updatedServices[index].customPrice = e.target.value;
                                         setSelectedServices(updatedServices);
                                     }}
-                                    className="ml-2 w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded"
+                                    className="ml-2 mt-2 w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded"
                                 />
-                                
                             </div>
-                            </>
                         ))}
                     </div>
                     <div>

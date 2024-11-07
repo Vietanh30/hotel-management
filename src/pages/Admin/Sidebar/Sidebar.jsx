@@ -4,13 +4,18 @@ import { faHome, faList, faConciergeBell , faBed, faUserGroup, faCalendarCheck, 
 import path from "../../../constants/path";
 import { Link } from "react-router-dom";
 import flagVietnam from "../../../assets/Header/flagsVietnam.svg";
+import { useLocation } from "react-router-dom";
 
 function Sidebar() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const location = useLocation(); // Lấy đường dẫn hiện tại
 
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     };
+
+    const isActive = (path) => location.pathname === path; // Hàm kiểm tra đường dẫn hiện tại
+
 
     return (
         <>
@@ -83,61 +88,61 @@ function Sidebar() {
                 <div className="h-full px-3 py-6 overflow-y-auto bg-[#F5E8D0] text-black">
                     <ul className="space-y-2 font-medium">
                         <li>
-                            <Link to={path.dashboard} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <Link to={path.dashboard} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.dashboard) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faHome} className="mr-2" />
                                 <span className="ms-3">Trang chủ</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageTypeRoom} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <Link to={path.manageTypeRoom} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageTypeRoom) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faList} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý hạng phòng</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageService} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
-                                <FontAwesomeIcon icon={faConciergeBell } className="mr-2" />
+                            <Link to={path.manageService} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageService) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                                <FontAwesomeIcon icon={faConciergeBell} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý dịch vụ</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageRoom} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <Link to={path.manageRoom} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageRoom) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faBed} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý phòng</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageNumberRoom} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
-                            <FontAwesomeIcon icon={faDoorOpen} className="mr-2" />
-                            <span className="flex-1 ms-3 whitespace-nowrap">Quản lý số phòng</span>
+                            <Link to={path.manageNumberRoom} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageNumberRoom) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                                <FontAwesomeIcon icon={faDoorOpen} className="mr-2" />
+                                <span className="flex-1 ms-3 whitespace-nowrap">Quản lý số phòng</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageStaff} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <Link to={path.manageStaff} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageStaff) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faUserGroup} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý nhân viên</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageCustomer} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <Link to={path.manageCustomer} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageCustomer) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faUser} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý khách hàng</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to="/booking-management" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <Link to={path.manageBooking} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${location.pathname === "/booking-management" ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faCalendarCheck} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý đặt phòng</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to="/report" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <Link to="/report" className={`flex items-center p-2 rounded-lg font-semibold text-base group ${location.pathname === "/report" ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faChartLine} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Báo cáo, thống kê</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to="/feedback" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-500 hover:text-white font-semibold text-base group">
+                            <Link to="/feedback" className={`flex items-center p-2 rounded-lg font-semibold text-base group ${location.pathname === "/feedback" ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faCommentDots} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý phản hồi</span>
                             </Link>

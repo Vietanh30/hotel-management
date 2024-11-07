@@ -75,13 +75,15 @@ function ManageNumberRoom() {
             try {
                 const accessToken = getAccessTokenFromLS();
                 const response = await adminApi.activeNumberRoom(numberRoom.id, accessToken); // API cập nhật trạng thái số phòng
-                console.log(response);
-                fetchData();
-                Swal.fire(
-                    'Thành công!',
-                    `Số phòng đã được ${apiAction} thành công.`,
-                    'success'
-                );
+                console.log(response.data);
+                if(response.data.statusCode === 200){
+                    Swal.fire(
+                        'Thành công!',
+                        `Số phòng đã được ${apiAction} thành công.`,
+                        'success'
+                    );
+                    fetchData();
+                }
             } catch (error) {
                 console.error("Error updating number room:", error);
                 Swal.fire(
