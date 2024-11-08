@@ -44,8 +44,8 @@ const CartBooking = ({ onClose, dataCart }) => {
                 console.log(response)
                 if (response.data.statusCode === 200) {
                     // Update the cart options after successful removal
-                    // const updatedCartOptions = cartOptions.filter(option => option.bookingRoomId !== bookingRoomId);
-                    // setCartOptions(updatedCartOptions);
+                    const updatedCartOptions = cartOptions.filter(option => option.bookingRoomId !== bookingRoomId);
+                    setCartOptions(updatedCartOptions);
 
                     // Optionally, update totalAmount and policyPrice if needed
                     // You might want to recalculate these values based on the updated cart
