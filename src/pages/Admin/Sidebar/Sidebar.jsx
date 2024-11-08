@@ -2,20 +2,24 @@ import { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faList, faConciergeBell , faBed, faUserGroup, faCalendarCheck, faChartLine, faCommentDots, faDoorOpen, faUser } from '@fortawesome/free-solid-svg-icons';
 import path from "../../../constants/path";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import flagVietnam from "../../../assets/Header/flagsVietnam.svg";
 import { useLocation } from "react-router-dom";
+import { clearLS } from "../../../utils/auth";
 
 function Sidebar() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const location = useLocation(); // Lấy đường dẫn hiện tại
-
+    const navigate = useNavigate()
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     };
 
     const isActive = (path) => location.pathname === path; // Hàm kiểm tra đường dẫn hiện tại
-
+    const handleLogOut = () =>{
+        clearLS()
+        navigate(path.loginAdmin)
+    }
 
     return (
         <>
@@ -73,7 +77,7 @@ function Sidebar() {
                                     <div className="absolute z-50 my-4 text-base min-w-40 list-none bg-[#a27b41] divide-y divide-gray-100 rounded shadow-md right-[40%] top-[55%]">
                                         <ul className="py-1">
                                             <li>
-                                                <Link to="" className="block px-4 py-2 text-sm text-white hover:bg-[#885d37] font-semibold">Đăng xuất</Link>
+                                                <button className="block px-4 py-2 text-sm text-white hover:bg-[#885d37] font-semibold" onClick = {handleLogOut}>Đăng xuất</button>
                                             </li>
                                         </ul>
                                     </div>

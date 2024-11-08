@@ -19,7 +19,7 @@ function EditRoom({ isOpen, onClose, roomData, fetchData }) {
         customPrice: service.price || 0
     })) || []);
     const [selectedPolicies, setSelectedPolicies] = useState(roomData.policyList.map(policy => ({
-        value: policy.id,
+        value: policy.typeId,
         label: policy.type,
         content: policy.content,
         description: policy.description

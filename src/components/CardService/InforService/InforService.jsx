@@ -35,19 +35,19 @@ const InforService = ({ isOpen, onClose, serviceDetails }) => {
                 </button>
                 <div className="grid grid-cols-12">
                     <div className="col-span-8">
-                        <img className='w-full' src={poolService} alt="Hồ bơi" />
+                        <img className='w-full' src={serviceDetails.image || poolService} alt="Hồ bơi" />
                     </div>
                     <div className="col-span-4 p-4 font-garamond">
-                        <div className="text-2xl font-bold">{serviceDetails.title}</div>
+                        <div className="text-2xl font-bold">{serviceDetails.name}</div>
                         <div className='w-full my-3 border-b border-b-gray-400' />
-                        <div className="mt-2">{serviceDetails.description}</div>
+                        <div className="mt-2">Mô tả: {serviceDetails.description}</div>
                         <div className="mt-4 flex items-center gap-5">
                             <div className="font-bold text-xl">Vị trí:</div>
-                            <div className='text-lg'>{serviceDetails.position}</div>
+                            <div className='text-lg'>{serviceDetails.location}</div>
                         </div>
                         <div className="mt-2 flex gap-5">
                             <div className="font-semibold text-xl">Giờ mở cửa:</div>
-                            <div className='text-lg'>{serviceDetails.openingHours}</div>
+                            <div className='text-lg'>{serviceDetails.startTime} - {serviceDetails.endTime}</div>
                         </div>
                     </div>
                 </div>

@@ -26,6 +26,7 @@ const path = {
     manageStaff: '/manage-staff',
     manageCustomer: '/manage-customer',
     manageBooking: '/manage-booking',
+    checkOutAdmin: '/check-out-admin',
     // allProduct: '/all-product',
     // allCategories: '/all-categories',
     // orderList: '/order-list',

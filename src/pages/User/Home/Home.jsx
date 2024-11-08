@@ -47,10 +47,10 @@ function Home() {
             <div className='container-fluid'>
                 <div className='bg-[#232323] w-full text-white text-center py-14 '>
                     <div className='font-garamond text-xl w-fit mx-auto border-t-2 border-t-[#B5986D] pt-2'>
-                        Your
+                        Mục
                     </div>
                     <div className='text-5xl font-garamond pb-20'>
-                    Favorite
+                    Yêu Thích
                     </div>
                 <CenterModeSlider />
                 <button className="bg-[#B5986D] text-white rounded-md py-2 px-6 font-semibold text-xl hover:bg-[#8A6A4E] mt-10">Xem thêm</button>
@@ -73,7 +73,7 @@ function Home() {
                 </div>
             </div>
             <div className='mt-4' >
-                <div className='text-center font-inter font-semibold text-5xl'>Hotel</div>
+                <div className='text-center font-inter font-semibold text-5xl'>Khách sạn Nhóm 7</div>
                 <div className='mt-20'>
                     <CenterModeSlider />
                 </div>
@@ -81,7 +81,7 @@ function Home() {
             <div className='my-20' id='rating'>
                 <div className="container mx-auto px-4">
                     <div className='font-inter font-semibold uppercase text-4xl'>
-                    ĐÁNH GIÁ CỦA KHÁCH HÀNG VỀ LUXURY HẢI PHÒNG  
+                    ĐÁNH GIÁ CỦA KHÁCH HÀNG VỀ khách sạn Nhóm 7
                     </div>
                     <Rating
                         averageRating={averageRating} 
@@ -101,7 +101,7 @@ function Home() {
             <div className='mt-10' id='location'>
                 <div className="container mx-auto">
                     <div className='font-inter font-semibold uppercase text-4xl'>
-                    Vị trí tuyệt vời của LUXURY HẢI PHÒNG  
+                    Vị trí tuyệt vời của khách sạn Nhóm 7
                     </div>
                     <div className='my-10'>
                         <iframe

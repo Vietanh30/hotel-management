@@ -7,7 +7,8 @@ import { faChevronLeft, faChevronRight, faTimes } from '@fortawesome/free-solid-
 import { useNavigate } from "react-router-dom";
 import path from "../../constants/path";
 
-const CalendarModal = ({ isOpen, onClose }) => {
+const CalendarModal = ({ isOpen, onClose,idTypeRoom }) => {
+  console.log(idTypeRoom)
   const navigate = useNavigate()
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -37,7 +38,7 @@ const CalendarModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
-      <div className="bg-white p-6 rounded-lg max-w-5xl w-full relative">
+      <div className="bg-white p-4 rounded-lg max-w-5xl w-full relative">
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-600 hover:text-red-600"
@@ -45,7 +46,7 @@ const CalendarModal = ({ isOpen, onClose }) => {
           <FontAwesomeIcon icon={faTimes} />
         </button>
         <div className="flex justify-between px-5 items-start my-6">
-          <div className="text-3xl font-bold">Mường Thanh Luxury Nha Trang</div>
+          <div className="text-3xl font-bold">Khách sạn Nhóm 7</div>
           <div className="">
             {startDate && (
               <p className="">

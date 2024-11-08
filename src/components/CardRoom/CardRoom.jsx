@@ -1,5 +1,4 @@
 import React from "react";
-import room from "../../assets/Home/roomtype.svg";
 import area from "../../assets/Home/area.svg";
 import bed from "../../assets/Home/bed.svg";
 
@@ -9,25 +8,30 @@ function CardRoom({ roomDetails, onClick, onCalendarClick }) {
       <div className="bg-white cursor-pointer hover:shadow-lg rounded-lg overflow-hidden border">
         <div className="relative group">
           <img
-            src={room}
+            src={roomDetails.image[0]}
             onClick={onClick} // Trigger the onClick function passed as prop
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-72 object-cover transition-transform duration-300 group-hover:scale-105"
             alt="Room Type"
           />
         </div>
         <div className="p-4">
           <div className="text-xl font-semibold font-inter text-stroke">
-            {roomDetails.title}
+            {roomDetails.name}
           </div>
           <div className="flex gap-5 mt-3">
             <div className="flex gap-2 items-center">
               <img className="w-6 h-auto" src={area} alt="Area" />
-              <div className="font-inter font-medium text-sm">32m²</div>
+              <div className="font-inter font-medium text-sm">{roomDetails.area}m²</div>
             </div>
             <div className="flex gap-2 items-center">
               <img className="w-6 h-auto" src={bed} alt="Bed" />
               <div className="font-inter font-medium text-sm">
-                1 giường đôi
+                {roomDetails.bed.map((bed, index) => (
+                  <span key={index}>
+                    {bed.quantity} {bed.name}
+                    {index < roomDetails.bed.length - 1 ? ", " : ""}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
@@ -35,7 +39,7 @@ function CardRoom({ roomDetails, onClick, onCalendarClick }) {
             <div className="font-bold">
               Chỉ từ{" "}
               <span className="text-[#FFC745] font-medium text-3xl">
-                1,367,000
+                {roomDetails.price}
               </span>{" "}
               / đêm
             </div>

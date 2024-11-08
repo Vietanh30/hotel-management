@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Slider from 'react-slick';
 import CardService from "../../../../components/CardService/CardService";
 import InforService from "../../../../components/CardService/InforService/InforService";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import userApi from '../../../../api/userApi';
 
 const NextButton = ({ onClick }) => (
     <button 
@@ -26,56 +27,95 @@ const PrevButton = ({ onClick }) => (
 function ServiceRoom() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedService, setSelectedService] = useState(null);
+    const [serviceCategories, setServiceCategories] = useState([]);
+    const [activeTab, setActiveTab] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const servicesList = [
-        {
-            title: "Hồ bơi",
-            description: "Bể bơi ngoài trời với diện tích 400m2...",
-            position: "Tầng 4",
-            openingHours: "06h00 - 22h00",
-        },
-        {
-            title: "Hồ bơi",
-            description: "Bể bơi ngoài trời với diện tích 400m2...",
-            position: "Tầng 4",
-            openingHours: "06h00 - 22h00",
-        },
-        {
-            title: "Hồ bơi",
-            description: "Bể bơi ngoài trời với diện tích 400m2...",
-            position: "Tầng 4",
-            openingHours: "06h00 - 22h00",
-        },
-        // Add more services as needed
-    ];
+    useEffect(() => {
+        const fetchServiceCategories = async () => {
+            try {
+                const response = await userApi.getAllService();
+                if (response.data.statusCode === 200) {
+                    setServiceCategories(response.data.data);
+                    setActiveTab(response.data.data[0]?.name);
+                }
+            } catch (err) {
+                setError("Failed to load service categories");
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const settings = {
-        dots: false,
-        infinite: true,
-        speed: 500,
-        slidesToShow: servicesList.length < 3 ? servicesList.length : 3,
-        slidesToScroll: 1,
-        nextArrow: <NextButton />,
-        prevArrow: <PrevButton />,
-    };
+        fetchServiceCategories();
+    }, []);
 
     const handleServiceClick = (serviceDetails) => {
         setSelectedService(serviceDetails);
         setIsModalOpen(true);
     };
 
-    return ( 
+    const handleTabClick = (categoryName) => {
+        setActiveTab(categoryName);
+    };
+
+    const settings = {
+        dots: false,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        nextArrow: <NextButton />,
+        prevArrow: <PrevButton />,
+    };
+
+    if (loading) {
+        return <div>Loading...</div>; // Loading state
+    }
+
+    if (error) {
+        return <div>{error}</div>; // Error state
+    }
+
+    const activeCategory = serviceCategories.find(category => category.name === activeTab);
+    const hasServices = activeCategory?.serviceHotelList.length > 0;
+
+    return (
         <>
-            <div className="relative">
-                <Slider {...settings}>
-                    {servicesList.map((serviceDetails, index) => (
-                        <div key={index}>
-                            <CardService 
-                                onServiceClick={handleServiceClick} 
-                            />
-                        </div>
+            <div className="flex flex-col gap-8">
+                <div className="flex justify-start gap-5 mb-4 px-4">
+                    {serviceCategories.map((category) => (
+                        <button
+                            key={category.id}
+                            className={`px-4 py-2 rounded-md font-semibold transition-colors duration-300 ${activeTab === category.name ? 'bg-[#f2a900] text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+                            onClick={() => handleTabClick(category.name)}
+                        >
+                            {category.name}
+                        </button>
                     ))}
-                </Slider>
+                </div>
+
+                {activeTab && (
+                    <div className="relative">
+                        {hasServices ? (
+                            <Slider {...settings}>
+                                {activeCategory.serviceHotelList.map((service, index) => (
+                                    <div key={index}>
+                                        <CardService
+                                            serviceDetails={service}
+                                            onServiceClick={handleServiceClick}
+                                        />
+                                    </div>
+                                ))}
+                            </Slider>
+                        ) : (
+                            <div className="text-center text-gray-500 font-semibold text-xl">
+                                Chưa có dữ liệu
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             <InforService

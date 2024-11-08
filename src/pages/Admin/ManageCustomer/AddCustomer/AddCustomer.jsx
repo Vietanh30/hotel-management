@@ -110,7 +110,7 @@ const AddCustomer = ({ isOpen, onClose, fetchData }) => {
                     </div>
                     <div className="mb-4">
                         <input
-                            type="text"
+                            type="number"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="Số điện thoại"

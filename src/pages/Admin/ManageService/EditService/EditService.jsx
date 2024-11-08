@@ -196,7 +196,7 @@ function EditService({ isOpen, onClose, initialData, fetchData }) {
                                     />
                                     <div className="w-full px-3">
                                         <div className="flex mb-2 items-center justify-between">
-                                            <span>{image.name}</span>
+                                            <span className='line-clamp-1'>{image.name}</span>
                                             <button
                                                 className="text-white rounded-full ml-2 px-2 py-1 bg-red-600 text-xs"
                                                 onClick={handleRemoveImage}

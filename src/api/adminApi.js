@@ -24,7 +24,7 @@ export const URL_GET_ALL_ROOM = "room/admin/getAll";
 export const URL_GET_ROOM_BY_ID = "room";
 export const URL_ADD_ROOM = "room/create";
 export const URL_EDIT_ROOM = "room/edit";
-export const URL_ACTIVE_ROOM = "admin/active";
+export const URL_ACTIVE_ROOM = "room/admin/active";
 export const URL_GET_ALL_SERVICE_ROOM = "room/admin/room_service/all";
 
 //!Staff
@@ -39,6 +39,15 @@ export const URL_EDIT_CUSTOMER = "admin/customer/edit";
 export const URL_ACTIVE_CUSTOMER = "admin/active";
 //! Chính sách
 export const URL_GET_ALL_POLICY = "room/admin/policy_type/getAll";
+//! Tìm phòng admin
+export const URL_SEARCH_ROOM_ADMIN = "admin/search_room";
+//! Giỏ hàng
+export const URL_ADD_ROOM_TO_CART = "admin/cart";
+export const URL_GET_CART = "book/get_cart";
+export const URL_REMOVE_CART = "book/remove_cart";
+
+//! Đặt phòng
+export const URL_BOOKING_ROOM = "admin/place";
 
 const adminApi = {
   //! Hạng phòng
@@ -287,6 +296,58 @@ const adminApi = {
 
   activeCustomer: function (idCustomer, accessToken) {
     return http.get(`${URL_ACTIVE_CUSTOMER}/${idCustomer}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  searchRoomAdmin: function (accessToken, params) {
+    const { checkInDate, checkOutDate, adults, children, rankId } = params;
+
+    const queryParams = new URLSearchParams({
+      checkInDate,
+      checkOutDate,
+      adults,
+      children,
+      rankId,
+    }).toString();
+
+    return http.get(`${URL_SEARCH_ROOM_ADMIN}?${queryParams}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  //! Giỏ hàng
+  addRoomToCart: function (accessToken, body) {
+    return http.post(URL_ADD_ROOM_TO_CART, body, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  getCart: function (accessToken) {
+    return http.get(URL_GET_CART, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  removeCartItem: function (accessToken, idCartItem) {
+    return http.get(`${URL_REMOVE_CART}/${idCartItem}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  //! Đặt phòng
+  bookingRoom: function (accessToken) {
+    return http.post(URL_BOOKING_ROOM, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,

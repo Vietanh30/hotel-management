@@ -8,6 +8,7 @@ import { getAccessTokenFromLS } from "../../../utils/auth";
 import Swal from 'sweetalert2';
 import AddRoom from "./AddRoom/AddRoom";
 import EditRoom from "./EditRoom/EditRoom";
+import Select from 'react-select';
 
 function ManageRoom() {
     const [searchText, setSearchText] = useState('');
@@ -15,6 +16,8 @@ function ManageRoom() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [rooms, setRooms] = useState([]);
+    const [roomTypes, setRoomTypes] = useState([]);
+    const [selectedRoomRank, setSelectedRoomRank] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
@@ -23,7 +26,11 @@ function ManageRoom() {
             const response = await adminApi.getAllRoom(accessToken);
             if (response.data.statusCode === 200) {
                 setRooms(response.data.data);
-                console.log(response.data.data);
+            }
+
+            const typeResponse = await adminApi.getAllTypeRoom(accessToken);
+            if (typeResponse.data.statusCode === 200) {
+                setRoomTypes(typeResponse.data.data);
             }
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -37,16 +44,21 @@ function ManageRoom() {
     }, []);
 
     const filteredData = useMemo(() => {
-        return rooms.filter(item =>
-            item.name.toLowerCase().includes(searchText.toLowerCase())
-        );
-    }, [searchText, rooms]);
+        return rooms.filter(item => {
+            const matchesSearchText = item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+                item.description.toLowerCase().includes(searchText.toLowerCase());
+            
+            const matchesRoomRank = selectedRoomRank ? 
+                (selectedRoomRank.value === null || item.roomRank === selectedRoomRank.value) : true;
+
+            return matchesSearchText && matchesRoomRank;
+        });
+    }, [searchText, rooms, selectedRoomRank]);
 
     const openAddModal = () => setIsAddModalOpen(true);
     const closeAddModal = () => setIsAddModalOpen(false);
 
     const openEditModal = (room) => {
-        console.log(room)
         setSelectedRoom(room);
         setIsEditModalOpen(true);
     };
@@ -54,28 +66,31 @@ function ManageRoom() {
 
     const handleDelete = async (room) => {
         const result = await Swal.fire({
-            title: `Bạn có chắc chắn muốn xóa phòng này?`,
+            title: `Bạn có chắc chắn muốn ${room.active ? 'dừng hoạt động' : 'kích hoạt'} phòng này?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Có',
             cancelButtonText: 'Không'
         });
-
+    
         if (result.isConfirmed) {
             try {
                 const accessToken = getAccessTokenFromLS();
-                await adminApi.activeRoom(room.id, accessToken);
-                fetchData();
-                Swal.fire(
-                    'Thành công!',
-                    'Phòng đã được xóa thành công.',
-                    'success'
-                );
+                const response = await adminApi.activeRoom(room.id, accessToken, !room.active); // Chuyển trạng thái active
+                console.log(response)
+                if(response.data.statusCode === 200) {
+                    fetchData();
+                    Swal.fire(
+                        'Thành công!',
+                        `Phòng đã được ${room.active ? 'dừng hoạt động' : 'kích hoạt'} thành công.`,
+                        'success'
+                    );
+                }
             } catch (error) {
-                console.error("Error deleting room:", error);
+                console.error("Error updating room status:", error);
                 Swal.fire(
                     'Lỗi!',
-                    'Có lỗi xảy ra khi xóa phòng.',
+                    'Có lỗi xảy ra khi cập nhật trạng thái phòng.',
                     'error'
                 );
             }
@@ -115,12 +130,12 @@ function ManageRoom() {
         { name: 'Số lượng', selector: row => row.quantity, sortable: true, },
         {
             name: 'Trạng thái',
-            selector: row => row.active, // Updated to use a function
+            selector: row => row.active,
             sortable: true,
             cell: row => row.active ? 'Đang hoạt động' : 'Dừng hoạt động',
         },
         {
-            name: 'Danh mục',
+            name: 'Hạng phòng',
             selector: row => row.roomRank,
             sortable: true,
         },
@@ -132,26 +147,6 @@ function ManageRoom() {
                 <div className="">{row.description}</div>
             ),
         },
-        {
-            name: 'Chính sách',
-            selector: row => row.policyList.map(policy => `${policy.type}: ${policy.content}`).join(', '),
-            sortable: true,
-            cell: row => (
-                <div className="space-y-1">
-                    {row.policyList.map((policy, index) => (
-                        <div key={index}>{`${policy.type}: ${policy.content}`}</div>
-                    ))}
-                </div>
-            ),
-        },
-        {
-            name: 'Chi tiết phòng',
-            selector: row => row.roomDetailList.map(detail => `Phòng ${detail.roomNumber} (${detail.status})`).join(', '),
-            sortable: true,
-            cell: row => (
-                <div className="">{row.roomDetailList.map(detail => `Phòng ${detail.roomNumber} (${detail.status})`).join(', ')}</div>
-            ),
-        }
     ];
 
     if (loading) {
@@ -161,7 +156,7 @@ function ManageRoom() {
     return (
         <>
             <Sidebar />
-            <div className="p-4 sm:ml-60 overflow-x-auto">
+            <div className="p-4 sm:ml-60 overflow-x-auto min-h-screen">
                 <div className="p-4 mt-20">
                     <div className="w-full flex justify-between items-center">
                         <div className="font-semibold text-2xl font-inter">
@@ -174,15 +169,27 @@ function ManageRoom() {
                         </div>
                     </div>
                     <div className="mt-6">
-                        <input
-                            type="text"
-                            placeholder="Tìm kiếm phòng..."
-                            value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
-                            className="p-2 border border-gray-500 rounded w-56 float-end mb-4 text-sm"
-                        />
+                        <div className="flex justify-between">
+                            <Select
+                            options={[
+                                { value: null, label: 'Tất cả' }, // Tùy chọn "Tất cả"
+                                ...roomTypes.map(type => ({ value: type.id, label: type.name })),
+                            ]}                                
+                            onChange={setSelectedRoomRank}
+                            placeholder="Chọn hạng phòng"
+                            className="mb-4"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Tìm kiếm phòng..."
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                                className="p-2 border border-gray-500 rounded w-56 float-end mb-4 text-sm"
+                            />
+
+                        </div>
                         <DataTable
-                            className="min-w-max overflow-auto"
+                            className="min-w-max overflow-auto "
                             columns={columns}
                             data={filteredData}
                             pagination

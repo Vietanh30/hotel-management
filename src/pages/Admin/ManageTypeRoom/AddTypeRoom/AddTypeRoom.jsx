@@ -166,7 +166,7 @@ function AddTypeRoom({ isOpen, onClose, fetchData }) {
                             onChange={handleBedChange}
                             placeholder="Chọn giường"
                             className="mb-4"
-                            isClearable={true}
+                            // isClearable={true}
                         />
                         <div className={selectedBeds.length > 0 ? 'mb-4' : 'hidden'}>
                             <div className="mt-2 flex items-center gap-1 w-full flex-wrap">

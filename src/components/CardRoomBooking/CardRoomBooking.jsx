@@ -1,28 +1,23 @@
-import { useState } from "react";
-import imgRoom from "../../assets/Booking/Room.svg";
+import { useState, useRef } from "react";
 import area from "../../assets/Home/area.svg";
 import bed from "../../assets/Home/bed.svg";
 import Collapse from "./Collapse/Collapse";
 import InforRoom from "../CardRoom/InforRoom/InforRoom";
 import RoomPolicy from "../RoomPolicy/RoomPolicy";
+import Slider from "react-slick"; // Import slider
+import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import userApi from "../../api/userApi"; // Đảm bảo đường dẫn đúng
 
-function CardRoomBooking() {
+function CardRoomBooking({ typeRoom }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [isRoomPolicyModalOpen, setIsRoomPolicyModalOpen] = useState(false);
     const [isInforRoomModalOpen, setIsInforRoomModalOpen] = useState(false);
+    const [roomDetails, setRoomDetails] = useState(null); // State để lưu thông tin phòng
 
-    const roomDetails = {
-        title: "Deluxe King",
-        description: "Phòng Deluxe King thoáng đãng với nội thất sang trọng và đầy đủ tiện nghi.",
-        amenities: [
-            "Tủ quần áo", 
-            "Máy sấy tóc", 
-            "Ga trải giường, gối", 
-            "Wifi", 
-            "Điều hòa"
-        ],
-    };
+    // Slider reference
+    const sliderRef = useRef(null);
 
     const handleSelectTypeRoom = (typeRoom) => {
         setSelectedRoom(typeRoom);
@@ -33,24 +28,84 @@ function CardRoomBooking() {
     const toggleModal = () => setIsRoomPolicyModalOpen((prev) => !prev);
     const toggleInfoModal = () => setIsInforRoomModalOpen((prev) => !prev);
 
+    const handleChooseRoom = async (idTypeRoom) => {
+        if (isDropdownOpen) {
+            setIsDropdownOpen(false); // Đóng dropdown
+            return
+        }
+        setIsDropdownOpen(true); // Mở dropdown để hiển thị thông tin
+        try {
+            const response = await userApi.getRoomById(idTypeRoom);
+            console.log(response);
+            if (response.data.statusCode === 200) {
+                // Đóng dropdown nếu đã mở
+
+                setRoomDetails(response.data.data); // Lưu thông tin phòng từ API
+
+                // Chờ một chút trước khi mở lại dropdown để đảm bảo hoạt động mượt mà
+                // setTimeout(() => {
+                // }, 100);
+            }
+        } catch (error) {
+            console.error("Error fetching room details:", error);
+            // Xử lý lỗi nếu cần
+        }
+    };
+
+    // Slider settings
+    const sliderSettings = {
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+    };
+
     return (
         <>
-            <div className="grid grid-cols-2">
+            <div className="relative grid grid-cols-2">
                 <div className="col-span-1 w-11/12">
-                    <img className="rounded w-full" src={imgRoom} alt="Room" />
+                    <Slider ref={sliderRef} {...sliderSettings}>
+                        {typeRoom.image.map((img, index) => (
+                            <div className="relative" key={index}>
+                                <img className="relative rounded w-full h-96" src={img} alt={`Room ${index + 1}`} />
+                            </div>
+                        ))}
+                    </Slider>
+                    <div className="absolute top-1/2 transform -translate-y-1/2 -left-6 z-10">
+                        <button
+                            className="bg-[#f2a900] text-white font-semibold px-2 py-1 items-center rounded-full shadow-md hover:bg-yellow-500 transition duration-300"
+                            onClick={() => sliderRef.current.slickPrev()}
+                        >
+                            <FontAwesomeIcon icon={faArrowLeft} />
+                        </button>
+                    </div>
+                    <div className="absolute top-1/2 transform -translate-y-1/2 right-[53%] z-10">
+                        <button
+                            className="bg-[#f2a900] text-white font-semibold px-2 py-1 rounded-full shadow-md hover:bg-yellow-500 transition duration-300"
+                            onClick={() => sliderRef.current.slickNext()}
+                        >
+                            <FontAwesomeIcon icon={faArrowRight} />
+                        </button>
+                    </div>
                 </div>
                 <div className="col-span-1 flex flex-col justify-between">
                     <div>
-                        <div className="font-inter font-semibold text-xl">{roomDetails.title}</div>
+                        <div className="font-inter font-semibold text-xl">{typeRoom.title}</div>
                         <div className="mt-3">
                             <div className="flex gap-5 mt-3">
                                 <div className="flex gap-2 items-center">
                                     <img className="w-6 h-auto" src={area} alt="Area" />
-                                    <div className="font-inter font-medium text-sm">32m²</div>
+                                    <div className="font-inter font-medium">{typeRoom.area}m²</div>
                                 </div>
                                 <div className="flex gap-2 items-center">
                                     <img className="w-6 h-auto" src={bed} alt="Bed" />
-                                    <div className="font-inter font-medium text-sm">1 giường đôi</div>
+                                    <div className="font-inter font-medium">
+                                        {typeRoom.bed.map((bed, index) => (
+                                            <span className="mr-2" key={index}>
+                                                {bed.quantity} {bed.name}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -68,20 +123,25 @@ function CardRoomBooking() {
                         </div>
                         <button
                             className="bg-yellow-500 text-nowrap hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded"
-                            onClick={toggleDropdown}
+                            onClick={() => handleChooseRoom(typeRoom.id)} // Gọi hàm khi nhấn nút
                         >
                             Chọn phòng
                         </button>
                     </div>
                 </div>
             </div>
-            <Collapse isOpen={isDropdownOpen} onSelectTypeRoom={handleSelectTypeRoom} onOpenModal={toggleModal} />
+            <Collapse 
+                isOpen={isDropdownOpen} 
+                rooms={roomDetails} // Truyền thông tin phòng vào Collapse
+                onSelectTypeRoom={handleSelectTypeRoom} 
+                onOpenModal={toggleModal} 
+            />
             {isRoomPolicyModalOpen && <RoomPolicy onClose={toggleModal} />}
             {isInforRoomModalOpen && (
                 <InforRoom 
                     isOpen={isInforRoomModalOpen} 
                     onClose={toggleInfoModal} 
-                    roomDetails={roomDetails} 
+                    roomDetails={roomDetails} // Truyền thông tin phòng vào modal
                 />
             )}
         </>

@@ -10,7 +10,7 @@ import path from "../../../constants/path";
 import authApi from '../../../api/authApi'; // Import your API
 import { setAccessTokenToLS, setRoleTokenToLS } from '../../../utils/auth'; // Ensure this function exists
 
-function Login() {
+function Login({ setUserRole }) {
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
         email: '',
@@ -61,7 +61,8 @@ function Login() {
             const response = await authApi.login(formData.email, formData.password);
             if (response.data.statusCode === 200) {
                 setAccessTokenToLS(response.data.data.accessToken);
-                setRoleTokenToLS(response.data.data.roles[0])                
+                setRoleTokenToLS(response.data.data.roles[0])   
+                setUserRole(response.data.data.roles[0])             
                 // Uncomment the line below to navigate to the home page after login
                 // navigate(path.home);
             }

@@ -1,7 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import room from "../../../assets/Home/roomtype.svg";
+import { faTimes, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import wardrobeImage from "../../../assets/ServiceRoom/wardrobe.svg";
 import hairDryerImage from "../../../assets/ServiceRoom/hair-dryer.svg";
 import beddingImage from "../../../assets/ServiceRoom/bedding.svg";
@@ -35,7 +34,10 @@ const amenitiesImages = {
 };
 
 function InforRoom({ isOpen, onClose, roomDetails }) {
+    console.log(roomDetails);
+
     const modalRef = useRef(null);
+    const [currentSlide, setCurrentSlide] = useState(0);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -55,6 +57,14 @@ function InforRoom({ isOpen, onClose, roomDetails }) {
         };
     }, [isOpen, onClose]);
 
+    const handlePrevSlide = () => {
+        setCurrentSlide((prevSlide) => (prevSlide === 0 ? roomDetails.image.length - 1 : prevSlide - 1));
+    };
+
+    const handleNextSlide = () => {
+        setCurrentSlide((prevSlide) => (prevSlide === roomDetails.image.length - 1 ? 0 : prevSlide + 1));
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -71,18 +81,33 @@ function InforRoom({ isOpen, onClose, roomDetails }) {
                 </button>
                 
                 <div className="grid grid-cols-12">
-                    <div className="col-span-8">
-                        <img className='w-full' src={room} alt="" />
+                    <div className="col-span-8 relative">
+                        <button 
+                            className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-[#f2a900] text-white font-semibold px-3 py-2 rounded-full shadow-md hover:bg-yellow-500 transition duration-300"
+                            onClick={handlePrevSlide}
+                        >
+                            <FontAwesomeIcon icon={faArrowLeft} />
+                        </button>
+                        <img 
+                            className="w-full h-auto object-cover" 
+                            src={roomDetails.image[currentSlide]} 
+                            alt="" 
+                        />
+                        <button 
+                            className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-[#f2a900] text-white font-semibold px-3 py-2 rounded-full shadow-md hover:bg-yellow-500 transition duration-300"
+                            onClick={handleNextSlide}
+                        >
+                            <FontAwesomeIcon icon={faArrowRight} />
+                        </button>
                     </div>
                     <div className="col-span-4 p-4 font-inter">
-                        <div className="text-xl font-bold">{roomDetails.title}</div>
+                        <div className="text-xl font-bold">{roomDetails.name}</div>
                         <div className='w-full my-3 border-b border-b-gray-400' />
-                        <div className="mt-2 text-sm">{roomDetails.description}</div>
                         <div className="mt-4 text-sm">
                             <h3 className="font-semibold mb-2">Tiện nghi của phòng:</h3>
-                            <div className="grid grid-cols-2 gap-2 pl-5">
-                                {roomDetails.amenities.map((amenity, index) => (
-                                    <div key={index} className="flex items-center my-1">
+                            <div className="grid grid-cols-2">
+                                {roomDetails.amenityList.map((amenity, index) => (
+                                    <div key={index} className="flex items-center my-1 col-span-1">
                                         <img src={amenitiesImages[amenity]} alt={amenity} className="mr-2 w-6 h-6" />
                                         <span>{amenity}</span>
                                     </div>
