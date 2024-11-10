@@ -17,7 +17,7 @@ const Footer = () => {
                             </div>
                             <div className='flex gap-5 items-center'>
                                 <div className='w-11 border-b border-white'></div>
-                                <img src={flagVietnam} alt="Vietnam Flag" />
+                                <img src={flagVietnam} alt="Cờ Việt Nam" />
                                 <div className='w-11 border-b border-white'></div>
                             </div>
                         </div>
@@ -26,19 +26,19 @@ const Footer = () => {
                                 <FontAwesomeIcon className='w-5 h-5' icon={faFacebook} /> {/* Biểu tượng Facebook */}
                             </Link>
                             <div>
-                                <img className='w-5 h-5' src={be} alt="" />
+                                <img className='w-5 h-5' src={be} alt="Biểu tượng" />
                             </div>
                             <Link className="hover:text-gray-400">
-                                <FontAwesomeIcon  className='w-5 h-5'icon={faInstagram} /> {/* Biểu tượng Instagram */}
+                                <FontAwesomeIcon  className='w-5 h-5' icon={faInstagram} /> {/* Biểu tượng Instagram */}
                             </Link>
                         </div>
-                        <div className="mt-10 font-garamond text-gray-300">Privacy policy</div>
-                        <div className='mt-3 font-garamond text-gray-300'>Cookie policy</div>
-                        <div className='mt-3 font-garamond text-gray-300'>Terms of use</div>
+                        <div className="mt-10 font-garamond text-gray-300">Chính sách bảo mật</div>
+                        <div className='mt-3 font-garamond text-gray-300'>Chính sách cookie</div>
+                        <div className='mt-3 font-garamond text-gray-300'>Điều khoản sử dụng</div>
                     </div>
                     <div className="flex flex-col items-start mt-10">
-                        <div className="text-xl font-semibold">Contact</div>
-                        <div className='mt-10'>Mo - Fr: 09:00 - 18:00</div>
+                        <div className="text-xl font-semibold">Liên hệ</div>
+                        <div className='mt-10'>Thứ 2 - Thứ 6: 09:00 - 18:00</div>
                         <div className='text-[#B5986D] mt-3'>+12 345 678 89</div>
                         <div className='text-[#B5986D] mt-3'>+12 345 678 89</div>
                         <div className='mt-3'>lovevietnam.vn</div>
@@ -47,17 +47,16 @@ const Footer = () => {
                         <div className="text-xl font-semibold">Menu</div>
                         <div className='flex gap-14'>
                             <div>
-                                <div className='mt-10'>For tourists</div>
-                                <div className='mt-3'>For travel agencies</div>
-                                <div className='mt-3'>For travel agencies</div>
+                                <div className='mt-10'>Dành cho du khách</div>
+                                <div className='mt-3'>Dành cho các đại lý du lịch</div>
+                                <div className='mt-3'>Nhà cung cấp</div>
                             </div>
                             <div>
-                                <div className='mt-10'>Stocks</div>
-                                <div className='mt-3'>Contacts</div>
-                                <div className='mt-3'>About us</div>
+                                <div className='mt-10'>Cổ phiếu</div>
+                                <div className='mt-3'>Liên hệ</div>
+                                <div className='mt-3'>Về chúng tôi</div>
                             </div>
                         </div>
-                        
                     </div>
                 </div>
             </div>

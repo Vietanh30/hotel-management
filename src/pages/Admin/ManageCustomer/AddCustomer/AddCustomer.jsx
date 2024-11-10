@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import adminApi from '../../../../api/adminApi';
 import { getAccessTokenFromLS } from '../../../../utils/auth';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const AddCustomer = ({ isOpen, onClose, fetchData }) => {
     const [email, setEmail] = useState('');
@@ -29,18 +31,17 @@ const AddCustomer = ({ isOpen, onClose, fetchData }) => {
         }
 
         const newCustomer = {
-            "email" :email,
-            "password":password,
-            "firstName":firstName,
-            "lastName":lastName,
-            "phone":phone,
-            "birthday":birthday,
+            email,
+            password,
+            firstName,
+            lastName,
+            phone,
+            birthday,
         };
 
         try {
             const accessToken = getAccessTokenFromLS();
-            const response = await adminApi.addCustomer(accessToken, newCustomer); // Giả sử có phương thức addCustomer
-            console.log(response);
+            const response = await adminApi.addCustomer(accessToken, newCustomer);
             if (response.data.statusCode === 201) {
                 Swal.fire('Thành công!', 'Khách hàng đã được thêm thành công.', 'success');
                 fetchData(); // Tải lại dữ liệu
@@ -67,6 +68,14 @@ const AddCustomer = ({ isOpen, onClose, fetchData }) => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
                 <h2 className="text-xl font-bold mb-4">Thêm khách hàng</h2>
+                
+                <button
+                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                    onClick={onClose}
+                >
+                        <FontAwesomeIcon icon={faTimes} className="w-6 h-6" />
+                    </button>
+
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <input

@@ -25,7 +25,7 @@ function FilterRoom() {
 
     return (
         <>
-            <div className="grid grid-cols-7 gap-3 items-end justify-center">
+            <div className="grid grid-cols-7 gap-3 items-end justify-center relative">
                 <div className='col-span-2'>
                     <label htmlFor="check-in" className="font-inter font-semibold mb-2 text-sm">
                         Ngày nhận phòng

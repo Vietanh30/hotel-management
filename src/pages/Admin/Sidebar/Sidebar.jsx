@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faList, faConciergeBell , faBed, faUserGroup, faCalendarCheck, faChartLine, faCommentDots, faDoorOpen, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faList, faConciergeBell, faBed, faUserGroup, faCalendarCheck, faChartLine, faCommentDots, faDoorOpen, faUser, faHistory } from '@fortawesome/free-solid-svg-icons';
 import path from "../../../constants/path";
 import { Link, useNavigate } from "react-router-dom";
 import flagVietnam from "../../../assets/Header/flagsVietnam.svg";
@@ -9,17 +9,17 @@ import { clearLS } from "../../../utils/auth";
 
 function Sidebar() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const location = useLocation(); // Lấy đường dẫn hiện tại
-    const navigate = useNavigate()
+    const location = useLocation();
+    const navigate = useNavigate();
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     };
 
-    const isActive = (path) => location.pathname === path; // Hàm kiểm tra đường dẫn hiện tại
-    const handleLogOut = () =>{
-        clearLS()
-        navigate(path.loginAdmin)
-    }
+    const isActive = (targetPath) => location.pathname === targetPath;
+    const handleLogOut = () => {
+        clearLS();
+        navigate(path.loginAdmin);
+    };
 
     return (
         <>
@@ -27,28 +27,6 @@ function Sidebar() {
                 <div className="px-3 py-3 lg:px-5 lg:pl-3">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center justify-start rtl:justify-end">
-                            <button
-                                data-drawer-target="logo-sidebar"
-                                data-drawer-toggle="logo-sidebar"
-                                aria-controls="logo-sidebar"
-                                type="button"
-                                className="inline-flex items-center p-2 text-sm rounded-lg sm:hidden hover:bg-yellow-500 hover:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600"
-                            >
-                                <span className="sr-only">Open sidebar</span>
-                                <svg
-                                    className="w-6 h-6"
-                                    aria-hidden="true"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        clipRule="evenodd"
-                                        fillRule="evenodd"
-                                        d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
-                                    />
-                                </svg>
-                            </button>
                             <Link to={path.dashboard} className="flex flex-col items-center cursor-pointer">
                                 <div className="text-[#B5986D] text-4xl font-bold">Nhóm 7</div>
                                 <div className="flex gap-5 items-center">
@@ -62,11 +40,10 @@ function Sidebar() {
                             <div className="flex items-center me-10">
                                 <button
                                     type="button"
-                                    className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                                    className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300"
                                     aria-expanded={dropdownOpen}
                                     onClick={toggleDropdown}
                                 >
-                                    <span className="sr-only">Open user menu</span>
                                     <img
                                         className="w-8 h-8 rounded-full"
                                         src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
@@ -74,10 +51,10 @@ function Sidebar() {
                                     />
                                 </button>
                                 {dropdownOpen && (
-                                    <div className="absolute z-50 my-4 text-base min-w-40 list-none bg-[#a27b41] divide-y divide-gray-100 rounded shadow-md right-[40%] top-[55%]">
-                                        <ul className="py-1">
+                                    <div className="absolute z-50 my-4 text-base min-w-40 list-none bg-[#a27b41] hover:bg-[#885d37] divide-y divide-gray-100 rounded shadow-md right-[40%] top-[55%]">
+                                        <ul>
                                             <li>
-                                                <button className="block px-4 py-2 text-sm text-white hover:bg-[#885d37] font-semibold" onClick = {handleLogOut}>Đăng xuất</button>
+                                                <button className="block w-full py-2 text-sm text-white shadow-md font-semibold" onClick={handleLogOut}>Đăng xuất</button>
                                             </li>
                                         </ul>
                                     </div>
@@ -134,23 +111,29 @@ function Sidebar() {
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageBooking} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${location.pathname === "/booking-management" ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                            <Link to={path.manageBooking} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageBooking) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faCalendarCheck} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý đặt phòng</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to="/report" className={`flex items-center p-2 rounded-lg font-semibold text-base group ${location.pathname === "/report" ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                            <Link to={path.bookingHistoryAdmin} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.bookingHistory) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                                <FontAwesomeIcon icon={faHistory} className="mr-2" />
+                                <span className="flex-1 ms-3 whitespace-nowrap">Lịch sử đặt phòng</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/report" className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive("/report") ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faChartLine} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Báo cáo, thống kê</span>
                             </Link>
                         </li>
-                        <li>
-                            <Link to="/feedback" className={`flex items-center p-2 rounded-lg font-semibold text-base group ${location.pathname === "/feedback" ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                        {/* <li>
+                            <Link to="/feedback" className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive("/feedback") ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faCommentDots} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý phản hồi</span>
                             </Link>
-                        </li>
+                        </li> */}
                     </ul>
                 </div>
             </aside>

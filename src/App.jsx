@@ -20,6 +20,7 @@ import { getRoleFromLS } from "./utils/auth";
 import ManageNumberRoom from "./pages/Admin/ManageNumberRoom/ManageNumberRoom";
 import ManageBooking from "./pages/Admin/ManageBooking/ManageBooking";
 import CheckOutAdmin from "./pages/Admin/CheckOutAdmin/CheckOutAdmin";
+import BookingHistoryAdmin from "./pages/Admin/BookingHistoryAdmin/BookingHistoryAdmin";
 
 function App() {
   const [userRole, setUserRole] = useState(getRoleFromLS()); // Lấy userRole từ localStorage
@@ -106,6 +107,12 @@ function App() {
           path={path.checkOutAdmin}
           element={
             <PrivateRoute element={CheckOutAdmin} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+          }
+        />
+        <Route
+          path={path.bookingHistoryAdmin}
+          element={
+            <PrivateRoute element={BookingHistoryAdmin} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
           }
         />
       </Routes>

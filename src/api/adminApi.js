@@ -42,12 +42,17 @@ export const URL_GET_ALL_POLICY = "room/admin/policy_type/getAll";
 //! Tìm phòng admin
 export const URL_SEARCH_ROOM_ADMIN = "admin/search_room";
 //! Giỏ hàng
-export const URL_ADD_ROOM_TO_CART = "admin/cart";
+export const URL_ADD_ROOM_TO_CART = "book/add_cart";
 export const URL_GET_CART = "book/get_cart";
 export const URL_REMOVE_CART = "book/remove_cart";
+export const URL_EDIT_CART = "book/edit_cart";
+//! chekout
+export const URL_GET_CHECKOUT = "book/checkout";
 
 //! Đặt phòng
-export const URL_BOOKING_ROOM = "admin/place";
+export const URL_BOOKING_ROOM = "book/payment";
+//! Lịch sử đặt
+export const URL_BOOKING_HISTORY = "book/history";
 
 const adminApi = {
   //! Hạng phòng
@@ -345,9 +350,50 @@ const adminApi = {
       },
     });
   },
+  editCartItem: function (accessToken, params) {
+    // Destructure parameters
+    const { adult, child, infant, serviceId, bookingRoomId } = params;
+
+    // Create an object for query parameters, only including defined values
+    const queryParams = {};
+    if (adult !== undefined) queryParams.adult = adult;
+    if (child !== undefined) queryParams.child = child;
+    if (infant !== undefined) queryParams.infant = infant;
+    if (serviceId) queryParams.serviceId = serviceId; // Assuming serviceId can be an empty string
+    if (bookingRoomId) queryParams.bookingRoomId = bookingRoomId;
+
+    // Convert the query parameters object to a URL query string
+    const queryString = new URLSearchParams(queryParams).toString();
+
+    // Make the POST request with the constructed query string
+    return http.post(`${URL_EDIT_CART}?${queryString}`, null, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  //! checkouty
+  getCheckout: function (accessToken) {
+    return http.get(URL_GET_CHECKOUT, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
   //! Đặt phòng
-  bookingRoom: function (accessToken) {
-    return http.post(URL_BOOKING_ROOM, {
+  bookingRoom: function (accessToken, idCustomer) {
+    return http.post(`${URL_BOOKING_ROOM}/${idCustomer}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  //! Lịch sử đặt phòng
+  getBookingHistory: function (accessToken) {
+    return http.get(URL_BOOKING_HISTORY, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,

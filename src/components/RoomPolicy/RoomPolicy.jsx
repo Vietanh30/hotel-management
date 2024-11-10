@@ -1,5 +1,6 @@
-
-function RoomPolicy({ onClose }) {
+function RoomPolicy({ onClose, policyList, isOpen }) {
+    if (!isOpen) return null; // Only render when isOpen is true
+    console.log(policyList)
     return ( 
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 font-inter">
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
@@ -7,21 +8,17 @@ function RoomPolicy({ onClose }) {
                 <hr className="my-4" />
                 <div className="font-bold">Chính sách hoàn hủy</div>
                 <p className="my-2">Nếu hủy, thay đổi hoặc không đến, khách sẽ trả toàn bộ giá trị tiền đặt phòng.</p>
-                <div className="mb-2">
-                    <span className="font-bold">Thanh toán:</span> Thanh toán toàn bộ giá trị tiền đặt phòng.
-                </div>
-                <div className="mb-2">
-                    <span className="font-bold">Nhận phòng:</span> 14:00
-                </div>
-                <div className="mb-2">
-                    <span className="font-bold">Trả phòng:</span> 12:00
-                </div>
-                <div className="mb-2">
-                    <span className="font-bold">Phụ thu người lớn:</span> 380,000 VNĐ /đêm
-                </div>
-                <div className="mb-2">
-                    <span className="font-bold">Phụ thu trẻ em:</span> 188,000 VNĐ /đêm
-                </div>
+
+                {policyList.length > 0 ? (
+                    policyList.map(policy => (
+                        <div className="mb-2" key={policy.id}>
+                            <span className="font-bold">{policy.type}:</span> {policy.content} {policy.typeId === 5 || policy.typeId === 6 ? "VNĐ /đêm" : ""}
+                        </div>
+                    ))
+                ) : (
+                    <p>Không có thông tin chính sách.</p>
+                )}
+
                 <div className="mb-2">
                     <span className="font-bold">Chính sách khác:</span>
                 </div>
@@ -31,7 +28,7 @@ function RoomPolicy({ onClose }) {
                 <div className="mt-4 flex justify-end">
                     <button
                         className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded"
-                        onClick={onClose} // Sử dụng hàm từ props
+                        onClick={onClose} // Use function from props
                         aria-label="Đóng chính sách phòng"
                     >
                         Đóng
@@ -41,6 +38,5 @@ function RoomPolicy({ onClose }) {
         </div>
     );
 }
-
 
 export default RoomPolicy;

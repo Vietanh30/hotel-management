@@ -7,11 +7,30 @@ import { faChevronLeft, faChevronRight, faTimes } from '@fortawesome/free-solid-
 import { useNavigate } from "react-router-dom";
 import path from "../../constants/path";
 
-const CalendarModal = ({ isOpen, onClose,idTypeRoom }) => {
-  console.log(idTypeRoom)
-  const navigate = useNavigate()
+const CalendarModal = ({ isOpen, onClose, idTypeRoom }) => {
+  const navigate = useNavigate();
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Set default dates when the modal opens
+      const today = new Date();
+      const tomorrow = new Date();
+      tomorrow.setDate(today.getDate() + 1);
+      
+      setStartDate(today);
+      setEndDate(tomorrow);
+
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const handleDateChange = (dates) => {
     const [start, end] = dates;
@@ -19,21 +38,13 @@ const CalendarModal = ({ isOpen, onClose,idTypeRoom }) => {
     setEndDate(end);
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
+  const handleSearchCalender = () => {
+    const start = startDate.toISOString().split('T')[0]; // Format to YYYY-MM-DD
+    const end = endDate.toISOString().split('T')[0];
+    const roomNumber = 1; // Default room number
+    navigate(`${path.booking}?startDate=${start}&endDate=${end}&roomNumber=${roomNumber}`);
+  };
 
-  const handleSearchCalender = () =>{
-    navigate(path.booking)
-  }
   if (!isOpen) return null;
 
   return (
@@ -62,7 +73,7 @@ const CalendarModal = ({ isOpen, onClose,idTypeRoom }) => {
         </div>
 
         <div className="flex justify-center">
-        <DatePicker
+          <DatePicker
             locale={vi}
             selected={startDate}
             onChange={handleDateChange}
@@ -74,45 +85,43 @@ const CalendarModal = ({ isOpen, onClose,idTypeRoom }) => {
             className="w-full text-sm"
             calendarClassName="rounded-lg"
             dayClassName={() =>
-                "min-w-32 min-h-14 text-center transition duration-200 ease-in-out"
+              "min-w-32 min-h-14 text-center transition duration-200 ease-in-out"
             }
-            // Tùy chỉnh tên các ngày trong tuần
             renderDayContents={(day, date) => {
-                return (
-                <span className="custom-day-class">{day}</span> // Thay đổi lớp ở đây
-                );
+              return (
+                <span className="custom-day-class">{day}</span>
+              );
             }}
             renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => (
-                <div className="flex justify-between p-5 custom-header-class"> {/* Thay đổi lớp ở đây */}
-                    <div className="font-inter text-2xl uppercase font-bold">
-                        {date.toLocaleDateString("vi-VN", { month: "long", year: "numeric" })}
-                    </div>
-                    <div>
-                        <button
-                        onClick={decreaseMonth}
-                        className="focus:outline-none px-2 py-1 rounded hover:bg-[#f2a900] font-inter text-xl"
-                        >
-                        <FontAwesomeIcon icon={faChevronLeft} />
-                        </button>
-                        <button
-                        onClick={increaseMonth}
-                        className="focus:outline-none px-2 py-1 rounded hover:bg-[#f2a900] font-inter text-xl"
-                        >
-                        <FontAwesomeIcon icon={faChevronRight} />
-                        </button>
-                    </div>
+              <div className="flex justify-between p-5 custom-header-class">
+                <div className="font-inter text-2xl uppercase font-bold">
+                  {date.toLocaleDateString("vi-VN", { month: "long", year: "numeric" })}
                 </div>
+                <div>
+                  <button
+                    onClick={decreaseMonth}
+                    className="focus:outline-none px-2 py-1 rounded hover:bg-[#f2a900] font-inter text-xl"
+                  >
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                  </button>
+                  <button
+                    onClick={increaseMonth}
+                    className="focus:outline-none px-2 py-1 rounded hover:bg-[#f2a900] font-inter text-xl"
+                  >
+                    <FontAwesomeIcon icon={faChevronRight} />
+                  </button>
+                </div>
+              </div>
             )}
-            />
-
+          />
         </div>
         <div className="flex justify-end w-full px-4">
-            <button
+          <button
             onClick={handleSearchCalender}
             className="mt-4 bg-[#f2a900] text-white py-2 px-4 rounded hover:bg-[#f2a900] focus:bg-[#f2a900] font-inter font-semibold"
-            >
+          >
             Đặt Phòng
-            </button>
+          </button>
         </div>
       </div>
     </div>

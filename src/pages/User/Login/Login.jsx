@@ -59,12 +59,13 @@ function Login({ setUserRole }) {
         setLoading(true);
         try {
             const response = await authApi.login(formData.email, formData.password);
+            console.log(response);
             if (response.data.statusCode === 200) {
                 setAccessTokenToLS(response.data.data.accessToken);
                 setRoleTokenToLS(response.data.data.roles[0])   
                 setUserRole(response.data.data.roles[0])             
                 // Uncomment the line below to navigate to the home page after login
-                // navigate(path.home);
+                navigate(path.home);
             }
         } catch (error) {
             let errorMessage = 'Đăng nhập không thành công! Vui lòng kiểm tra lại thông tin.';

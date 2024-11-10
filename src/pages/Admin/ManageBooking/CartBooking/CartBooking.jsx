@@ -1,32 +1,29 @@
 import { faTimesCircle, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import path from "../../../../constants/path";
 import { formatDate } from "../../../../utils/utils";
 import adminApi from "../../../../api/adminApi";
-import { getAccessTokenFromLS } from "../../../../utils/auth"; // Import token utility
-import Swal from "sweetalert2"; // Import SweetAlert2
+import { getAccessTokenFromLS } from "../../../../utils/auth"; 
+import Swal from "sweetalert2"; 
 
-const CartBooking = ({ onClose, dataCart }) => {
-    const [cartOptions, setCartOptions] = useState([]);
-    const [totalAmount, setTotalAmount] = useState(0);
-    const [policyPrice, setPolicyPrice] = useState(0);
+const CartBooking = ({ onClose, dataCart, fetchCart, resetSearch }) => {
     const accessToken = getAccessTokenFromLS();
+    const [cartOptions, setCartOptions] = useState(dataCart.roomCart || []);
+    const [totalAmount, setTotalAmount] = useState(dataCart.totalPrice || 0);
+    const [policyPrice, setPolicyPrice] = useState(dataCart.policyPrice || 0);
 
+    // This effect runs only when dataCart changes
     useEffect(() => {
-        const fetchCart = async () => {
-            const { roomCart, totalPrice, policyPrice } = dataCart;
-            setCartOptions(roomCart);
-            setTotalAmount(totalPrice);
-            setPolicyPrice(policyPrice);
-        };
-
-        fetchCart();
+        if (dataCart) {
+            setCartOptions(dataCart.roomCart);
+            setTotalAmount(dataCart.totalPrice);
+            setPolicyPrice(dataCart.policyPrice);
+        }
     }, [dataCart]);
 
-    const handleRemoveItem = async (bookingRoomId) => {
-        // Show confirmation dialog
+    const handleRemoveItem = useCallback(async (bookingRoomId) => {
         const result = await Swal.fire({
             title: 'Bạn có chắc chắn?',
             text: "Bạn muốn xóa phòng này khỏi giỏ hàng!",
@@ -40,29 +37,30 @@ const CartBooking = ({ onClose, dataCart }) => {
 
         if (result.isConfirmed) {
             try {
-                const response = await adminApi.removeCartItem(accessToken, bookingRoomId); // Call your API
-                console.log(response)
+                const response = await adminApi.removeCartItem(accessToken, bookingRoomId);
                 if (response.data.statusCode === 200) {
-                    // Update the cart options after successful removal
-                    const updatedCartOptions = cartOptions.filter(option => option.bookingRoomId !== bookingRoomId);
-                    setCartOptions(updatedCartOptions);
-
-                    // Optionally, update totalAmount and policyPrice if needed
-                    // You might want to recalculate these values based on the updated cart
-                    Swal.fire(
-                        'Đã xóa!',
-                        'Phòng đã được xóa khỏi giỏ hàng.',
-                        'success'
-                    );
+                    await fetchCart();
+                    resetSearch();
+                    Swal.fire('Đã xóa!', 'Phòng đã được xóa khỏi giỏ hàng.', 'success');
                 }
             } catch (error) {
                 console.error("Error removing item from cart:", error);
-                Swal.fire(
-                    'Lỗi!',
-                    'Có lỗi xảy ra khi xóa phòng.',
-                    'error'
-                );
+                Swal.fire('Lỗi!', 'Có lỗi xảy ra khi xóa phòng.', 'error');
             }
+        }
+    }, [accessToken, fetchCart, resetSearch]);
+
+    const handleCheckout = () => {
+        if (cartOptions.length === 0) {
+            Swal.fire({
+                title: 'Không có phòng nào trong giỏ hàng!',
+                text: 'Vui lòng thêm phòng vào giỏ hàng trước khi đặt.',
+                icon: 'warning',
+                confirmButtonText: 'Đồng ý'
+            });
+        } else {
+            // Redirect to checkout page if there are rooms in the cart
+            window.location.href = path.checkOutAdmin;
         }
     };
 
@@ -75,39 +73,45 @@ const CartBooking = ({ onClose, dataCart }) => {
                     </button>
                 </div>
                 <div className="overflow-auto max-h-[70vh]">
-                    <table className="min-w-full bg-white border border-gray-300">
-                        <thead>
-                            <tr className="bg-gray-100">
-                                <th className="py-2 px-4 border-b">Mã phòng</th>
-                                <th className="py-2 px-4 border-b">Loại phòng</th>
-                                <th className="py-2 px-4 border-b">Thời gian</th>
-                                <th className="py-2 px-4 border-b">Giá</th>
-                                <th className="py-2 px-4 border-b"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {cartOptions.map((option, index) => (
-                                <tr key={index} className="hover:bg-gray-50">
-                                    <td className="py-2 px-4 border-b">{option.roomNumber}</td>
-                                    <td className="py-2 px-4 border-b">{option.roomType}</td>
-                                    <td className="py-2 px-4 border-b">{`${formatDate(new Date(option.checkin))} - ${formatDate(new Date(option.checkout))}`}</td>
-                                    <td className="py-2 px-4 border-b">{option.price.toLocaleString()} đ</td>
-                                    <td className="py-2 px-4 border-b">
-                                        <button 
-                                            className="text-red-500 hover:text-red-700"
-                                            onClick={() => handleRemoveItem(option.bookingRoomId)} // Remove item on click
-                                        >
-                                            <FontAwesomeIcon icon={faTrashAlt} />
-                                        </button>
-                                    </td>
+                    {cartOptions.length > 0 ? (
+                        <table className="min-w-full bg-white border border-gray-300">
+                            <thead>
+                                <tr className="bg-gray-100">
+                                    <th className="py-2 px-4 border-b">Mã phòng</th>
+                                    <th className="py-2 px-4 border-b">Loại phòng</th>
+                                    <th className="py-2 px-4 border-b">Thời gian</th>
+                                    <th className="py-2 px-4 border-b">Giá</th>
+                                    <th className="py-2 px-4 border-b"></th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {cartOptions.map((option) => (
+                                    <tr key={option.bookingRoomId} className="hover:bg-gray-50">
+                                        <td className="py-2 px-4 border-b">{option.roomNumber}</td>
+                                        <td className="py-2 px-4 border-b">{option.roomType}</td>
+                                        <td className="py-2 px-4 border-b">
+                                            {`${formatDate(new Date(option.checkin))} - ${formatDate(new Date(option.checkout))}`}
+                                        </td>
+                                        <td className="py-2 px-4 border-b">{option.price.toLocaleString()} đ</td>
+                                        <td className="py-2 px-4 border-b">
+                                            <button 
+                                                className="text-red-500 hover:text-red-700"
+                                                onClick={() => handleRemoveItem(option.bookingRoomId)}
+                                            >
+                                                <FontAwesomeIcon icon={faTrashAlt} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <div className="text-center text-gray-500 py-4">Không có phòng nào trong giỏ hàng.</div>
+                    )}
                 </div>
                 <div className="mt-4 bg-gray-100 p-4 py-2 rounded">
                     <div className='flex justify-between items-center'>
-                        <div className=''>Phụ phí:</div>
+                        <div>Phụ phí:</div>
                         <div className='font-black text-xl'>{policyPrice.toLocaleString()} đ</div>
                     </div>
                 </div>
@@ -118,9 +122,12 @@ const CartBooking = ({ onClose, dataCart }) => {
                     </div>
                 </div>
                 <div className='flex justify-end mt-3'>
-                    <Link to={path.checkOutAdmin} className="bg-yellow-500 font-semibold text-white py-2 px-4 rounded hover:bg-yellow-600 mt-2">
+                    <button 
+                        onClick={handleCheckout}
+                        className="bg-yellow-500 font-semibold text-white py-2 px-4 rounded hover:bg-yellow-600 mt-2"
+                    >
                         ĐẶT NGAY
-                    </Link>
+                    </button>
                 </div>
             </div>
         </div>
