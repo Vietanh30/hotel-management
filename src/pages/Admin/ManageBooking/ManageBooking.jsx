@@ -36,7 +36,7 @@ function ManageBooking() {
         };
 
         initializeDates();
-        fetchCart(); // Call fetchCart directly
+        fetchCart();
     }, []); // Only run once on mount
 
     const fetchCart = useCallback(async () => {
@@ -126,8 +126,10 @@ function ManageBooking() {
                 const response = await adminApi.addRoomToCart(accessToken, bookingData);
                 Swal.fire('Đã thêm!', response.data.message || 'Phòng đã được thêm vào giỏ hàng.', 'success');
                 fetchCart();
+                
                 if (searchFunction) {
-                    await searchFunction(); // Gọi lại hàm tìm kiếm nếu có
+                    // Call the search function if it's defined
+                    await searchFunction(); 
                 }
             } catch (error) {
                 console.error("Error adding room to cart:", error);
@@ -136,15 +138,15 @@ function ManageBooking() {
         }
     };
 
-    const handleSearch = (searchFunc) => {
+    const handleSearch = useCallback((searchFunc) => {
+        // Set the search function only if it's different
         setSearchFunction(() => searchFunc);
-    };
+    }, []);
 
     const resetSearch = () => {
         if (searchFunction) {
             searchFunction(); // Call the search function to reset the search results
         }
-      
     };
 
     return (

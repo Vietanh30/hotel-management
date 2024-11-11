@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Footer from "../../../components/Footer/Footer";
 import path from "../../../constants/path";
 import authApi from '../../../api/authApi'; // Import your API
-import { setAccessTokenToLS, setRoleTokenToLS } from '../../../utils/auth'; // Ensure this function exists
+import { setAccessTokenToLS, setIdUserTokenToLS, setRoleTokenToLS } from '../../../utils/auth'; // Ensure this function exists
 
 function Login({ setUserRole }) {
     const navigate = useNavigate()
@@ -63,7 +63,7 @@ function Login({ setUserRole }) {
             if (response.data.statusCode === 200) {
                 setAccessTokenToLS(response.data.data.accessToken);
                 setRoleTokenToLS(response.data.data.roles[0])   
-                setUserRole(response.data.data.roles[0])             
+                setUserRole(response.data.data.roles[0])         
                 // Uncomment the line below to navigate to the home page after login
                 navigate(path.home);
             }

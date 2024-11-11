@@ -7,6 +7,7 @@ import AddCustomer from '../ManageCustomer/AddCustomer/AddCustomer';
 import ServiceChange from './ServiceChange/ServiceChange';
 import RoomPolicy from '../../../components/RoomPolicy/RoomPolicy';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 const CheckOutAdmin = () => {
   const [bookingData, setBookingData] = useState({
@@ -16,7 +17,7 @@ const CheckOutAdmin = () => {
     totalRoomBooking: 0,
     bookingRoomDetails: [],
   });
-
+  const navigate = useNavigate()
   const [showDropdown, setShowDropdown] = useState(null);
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -146,7 +147,7 @@ const handlePayment = async () => {
     try {
         const response = await adminApi.bookingRoom(accessToken, selectedCustomer.value);
         console.log(response);
-        if (response.data.statusCode === 200) {
+        if (response.status === 200) {
             Swal.fire({
                 title: 'Thành công!',
                 text: 'Thanh toán thành công!',
@@ -154,7 +155,8 @@ const handlePayment = async () => {
                 confirmButtonText: 'OK'
             });
             // Optionally, you can reset the form or redirect the user
-            fetchBookingData(); // Refresh booking data if necessary
+            await fetchBookingData(); // Refresh booking data if necessary
+            window.location.href = response.data.orderurl
         } else {
             Swal.fire({
                 title: 'Lỗi!',

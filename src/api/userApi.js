@@ -4,10 +4,12 @@ export const URL_GET_ALL_TYPE_ROOM = "rank";
 export const URL_GET_ALL_SERVICE = "service_hotel/category/get-service";
 export const URL_GET_ROOM_BY_ID = "room/getByRank";
 //! Giỏ hàng
-export const URL_ADD_ROOM_TO_CART = "book/add_cart";
+export const URL_ADD_ROOM_TO_CART = "user/add_cart";
 export const URL_GET_CART = "book/get_cart";
 export const URL_REMOVE_CART = "book/remove_cart";
 export const URL_EDIT_CART = "book/edit_cart";
+export const URL_GET_CHECKOUT = "book/checkout";
+export const URL_BOOKING_ROOM = "book/payment";
 const userApi = {
   getAllTypeRoom: function () {
     return http.get(URL_GET_ALL_TYPE_ROOM);
@@ -15,8 +17,10 @@ const userApi = {
   getAllService: function () {
     return http.get(URL_GET_ALL_SERVICE);
   },
-  getRoomById: function (idTypeRoom) {
-    return http.get(`${URL_GET_ROOM_BY_ID}/${idTypeRoom}`);
+  getRoomById: function (idTypeRoom, startDate, endDate) {
+    return http.get(
+      `${URL_GET_ROOM_BY_ID}/${idTypeRoom}?startDate=${startDate}&endDate=${endDate}`
+    );
   },
   searchRoom: function (startDate, endDate, numberRoom) {
     console.log(startDate, endDate);
@@ -57,7 +61,7 @@ const userApi = {
     if (adult !== undefined) queryParams.adult = adult;
     if (child !== undefined) queryParams.child = child;
     if (infant !== undefined) queryParams.infant = infant;
-    if (serviceId) queryParams.serviceId = serviceId; // Assuming serviceId can be an empty string
+    if (serviceId != undefined) queryParams.serviceId = serviceId; // Assuming serviceId can be an empty string
     if (bookingRoomId) queryParams.bookingRoomId = bookingRoomId;
 
     // Convert the query parameters object to a URL query string
@@ -65,6 +69,23 @@ const userApi = {
 
     // Make the POST request with the constructed query string
     return http.post(`${URL_EDIT_CART}?${queryString}`, null, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  //! checkout
+  getCheckout: function (accessToken) {
+    return http.get(URL_GET_CHECKOUT, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  bookingRoom: function (accessToken, idCustomer) {
+    return http.get(`${URL_BOOKING_ROOM}/${idCustomer}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,

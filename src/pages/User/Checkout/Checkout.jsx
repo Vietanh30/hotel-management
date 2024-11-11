@@ -1,235 +1,357 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Footer from "../../../components/Footer/Footer";
 import Header from "../../../components/Header/Header";
 import iconFile from "../../../assets/Checkout/iconFile.svg"
 import BackToTopButton from '../../../components/BackToTopButton/BackToTopButton';
+import userApi from '../../../api/userApi';
+import { getAccessTokenFromLS } from '../../../utils/auth';
+import RoomPolicy from '../../../components/RoomPolicy/RoomPolicy';
+import ServiceChange from '../../Admin/CheckOutAdmin/ServiceChange/ServiceChange';
+import Swal from 'sweetalert2';
 function Checkout() {
-  const [title, setTitle] = useState('Ông');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [confirmEmail, setConfirmEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [country, setCountry] = useState('Việt Nam');
-  const [message, setMessage] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Xử lý dữ liệu form tại đây
-    console.log({
-      title,
-      name,
-      email,
-      confirmEmail,
-      phone,
-      country,
-      message
-    });
-  }
-
+    const [bookingData, setBookingData] = useState({
+        totalRoomPrice: 0,
+        totalPolicyPrice: 0,
+        totalBookingPrice: 0,
+        totalRoomBooking: 0,
+        bookingRoomDetails: [],
+      });
+      const [showDropdown, setShowDropdown] = useState(null);
+      const [selectedCustomer, setSelectedCustomer] = useState(null);
+      const [serviceModalIndex, setServiceModalIndex] = useState(null);
+      const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
+      const [selectedRoomPolicies, setSelectedRoomPolicies] = useState([]);
+      const [originalRoomValues, setOriginalRoomValues] = useState(null); 
+    
+      const accessToken = getAccessTokenFromLS();
+    
+      
+    
+      const fetchBookingData = useCallback(async () => {
+        try {
+          const response = await userApi.getCheckout(accessToken);
+          console.log(response)
+          setBookingData(response.data.data);
+        } catch (error) {
+          console.error('Failed to fetch booking data:', error);
+        }
+      }, [accessToken]);
+    
+      useEffect(() => {
+        fetchBookingData();
+      }, [ fetchBookingData]);
+    
+      const handleOccupancyChange = useCallback((index, type, value) => {
+        const newBookingRoomDetails = [...bookingData.bookingRoomDetails];
+        const room = newBookingRoomDetails[index];
+    
+        // Save original values when changing occupancy for the first time
+        if (!originalRoomValues) {
+            setOriginalRoomValues({
+                adults: room.adults,
+                children: room.children,
+                infant: room.infant,
+            });
+        }
+    
+        newBookingRoomDetails[index] = {
+            ...room,
+            [type]: value,
+        };
+        setBookingData((prev) => ({ ...prev, bookingRoomDetails: newBookingRoomDetails }));
+    }, [bookingData, originalRoomValues]);
+        
+      const handleViewPolicy = (policies) => {
+        setSelectedRoomPolicies(policies);
+        setIsPolicyModalOpen(true);
+      };
+    
+      const handleClosePolicyModal = () => {
+        setIsPolicyModalOpen(false);
+      };
+    
+      const updateBookingRoom = async (index, params) => {
+        console.log(params);
+        try {
+            const response = await userApi.editCartItem(accessToken, params);
+            console.log(response);
+            if (response.data.statusCode === 200) {
+                // Hiển thị thông báo thành công
+                Swal.fire({
+                    title: 'Thành công!',
+                    text: 'Cập nhật phòng đặt thành công.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+    
+                await fetchBookingData(); // Lấy dữ liệu đặt phòng đã cập nhật
+                setOriginalRoomValues(null); // Reset original values after a successful update
+            }
+        } catch (error) {
+            console.error('Cập nhật phòng đặt thất bại:', error);
+            
+            // Hiển thị thông báo lỗi
+            Swal.fire({
+                title: 'Lỗi!',
+                text: error.response?.data?.description || 'Cập nhật phòng đặt thất bại. Vui lòng thử lại.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // Reset số lượng khách về giá trị gốc khi cập nhật thất bại
+                if (originalRoomValues) {
+                    const newBookingRoomDetails = [...bookingData.bookingRoomDetails];
+                    newBookingRoomDetails[index] = {
+                        ...newBookingRoomDetails[index],
+                        adults: originalRoomValues.adults,
+                        children: originalRoomValues.children,
+                        infant: originalRoomValues.infant,
+                    };
+                    setBookingData((prev) => ({ ...prev, bookingRoomDetails: newBookingRoomDetails }));
+                }
+            });
+        }
+    };
+    const handlePayment = async () => {
+        console.log(selectedCustomer)
+        if (!selectedCustomer) {
+            Swal.fire({
+                title: 'Chưa chọn khách hàng!',
+                text: 'Vui lòng chọn một khách hàng trước khi thanh toán.',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+    
+        try {
+            const response = await userApi.bookingRoom(accessToken,);
+            console.log(response);
+            if (response.status === 200) {
+                Swal.fire({
+                    title: 'Thành công!',
+                    text: 'Thanh toán thành công!',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+                // Optionally, you can reset the form or redirect the user
+                await fetchBookingData(); // Refresh booking data if necessary
+                window.location.href = response.data.orderurl
+            } else {
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: response.data.description || 'Có lỗi xảy ra trong quá trình thanh toán.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        } catch (error) {
+            console.error('Thanh toán thất bại:', error);
+            Swal.fire({
+                title: 'Lỗi!',
+                text: error.response?.data?.description || 'Có lỗi xảy ra trong quá trình thanh toán.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    };
+      const renderOccupancyModal = (room, index) => {
+        if (showDropdown !== index) return null;
+    
+        return (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-[#F5E8D0] p-4 rounded shadow-xl">
+              <h4 className="text-lg font-semibold mb-2">Chọn số lượng khách</h4>
+              <div className="grid grid-cols-3 gap-4">
+                <label className="flex flex-col font-semibold">
+                  Người lớn:
+                  <input
+                    type="number"
+                    value={room.adults}
+                    onChange={(e) => handleOccupancyChange(index, 'adults', Number(e.target.value))}
+                    min="1"
+                    className="mt-1 border border-gray-300 rounded p-1"
+                  />
+                </label>
+                <label className="flex flex-col font-semibold">
+                  Trẻ em:
+                  <input
+                    type="number"
+                    value={room.children}
+                    onChange={(e) => handleOccupancyChange(index, 'children', Number(e.target.value))}
+                    min="0"
+                    className="mt-1 border border-gray-300 rounded p-1"
+                  />
+                </label>
+                <label className="flex flex-col font-semibold">
+                  Trẻ sơ sinh:
+                  <input
+                    type="number"
+                    value={room.infant}
+                    onChange={(e) => handleOccupancyChange(index, 'infant', Number(e.target.value))}
+                    min="0"
+                    max="3"
+                    className="mt-1 border border-gray-300 rounded p-1"
+                  />
+                </label>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <button
+                  className="bg-yellow-500 font-semibold text-white py-1 px-2 rounded hover:bg-yellow-600"
+                  onClick={() => {
+                    const params = {
+                      adult: room.adults,
+                      child: room.children,
+                      infant: room.infant,
+                      serviceId: room.serviceList.filter((s) => s.selected).map(s => s.id).join(','), // Assuming serviceId is a comma-separated string
+                      bookingRoomId: room.bookingRoomId,
+                    };
+                    updateBookingRoom(index, params);
+                    setShowDropdown(null);
+                  }}
+                >
+                  Xác nhận
+                </button>
+                <button
+                  className="ml-2 text-white bg-gray-500 font-semibold py-1 px-2 rounded hover:bg-gray-600"
+                  onClick={() => setShowDropdown(null)}
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      };
+    
+      const handleServiceSelect = (service, isSelected, roomIndex) => {
+        const newBookingRoomDetails = [...bookingData.bookingRoomDetails];
+        const selectedServices = newBookingRoomDetails[roomIndex].serviceList.map((s) => ({
+          ...s,
+          selected: s.id === service.id ? isSelected : s.selected,
+        }));
+        newBookingRoomDetails[roomIndex] = {
+          ...newBookingRoomDetails[roomIndex],
+          serviceList: selectedServices,
+        };
+        setBookingData({ ...bookingData, bookingRoomDetails: newBookingRoomDetails });
+      };
+    
+      const handleServiceConfirm = async (roomIndex) => {
+        const room = bookingData.bookingRoomDetails[roomIndex];
+        const params = {
+          adult: room.adults,
+          child: room.children,
+          infant: room.infant,
+          serviceId: room.serviceList.filter((s) => s.selected).map(s => s.id).join(','), // Assuming serviceId is a comma-separated string
+          bookingRoomId: room.bookingRoomId,
+        };
+    
+        await updateBookingRoom(roomIndex, params);
+        setServiceModalIndex(null);
+      };   
   return (
     <>
       <Header />
       <div className="bg-[#E5E5E5] w-full">
-        <div className="container py-9 mx-auto">
-            <div className="text-center text-[#002864] text-4xl">
-                Thông tin đặt phòng
-            </div>
-            <div className='px-8 grid grid-cols-10 gap-6 mt-6'>
-                <div className="col-span-7">
-                    <div className='bg-white rounded p-5 h-fit w-full'>
-                        <div className="font-inter font-medium text-xl">
-                            Thông tin người đặt phòng
-                        </div>
-                        <hr className="my-5" />
-                        <form onSubmit={handleSubmit}>
-                            <div className="grid grid-cols-2 gap-5">
-                            <div className="col-span-1 flex flex-col justify-end">
-                                <label
-                                htmlFor="title"
-                                className="font-inter text-sm font-medium text-gray-700"
-                                >
-                                Tiêu đề
-                                </label>
-                                <select
-                                id="title"
-                                name="title"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500"
-                                >
-                                <option>Ông</option>
-                                <option>Bà</option>
-                                </select>
-                            </div>
-                            <div className="col-span-1 flex flex-col justify-end">
-                                <label
-                                htmlFor="name"
-                                className="font-inter text-sm font-medium text-gray-700"
-                                >
-                                Họ và Tên <span className='text-red-500'>*</span>
-                                </label>
-                                <input
-                                type="text"
-                                name="name"
-                                id="name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="font-inter text-sm mt-1 w-full border px-4 py-2 border-gray-300 rounded-md focus:border-yellow-500 hover:border-yellow-500"
-                                />
-                            </div>
-                            <div className="col-span-1 flex flex-col justify-end">
-                                <label
-                                htmlFor="email"
-                                className="font-inter text-sm font-medium text-gray-700"
-                                >
-                                Email <span className='text-red-500'>*</span>
-                                </label>
-                                <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="font-inter text-sm mt-1 w-full border px-4 py-2 border-gray-300 rounded-md focus:border-yellow-500 hover:border-yellow-500"
-                                />
-                            </div>
-                            <div className="col-span-1 flex flex-col justify-end">
-                                <label
-                                htmlFor="confirm-email"
-                                className="font-inter text-sm font-medium text-gray-700"
-                                >
-                                Nhập lại email <span className='text-red-500'>*</span>
-                                </label>
-                                <input
-                                type="email"
-                                name="confirm-email"
-                                id="confirm-email"
-                                value={confirmEmail}
-                                onChange={(e) => setConfirmEmail(e.target.value)}
-                                className="font-inter text-sm mt-1 w-full border px-4 py-2 border-gray-300 rounded-md focus:border-yellow-500 hover:border-yellow-500"
-                                />
-                            </div>
-                            <div className="col-span-1 flex flex-col justify-end">
-                                <label
-                                htmlFor="phone"
-                                className="font-inter text-sm font-medium text-gray-700"
-                                >
-                                Số điện thoại <span className='text-red-500'>*</span>
-                                </label>
-                                <div className="mt-1 flex rounded-md shadow-sm group">
-                                <div className="mt-1 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md  px-3 flex items-center justify-center group-focus:border-yellow-500 group-hover:border-yellow-500">
-                                    <span>+84</span>
-                                </div>
-                                <input
-                                    type="number"
-                                    name="phone"
-                                    id="phone"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    className="mt-1 w-full border border-l-0 rounded-l-none px-4 py-2 border-gray-300 rounded-md group-focus:border-yellow-500 group-hover:border-yellow-500"
-                                />
-                                </div>
-                            </div>
-                            <div className="col-span-1 flex flex-col justify-end">
-                                <label
-                                htmlFor="country"
-                                className="font-inter text-sm font-medium text-gray-700"
-                                >
-                                Quốc gia <span className='text-red-500'>*</span>
-                                </label>
-                                <select
-                                id="country"
-                                name="country"
-                                value={country}
-                                onChange={(e) => setCountry(e.target.value)}
-                                className="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500"
-                                >
-                                <option>Việt Nam</option>
-                                {/* Thêm các quốc gia khác vào đây */}
-                                </select>
-                            </div>
-                            </div>
-                            <div className="mt-6">
-                            <label
-                                htmlFor="message"
-                                className="font-inter text-sm font-medium text-gray-700"
-                            >
-                                Yêu cầu thêm
-                            </label>
-                            <textarea
-                                id="message"
-                                name="message"
-                                rows="3"
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)}
-                                className="font-inter text-sm mt-1 w-full border px-4 py-2 border-gray-300 rounded-md focus:border-yellow-500 hover:border-yellow-500"
-                                placeholder="Ví dụ: Số thích về Giường, địa điểm đón hoặc trả khách">
-                            </textarea>
-                            </div>
-                        </form>
+        <div className='container mx-auto'>
+
+            <div className="">
+                <div className="p-4 min-h-screen">
+                <div className="mt-4 py-4 border border-[#aeaeae] bg-gray-50 shadow-lg rounded-lg overflow-x-auto">
+                    <div className="w-full flex justify-between items-center p-4 pt-0">
+                        <div className="font-semibold text-2xl font-inter">Thông tin đặt phòng</div>
                     </div>
-                    <div className="bg-white rounded p-5 h-fit mt-5">
-                        <div className="font-inter font-medium text-xl">
-                            Chính sách đặt phòng
-                        </div>
-                        <hr className="my-4" />
-                        <div className='flex items-start gap-4 font-inter'>
-                            <div>
-                                <img className='w-7 h-auto' src={iconFile} alt="" />
-                            </div>
-                            <div >
-                                <div className='font-semibold'>
-                                Deluxe King
-                                </div>
-                                <div className='mt-3 text-sm'><span className='font-semibold'>Hủy:</span>  Nếu hủy, thay đổi hoặc không đến, khách sẽ trả toàn bộ giá trị tiền đặt phòng.</div>
-                                <div className='mt-2 text-sm'><span className='font-semibold'>Thanh toán:</span>Thanh toán toàn bộ giá trị tiền đặt phòng.</div>
-                                <div className='mt-2 text-sm font-semibold'>Đã bao gồm ăn sáng</div>
-                            </div>
-                        </div>
-                    <div className='border-2 border-b border-dashed my-5'></div>
+                    <div className="max-w-full overflow-x-auto">
+                    <table className="table-auto border-collapse w-max">
+                        <thead>
+                        <tr className="bg-gray-100">
+                            <th className="py-2 px-4 border-b text-left font-semibold">Mã Phòng</th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">Hình ảnh</th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">Hạng phòng</th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">Thời gian</th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">Số người</th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">Phụ phí</th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">Giá phòng</th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">Tổng</th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">Dịch vụ</th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">Chính sách</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {bookingData.bookingRoomDetails.map((room, index) => (
+                            <tr key={room.bookingRoomId} className="hover:bg-gray-50">
+                            <td className="py-4 px-4 border-b">{room.roomNumber}</td>
+                            <td className="py-4 px-4 border-b">
+                                <img className='w-24 h-2w-24' src={room.image} alt="" />
+                            </td>
+                            <td className="py-4 px-4 border-b">{room.roomType}</td>
+                            <td className="py-4 px-4 border-b">
+                                {new Date(room.checkIn).toLocaleString()} <br /> {new Date(room.checkOut).toLocaleString()}
+                            </td>
+                            <td className="py-4 px-4 border-b">
+                                <button
+                                className="px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold"
+                                onClick={() => setShowDropdown(index)}
+                                >
+                                {`${room.adults} Adults, ${room.children} Children, ${room.infant} Infants`}
+                                </button>
+                                {renderOccupancyModal(room, index)}
+                            </td>
+                            <td className="py-4 px-4 border-b">
+                                {room.adultSurcharge.toLocaleString('vi-VN')} đ + {room.childSurcharge.toLocaleString('vi-VN')} đ
+                            </td>
+                            <td className="py-4 px-4 border-b">{room.roomPrice.toLocaleString('vi-VN')} đ</td>
+                            <td className="py-4 px-4 border-b">{room.totalPrice.toLocaleString('vi-VN')} đ</td>
+                            <td className="py-4 px-4 border-b">
+                                <button
+                                className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded"
+                                onClick={() => setServiceModalIndex(index)}
+                                >
+                                Chọn dịch vụ
+                                </button>
+                                {serviceModalIndex === index && (
+                                <ServiceChange
+                                    services={room.serviceList}
+                                    selectedServices={room.serviceList.filter((s) => s.selected)}
+                                    onServiceSelect={(service, isSelected) => handleServiceSelect(service, isSelected, index)}
+                                    onConfirm={() => handleServiceConfirm(index)}
+                                    onClose={() => setServiceModalIndex(null)}
+                                />
+                                )}
+                            </td>
+                            <td className="py-4 px-4 border-b">
+                                <button
+                                className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded"
+                                onClick={() => handleViewPolicy(room.policyList)}
+                                >
+                                Xem chính sách
+                                </button>
+                            </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                    <div className="flex justify-end mt-4 p-5">
+                        <button
+                            onClick={handlePayment}
+                            className="px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold"
+                        >
+                            Thanh toán ngay
+                        </button>
+                    </div>
                     </div>
                 </div>
-                <div className="col-span-3 p-5 rounded bg-white h-fit">
-                    <div className='font-inter font-medium text-xl'>
-                        Yêu cầu đặt phòng của bạn
-                    </div>
-                    <hr className="my-4" />
-                    <div>
-                        <div className='font-inter font-semibold text-lg'>Khách sạn nhóm 7</div>
-                        <div className='font-inter font-semibold mt-3 text-sm'>Nhận phòng: Thứ 4, 30/10/2024 từ 14:00</div>
-                        <div className='font-inter font-semibold mt-3 text-sm'>Trả phòng: Thứ 6, 08/11/2024 cho đến 12:00</div>
-                        <div className='font-inter font-semibold mt-3 text-sm'>(3 ngày 2 đêm)</div>
-                        <div className='border-b border-dashed my-5 border-2'></div>
-                        <div className='font-inter font-medium'>Thông tin phòng</div>
-                        <div className='mt-3 font-inter text-sm font-light'>
-                            <span className='font-semibold'>Phòng 1: </span>Phòng Deluxe King Ocean Views
-                        </div>
-                        <div className='font-inter text-sm font-light'>
-                            <div className='mt-2'>FLASH DEAL _3D</div>
-                            <div className='mt-2'>Dành cho 1 Người lớn - 2 Trẻ em - 0 Em bé</div>
-                            <div className='mt-2'>Phụ thu trẻ em: 188,000 VNĐ /đêm</div>
-                            <div className='mt-2'>Giá phòng: 1,580,985 VNĐ</div>
-                        </div>
-                        <div className='mt-4 font-semibold font-inter text-end'>1,580,985 VNĐ</div>
-                        <div className='my-4 border-b border-dashed'></div>
-                    </div>
-                    <div className='flex justify-between'>
-                        <div className='font-inter font-semibold'>Giá phòng</div>
-                        <div className='font-inter font-semibold'>3,580,985 VNĐ</div>
-                    </div>
-                    <hr  className='mt-6 mb-4'/>
-                    <div className='flex justify-between items-center'>
-                        <div className='font-inter font-semibold'>Tổng phòng</div>
-                        <div className='font-inter font-semibold text-yellow-500 text-xl'>3,580,985 VNĐ</div>
-                    </div>
-                    <div className='font-inter text-sm font-light mt-6'>Bao gồm tất cả các loại thuế và phí dịch vụ</div>
-                    <div className='font-inter text-sm mt-1 text-red-500'>(Theo quy định của Ngân hàng Nhà nước Việt Nam, Quý khách vui lòng thanh toán bằng VNĐ)</div>
-                    <div className='my-6 border-2 border-dashed'></div>
-                    </div>
+                
+                </div>
             </div>
-        
+
+            <RoomPolicy
+                onClose={handleClosePolicyModal}
+                policyList={selectedRoomPolicies}
+                isOpen={isPolicyModalOpen}
+            />
+            </div>
         </div>
-      </div>
       <Footer />
       <BackToTopButton />
     </>

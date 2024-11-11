@@ -48,8 +48,18 @@ function App() {
         <Route path={path.login} element={<Login setUserRole={setUserRole} />} />
         <Route path={path.register} element={<Register />} />
         <Route path={path.forgotPassword} element={<ForgotPassword />} />
-        <Route path={path.booking} element={<Booking />} />
-        <Route path={path.checkout} element={<Checkout />} />
+        <Route
+          path={path.booking}
+          element={
+            <PrivateRoute element={Booking} roles={["ROLE_USER"]} userRole={userRole} />
+          }
+        />
+        <Route
+          path={path.checkout}
+          element={
+            <PrivateRoute element={Checkout} roles={["ROLE_USER"]} userRole={userRole} />
+          }
+        />
 
         {/* Admin Routes */}
         <Route path={path.loginAdmin} element={<LoginAdmin  setUserRole={setUserRole} />} />

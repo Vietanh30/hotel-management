@@ -1,52 +1,125 @@
 import { useState, useEffect, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import breakfast from "../../../assets/Booking/breakfast.svg";
 import fee from "../../../assets/Booking/fee.svg";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import userApi from '../../../api/userApi';
+import Swal from 'sweetalert2';
+import { getAccessTokenFromLS } from "../../../utils/auth";
 
-function Collapse({ isOpen, rooms, onOpenModal }) {
+function Collapse({ isOpen, rooms, checkoutData, onOpenModal, fetchCart, fetchCheckout }) {
+    const { search } = useLocation();
+    const params = new URLSearchParams(search);
     const [roomData, setRoomData] = useState([]);
+    const accessToken = getAccessTokenFromLS();
+    const [checkInDate, setCheckInDate] = useState(params.get("startDate"));
+    const [checkOutDate, setCheckOutDate] = useState(params.get("endDate"));
 
     useEffect(() => {
         if (rooms && rooms.length > 0) {
-            setRoomData(rooms.map(() => ({ count: 0, adults: 0, children: 0, infants: 0 })));
+            const initialRoomData = rooms.map((room, index) => {
+                const bookingRoomData = checkoutData.filter(item => item.roomId === room.id);
+                return {
+                    count: bookingRoomData.length > 0 ? bookingRoomData.length : 0,
+                    adults: bookingRoomData.length > 0 ? bookingRoomData.reduce((total, item) => total + item.adults, 0) : 1,
+                    children: bookingRoomData.length > 0 ? bookingRoomData.reduce((total, item) => total + item.children, 0) : 0,
+                    infants: bookingRoomData.length > 0 ? bookingRoomData.reduce((total, item) => total + item.infant, 0) : 0,
+                };
+            });
+            setRoomData(initialRoomData);
         } else {
             setRoomData([]);
         }
-    }, [rooms]);
+    }, [rooms, checkoutData]);
 
-    const handleChange = useCallback((index, type, value) => {
-        setRoomData(prevData => {
-            const newData = [...prevData];
-            newData[index][type] = parseInt(value) || 0; // Fallback to 0
-            return newData;
-        });
-    }, []);
+    const isAnyRoomSelected = roomData.some(room => room.count > 0);
+    const shouldCollapseOpen = isOpen || isAnyRoomSelected;
 
-    const handleRoomCountChange = useCallback((index, value) => {
+    const handleRoomCountChange = useCallback(async (index, value) => {
         const newRoomCount = parseInt(value) || 0;
         setRoomData(prevData => {
             const newData = [...prevData];
             newData[index].count = newRoomCount;
-
             if (newRoomCount < newData[index].adults) {
                 newData[index].adults = newRoomCount;
             }
-
             if (newRoomCount === 0) {
-                newData[index] = { count: 0, adults: 0, children: 0, infants: 0 }; // Clear all fields
+                newData[index] = { count: 0, adults: 1, children: 0, infants: 0 };
             }
-
             return newData;
         });
-    }, []);
+        if (newRoomCount > 0) {
+            const body = {
+                checkinDate: checkInDate,
+                checkoutDate: checkOutDate,
+                roomId: rooms[index].id,
+                roomNumber: newRoomCount,
+            };
+            try {
+                const response = await userApi.addRoomToCart(accessToken, body);
+                if (response.data.statusCode === 200) {
+                    // Swal.fire({
+                    //     title: 'Thành công!',
+                    //     text: 'Phòng đã được thêm vào giỏ hàng.',
+                    //     icon: 'success',
+                    //     confirmButtonText: 'OK'
+                    // });
+                    await fetchCart();
+                    await fetchCheckout();
+                }
+            } catch (error) {
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: error.response?.data?.description || 'Không thể thêm phòng vào giỏ hàng. Vui lòng thử lại.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+    }, [checkInDate, checkOutDate, rooms, accessToken, fetchCart]);
 
-    const handleViewDetails = useCallback((room) => {
+    const handleChange = useCallback(async (index, type, value) => {
+        setRoomData(prevData => {
+            const newData = [...prevData];
+            newData[index][type] = parseInt(value) || 0;
+    
+            // Find the corresponding bookingRoomId from checkoutData
+            const bookingRoom = checkoutData?.find(item => item.roomId === rooms[index].id);
+            const params = {
+                adult: newData[index].adults,
+                child: newData[index].children ,
+                infant: newData[index].infants,
+                serviceId: rooms[index].serviceId,
+                bookingRoomId: bookingRoom ? bookingRoom.bookingRoomId : rooms[index].id, // Use the bookingRoomId from checkoutData
+            };
+    
+            (async () => {
+                try {
+                    const response = await userApi.editCartItem(accessToken, params);
+                    if (response.data.statusCode === 200) {
+                        await fetchCart();
+                        await fetchCheckout();
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: error.response?.data?.description || 'Không thể cập nhật thông tin phòng. Vui lòng thử lại.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })();
+            return newData;
+        });
+    }, [rooms, checkoutData, accessToken, fetchCart, fetchCheckout]);
+
+    const handleViewPolicyDetails = useCallback((room) => {
         onOpenModal(room.policyList);
     }, [onOpenModal]);
 
     return (
-        <div className={`transition-all duration-900 ${isOpen ? 'opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+        <div className={`transition-all duration-900 ${shouldCollapseOpen ? 'opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
             <hr className="mt-6 mb-8" />
             {rooms && rooms.length > 0 ? (
                 rooms.map((room, roomIndex) => (
@@ -63,7 +136,7 @@ function Collapse({ isOpen, rooms, onOpenModal }) {
                                     <div className="font-inter font-semibold">Không hoàn trả phí khi hủy phòng</div>
                                 </div>
                                 <div className="mt-3 font-inter font-semibold text-yellow-400 text-sm cursor-pointer" 
-                                     onClick={() => handleViewDetails(room)}>
+                                     onClick={() => handleViewPolicyDetails(room)}>
                                     Xem chi tiết
                                 </div>
                             </div>
@@ -109,6 +182,26 @@ function Collapse({ isOpen, rooms, onOpenModal }) {
 }
 
 function RoomOccupancySelector({ room, roomIndex, occupancyData, onChange }) {
+
+    const handleAdultChange = (e) => {
+        const adults = parseInt(e.target.value) || 1;
+        const maxChildren = room.adultMax - adults;
+        const children = Math.min(occupancyData.children, maxChildren);
+        onChange(roomIndex, 'adults', adults);
+        onChange(roomIndex, 'children', children);
+    };
+
+    const handleChildrenChange = (e) => {
+        const children = parseInt(e.target.value) || 0;
+        const maxAdults = room.adultMax - children;
+        const adults = Math.min(occupancyData.adults, maxAdults);
+        onChange(roomIndex, 'children', children);
+        onChange(roomIndex, 'adults', adults);
+    };
+    const handleInfantChange = (e) => {
+        onChange(roomIndex, 'infants', parseInt(e.target.value) || 0);
+    };
+
     return (
         <div className="w-full grid grid-cols-12 gap-20 items-start mt-6 py-6 hover:bg-[#f5f5f5] rounded">
             <div className="col-span-3 font-inter font-medium text-nowrap">Chọn số người phòng</div>
@@ -117,8 +210,8 @@ function RoomOccupancySelector({ room, roomIndex, occupancyData, onChange }) {
                 <select
                     className="p-1 mt-2 w-full border-2 border-gray-300 rounded bg-white relative focus:outline-none focus:ring focus:ring-yellow-500"
                     id={`adult-${roomIndex}`}
-                    value={occupancyData.adults || 0}
-                    onChange={(e) => onChange(roomIndex, 'adults', e.target.value)}
+                    value={occupancyData.adults || 1}
+                    onChange={handleAdultChange}
                 >
                     {[...Array(room.adultMax)].map((_, i) => (
                         <option key={i + 1} value={i + 1}>{i + 1}</option>
@@ -131,9 +224,9 @@ function RoomOccupancySelector({ room, roomIndex, occupancyData, onChange }) {
                     className="p-1 mt-2 w-full border-2 border-gray-300 rounded bg-white relative focus:outline-none focus:ring focus:ring-yellow-500"
                     id={`children-${roomIndex}`}
                     value={occupancyData.children || 0}
-                    onChange={(e) => onChange(roomIndex, 'children', e.target.value)}
+                    onChange={handleChildrenChange}
                 >
-                    {[...Array(4)].map((_, i) => (
+                    {[...Array(Math.max(0, room.adultMax - (occupancyData.adults || 1)))].map((_, i) => (
                         <option key={i} value={i}>{i}</option>
                     ))}
                 </select>
@@ -144,7 +237,7 @@ function RoomOccupancySelector({ room, roomIndex, occupancyData, onChange }) {
                     className="p-1 mt-2 w-full border-2 border-gray-300 rounded bg-white relative focus:outline-none focus:ring focus:ring-yellow-500"
                     id={`infant-${roomIndex}`}
                     value={occupancyData.infants || 0}
-                    onChange={(e) => onChange(roomIndex, 'infants', e.target.value)}
+                    onChange={handleInfantChange}
                 >
                     {[...Array(4)].map((_, i) => (
                         <option key={i} value={i}>{i}</option>
@@ -154,5 +247,4 @@ function RoomOccupancySelector({ room, roomIndex, occupancyData, onChange }) {
         </div>
     );
 }
-
 export default Collapse;

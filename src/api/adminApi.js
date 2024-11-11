@@ -384,7 +384,7 @@ const adminApi = {
   },
   //! Đặt phòng
   bookingRoom: function (accessToken, idCustomer) {
-    return http.post(`${URL_BOOKING_ROOM}/${idCustomer}`, {
+    return http.get(`${URL_BOOKING_ROOM}/${idCustomer}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,

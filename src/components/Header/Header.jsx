@@ -40,7 +40,7 @@ function Header() {
                     <div className='flex items-center gap-4 relative'>
                         <FontAwesomeIcon icon={faGlobe} size="lg" onClick={toggleDropdown} className="cursor-pointer" />
                         {isDropdownOpen && (
-                            <div className="absolute -left-8 top-5 mt-2 w-32 bg-white border rounded-lg shadow-lg z-10">
+                            <div className="absolute -left-8 top-5 mt-2 w-32 bg-white border rounded-lg shadow-lg z-30">
                                 <ul className="py-1">
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Vietnamese</li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">English</li>

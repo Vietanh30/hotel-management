@@ -1,49 +1,64 @@
-import { useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import area from "../../assets/Home/area.svg";
 import bed from "../../assets/Home/bed.svg";
 import Collapse from "./Collapse/Collapse";
 import InforRoom from "../CardRoom/InforRoom/InforRoom";
-import RoomPolicy from "../RoomPolicy/RoomPolicy";
 import Slider from "react-slick"; 
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import userApi from "../../api/userApi"; 
+import RoomPolicy from "../../components/RoomPolicy/RoomPolicy";
+import { useLocation } from "react-router-dom";
 
-function CardRoomBooking({ typeRoom }) {
+function CardRoomBooking({ typeRoom, fetchCart, dataCheckout, fetchCheckout }) {
+    const { search } = useLocation();
+    const params = new URLSearchParams(search);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [selectedRoom, setSelectedRoom] = useState(null);
     const [isRoomPolicyModalOpen, setIsRoomPolicyModalOpen] = useState(false);
     const [isInforRoomModalOpen, setIsInforRoomModalOpen] = useState(false);
     const [roomDetails, setRoomDetails] = useState(null);
     const [policyInfor, setPolicyInfor] = useState([]);
     const sliderRef = useRef(null);
 
-    const handleSelectTypeRoom = useCallback((room) => {
-        setSelectedRoom(room);
-        setIsDropdownOpen(false);
-    }, []);
+    useEffect(() => {
+        // Open dropdown if dataCheckout is not empty
+        if (dataCheckout && dataCheckout.length > 0) {
+            setIsDropdownOpen(true);
+            const startDate = params.get("startDate");
+            const endDate = params.get("endDate");
+            fetchRoomDetails(dataCheckout[0].roomTypeId, startDate, endDate);
+        } else {
+            setIsDropdownOpen(false);
+        }
+    }, [dataCheckout]);
 
     const toggleDropdown = () => setIsDropdownOpen(prev => !prev);
+    const closeDropdown = () => setIsDropdownOpen(false);
     const toggleModal = () => setIsRoomPolicyModalOpen(prev => !prev);
     const toggleInfoModal = () => setIsInforRoomModalOpen(prev => !prev);
 
-    const handleChooseRoom = async (idTypeRoom) => {
-        if (isDropdownOpen) {
-            setIsDropdownOpen(false);
-            return;
-        }
-        
-        setIsDropdownOpen(true);
+    const fetchRoomDetails = async (idTypeRoom, startDate, endDate) => {
         try {
-            const response = await userApi.getRoomById(idTypeRoom);
+            const response = await userApi.getRoomById(idTypeRoom, startDate, endDate);
+            console.log(response);
             if (response.data.statusCode === 200) {
                 setRoomDetails(response.data.data);
                 setPolicyInfor(response.data.data.policyList || []);
-            } else {
-                console.error("Failed to fetch room details:", response.data.message);
+                // Open dropdown after fetching room details
+                setIsDropdownOpen(true);
             }
         } catch (error) {
             console.error("Error fetching room details:", error);
+        }
+    };
+
+    const handleChooseRoom = (idTypeRoom) => {
+        if (isDropdownOpen) {
+            closeDropdown();
+        } else {
+            const startDate = params.get("startDate");
+            const endDate = params.get("endDate");
+            fetchRoomDetails(idTypeRoom, startDate, endDate); // Fetch details when opening dropdown
         }
     };
 
@@ -131,19 +146,23 @@ function CardRoomBooking({ typeRoom }) {
             <Collapse 
                 isOpen={isDropdownOpen} 
                 rooms={roomDetails} 
+                checkoutData ={dataCheckout}
                 onOpenModal={handleOpenPolicyModal} 
+                fetchCart={fetchCart}
+                fetchCheckout ={fetchCheckout}
             />
             {isRoomPolicyModalOpen && 
                 <RoomPolicy 
                     onClose={toggleModal} 
                     policyList={policyInfor} 
+                    isOpen={isRoomPolicyModalOpen}
                 />
             }
             {isInforRoomModalOpen && (
                 <InforRoom 
                     isOpen={isInforRoomModalOpen} 
                     onClose={toggleInfoModal} 
-                    roomDetails={roomDetails} 
+                    roomDetails={typeRoom} 
                 />
             )}
         </>

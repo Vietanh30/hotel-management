@@ -4,11 +4,9 @@ import Swal from 'sweetalert2';
 import path from '../../constants/path';
 
 const PrivateRoute = ({ element: Component, roles, userRole }) => {
-    console.log(roles);
-    console.log(userRole);
-    
-  const isAuthorized = roles.includes(userRole);
   const navigate = useNavigate();
+
+  const isAuthorized = roles.includes(userRole);
 
   useEffect(() => {
     if (!isAuthorized) {
@@ -23,16 +21,21 @@ const PrivateRoute = ({ element: Component, roles, userRole }) => {
         allowOutsideClick: false,
       }).then((result) => {
         if (result.isConfirmed) {
-          navigate(path.loginAdmin);
+          // Check if the roles include ROLE_USER
+          if (roles.includes('ROLE_USER')) {
+            navigate(path.login); // Redirect to user login
+          } else {
+            navigate(path.loginAdmin); // Redirect to admin login
+          }
         }
       });
     }
-  }, [isAuthorized, navigate]); // Theo dõi isAuthorized và navigate
+  }, [isAuthorized, navigate, roles]); // Track isAuthorized, navigate, and roles
 
-  // Nếu không có quyền truy cập, trả về null
+  // If not authorized, return null
   if (!isAuthorized) return null;
 
-  // Render component khi có quyền
+  // Render component when authorized
   return <Component />;
 };
 
