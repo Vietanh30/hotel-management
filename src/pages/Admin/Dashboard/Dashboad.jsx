@@ -152,11 +152,19 @@ function Dashboard() {
                                 Theo Tháng
                             </button>
                         </div>
-                        <Bar data={revenueChartData} options={{ responsive: true }} />
+                        {dashboardData.revenueData.length > 0 ? (
+                            <Bar data={revenueChartData} options={{ responsive: true }} />
+                        ) : (
+                            <p className="text-center text-gray-500">Chưa có dữ liệu</p>
+                        )}
                     </div>
                     <div className='col-span-1'>
                         <h2 className="text-xl font-bold">Trạng thái phòng</h2>
-                        <Pie data={roomStatusData} options={{ responsive: true }} />
+                        {dashboardData.roomStatusData.roomBooked !== undefined ? (
+                            <Pie data={roomStatusData} options={{ responsive: true }} />
+                        ) : (
+                            <p className="text-center text-gray-500">Chưa có dữ liệu</p>
+                        )}
                     </div>
                 </div>
             </div>
