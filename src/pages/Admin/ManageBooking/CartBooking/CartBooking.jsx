@@ -17,9 +17,9 @@ const CartBooking = ({ onClose, dataCart, fetchCart, resetSearch }) => {
     // This effect runs only when dataCart changes
     useEffect(() => {
         if (dataCart) {
-            setCartOptions(dataCart.roomCart);
-            setTotalAmount(dataCart.totalPrice);
-            setPolicyPrice(dataCart.policyPrice);
+            setCartOptions(dataCart.roomCart || []); // Đảm bảo cartOptions luôn là mảng
+            setTotalAmount(dataCart.totalPrice || 0);
+            setPolicyPrice(dataCart.policyPrice || 0);
         }
     }, [dataCart]);
 
@@ -51,7 +51,7 @@ const CartBooking = ({ onClose, dataCart, fetchCart, resetSearch }) => {
     }, [accessToken, fetchCart, resetSearch]);
 
     const handleCheckout = () => {
-        if (cartOptions.length === 0) {
+        if (!cartOptions || cartOptions.length === 0) {
             Swal.fire({
                 title: 'Không có phòng nào trong giỏ hàng!',
                 text: 'Vui lòng thêm phòng vào giỏ hàng trước khi đặt.',
@@ -73,7 +73,7 @@ const CartBooking = ({ onClose, dataCart, fetchCart, resetSearch }) => {
                     </button>
                 </div>
                 <div className="overflow-auto max-h-[70vh]">
-                    {cartOptions.length > 0 ? (
+                    {Array.isArray(cartOptions) && cartOptions.length > 0 ? (
                         <table className="min-w-full bg-white border border-gray-300">
                             <thead>
                                 <tr className="bg-gray-100">
@@ -109,18 +109,22 @@ const CartBooking = ({ onClose, dataCart, fetchCart, resetSearch }) => {
                         <div className="text-center text-gray-500 py-4">Không có phòng nào trong giỏ hàng.</div>
                     )}
                 </div>
-                <div className="mt-4 bg-gray-100 p-4 py-2 rounded">
-                    <div className='flex justify-between items-center'>
-                        <div>Phụ phí:</div>
-                        <div className='font-black text-xl'>{policyPrice.toLocaleString()} đ</div>
-                    </div>
-                </div>
-                <div className="mt-4 bg-gray-100 p-4 rounded">
-                    <div className='flex justify-between items-center'>
-                        <div className='text-lg'>Tổng tiền:</div>
-                        <div className='font-black text-2xl'>{totalAmount.toLocaleString()} đ</div>
-                    </div>
-                </div>
+                {cartOptions.length > 0 && (
+                    <>
+                        <div className="mt-4 bg-gray-100 p-4 py-2 rounded">
+                            <div className='flex justify-between items-center'>
+                                <div>Phụ phí:</div>
+                                <div className='font-black text-xl'>{policyPrice.toLocaleString()} đ</div>
+                            </div>
+                        </div>
+                        <div className="mt-4 bg-gray-100 p-4 rounded">
+                            <div className='flex justify-between items-center'>
+                                <div className='text-lg'>Tổng tiền:</div>
+                                <div className='font-black text-2xl'>{totalAmount.toLocaleString()} đ</div>
+                            </div>
+                        </div>
+                    </>
+                )}
                 <div className='flex justify-end mt-3'>
                     <button 
                         onClick={handleCheckout}

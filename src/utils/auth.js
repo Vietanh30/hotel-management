@@ -3,17 +3,18 @@ export const LocalStorageEventTarget = new EventTarget();
 export const setAccessTokenToLS = (access_token) => {
   localStorage.setItem("access_token", access_token);
 };
-export const setIdUserTokenToLS = (idUser) => {
-  localStorage.setItem("idUser", idUser);
+export const setPaymentIdToLS = (paymentId) => {
+  localStorage.setItem("paymentId", paymentId);
 };
+
 export const setRoleTokenToLS = (role) => {
   localStorage.setItem("role", role);
 };
 export const getRoleFromLS = () => {
   return localStorage.getItem("role") || "";
 };
-export const getIdUserFromLS = () => {
-  return localStorage.getItem("idUser") || "";
+export const getPaymentIdToLS = () => {
+  return localStorage.getItem("paymentId") || "";
 };
 export const clearLS = () => {
   localStorage.removeItem("access_token");

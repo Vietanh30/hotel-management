@@ -11,6 +11,7 @@ export const URL_EDIT_CART = "book/edit_cart";
 export const URL_GET_CHECKOUT = "book/checkout";
 export const URL_BOOKING_ROOM = "user/payment";
 export const URL_BOOKING_HISTORY = "user/history";
+export const URL_STATUS_BOOKING = "book/check_bill";
 const userApi = {
   getAllTypeRoom: function () {
     return http.get(URL_GET_ALL_TYPE_ROOM);
@@ -86,7 +87,7 @@ const userApi = {
     });
   },
   bookingRoom: function (accessToken) {
-    return http.post(URL_BOOKING_ROOM, {
+    return http.get(URL_BOOKING_ROOM, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
@@ -96,6 +97,15 @@ const userApi = {
   //! Lịch sử đặt phòng
   getBookingHistory: function (accessToken) {
     return http.get(URL_BOOKING_HISTORY, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  statusBookingRoom: function (accessToken, body) {
+    console.log(body);
+    return http.post(URL_STATUS_BOOKING, body, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,

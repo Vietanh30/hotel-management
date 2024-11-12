@@ -148,13 +148,8 @@ const handlePayment = async () => {
         const response = await adminApi.bookingRoom(accessToken, selectedCustomer.value);
         console.log(response);
         if (response.status === 200) {
-            Swal.fire({
-                title: 'Thành công!',
-                text: 'Thanh toán thành công!',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            });
             // Optionally, you can reset the form or redirect the user
+            setPaymentIdToLS(response.data.paymentId)
             await fetchBookingData(); // Refresh booking data if necessary
             window.location.href = response.data.orderurl
         } else {

@@ -8,6 +8,7 @@ const path = {
     booking: '/booking',
     checkout: '/checkout',
     bookingHistory: '/booking-history',
+    statusPayment: '/success/payment',
 
 
     //! admin

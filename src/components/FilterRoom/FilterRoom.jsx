@@ -5,10 +5,15 @@ function FilterRoom() {
     const navigate = useNavigate();
     const { search } = useLocation();
     const params = new URLSearchParams(search);
-    
-    const [checkInDate, setCheckInDate] = useState(params.get("startDate") || "");
-    const [checkOutDate, setCheckOutDate] = useState(params.get("endDate") || "");
-    const [numberRoom, setNumberRoom] = useState(params.get("roomNumber") || "");
+
+    // Thiết lập giá trị mặc định
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const [checkInDate, setCheckInDate] = useState(params.get("startDate") || today.toISOString().split("T")[0]);
+    const [checkOutDate, setCheckOutDate] = useState(params.get("endDate") || tomorrow.toISOString().split("T")[0]);
+    const [numberRoom, setNumberRoom] = useState(params.get("roomNumber") || "1");
 
     const handleCheckInChange = (e) => {
         const selectedDate = e.target.value;
@@ -34,7 +39,7 @@ function FilterRoom() {
                         <input
                             id="check-in"
                             type="date"
-                            min={new Date().toISOString().split("T")[0]} // Ngày nhỏ nhất là hôm nay
+                            min={today.toISOString().split("T")[0]} // Ngày nhỏ nhất là hôm nay
                             value={checkInDate}
                             onChange={handleCheckInChange}
                             className="border w-full bg-[#f5f5f5] rounded text-sm p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"

@@ -51,6 +51,7 @@ export const URL_GET_CHECKOUT = "book/checkout";
 
 //! Đặt phòng
 export const URL_BOOKING_ROOM = "book/payment";
+export const URL_STATUS_BOOKING = "book/check_bill";
 //! Lịch sử đặt
 export const URL_BOOKING_HISTORY = "book/history";
 
@@ -391,8 +392,16 @@ const adminApi = {
       },
     });
   },
+  statusBookingRoom: function (accessToken, body) {
+    return http.post(URL_STATUS_BOOKING, body, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
   //! Lịch sử đặt phòng
-  getBookingHistory: function (accessToken) {
+  getBookingHistory: function (accessToken, body) {
     return http.get(URL_BOOKING_HISTORY, {
       headers: {
         "Content-Type": "application/json",
