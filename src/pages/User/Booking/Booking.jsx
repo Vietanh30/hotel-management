@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinusCircle, faPlusCircle, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import path from "../../../constants/path";
+import { formatDateAndTime } from "../../../utils/utils";
 
 function Booking() {
     const { search } = useLocation();
@@ -42,6 +43,7 @@ function Booking() {
         try {
             const response = await userApi.getCart(accessToken);
             if (response.data.statusCode === 200) {
+                console.log(response.data)
                 setCartDetails(response.data.data);
             } else {
                 console.error("Failed to fetch cart details:", response.data.message);
@@ -173,14 +175,18 @@ function Booking() {
                                                     </button>
                                                 </div>
                                                 <div className='mt-2'>
-                                                    <div><span className="font-semibold">Nhận phòng:</span> {new Date(room.checkin).toLocaleString()}</div>
-                                                    <div><span className="font-semibold">Trả phòng:</span> {new Date(room.checkout).toLocaleString()}</div>
+                                                    <div><span className="font-semibold">Nhận phòng:</span> {formatDateAndTime(room.checkin)}</div>
+                                                    <div><span className="font-semibold">Trả phòng:</span> {formatDateAndTime(room.checkout)}</div>
                                                     <div><span className="font-semibold">Giá phòng:</span> {room.price.toLocaleString()} VNĐ</div>
                                                 </div>
                                             </div>
                                         ))}
                                     </>
                                 )}
+                            </div>
+                            <div className='flex justify-between items-center mt-4'>
+                                <div className='font-inter font-semibold'>Phụ phí</div>
+                                <div className='font-inter font-semibold text-yellow-500 text-xl'>{cartDetails ? `${cartDetails.policyPrice.toLocaleString()} VNĐ` : '0 VNĐ'}</div>
                             </div>
                             <div className='flex justify-between items-center mt-4'>
                                 <div className='font-inter font-semibold'>Tổng cộng</div>

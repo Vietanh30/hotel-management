@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css"; // Import CSS cho DatePicker
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
@@ -6,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import path from '../../constants/path';
 
 function SearchRoom() {
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
     const [numberOfRooms, setNumberOfRooms] = useState(1);
     const navigate = useNavigate(); // Khởi tạo useNavigate
 
@@ -16,13 +18,9 @@ function SearchRoom() {
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
 
-        // Định dạng ngày để phù hợp với input type="date"
-        const formattedToday = today.toISOString().split('T')[0];
-        const formattedTomorrow = tomorrow.toISOString().split('T')[0];
-
         // Thiết lập giá trị mặc định
-        setStartDate(formattedToday);
-        setEndDate(formattedTomorrow);
+        setStartDate(today);
+        setEndDate(tomorrow);
     }, []);
 
     const handleSearch = () => {
@@ -34,7 +32,7 @@ function SearchRoom() {
             });
             return;
         }
-        if (new Date(startDate) > new Date(endDate)) {
+        if (startDate > endDate) {
             Swal.fire({
                 icon: 'error',
                 title: 'Lỗi',
@@ -43,8 +41,12 @@ function SearchRoom() {
             return;
         }
 
+        // Chuyển đổi định dạng sang yyyy-mm-dd
+        const formattedStartDate = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
+        const formattedEndDate = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+
         // Chuyển hướng đến trang booking với các tham số
-        navigate(`${path.booking}?startDate=${startDate}&endDate=${endDate}&roomNumber=${numberOfRooms}`);
+        navigate(`${path.booking}?startDate=${formattedStartDate}&endDate=${formattedEndDate}&roomNumber=${numberOfRooms}`);
     };
 
     return ( 
@@ -54,30 +56,27 @@ function SearchRoom() {
                     <div className="bg-white bg-opacity-35 rounded-3xl shadow-lg px-8 py-6 text-white mx-auto w-3/4">
                         <div className="grid grid-cols-9 items-center">
                             <div className="col-span-5 flex gap-6 justify-evenly">
-                                {/* Check-in Input with Icon */}
+                                {/* Check-in Input with DatePicker */}
                                 <div>
                                     <div className='text-white font-garamond text-base mb-1'>Ngày bắt đầu</div>
-                                    <div className="flex items-center border-r-2 border-r-white mr-8">
-                                        <input
-                                            type="date"
-                                            min={new Date().toISOString().split('T')[0]} // Ngày tối thiểu là hôm nay
-                                            value={startDate}
-                                            onChange={(e) => setStartDate(e.target.value)}
-                                            className="bg-transparent text-xl rounded-md w-full focus:outline-none mr-8"
-                                        />
-                                    </div>
+                                    <DatePicker
+                                        selected={startDate}
+                                        onChange={(date) => setStartDate(date)}
+                                        dateFormat="dd/MM/yyyy"
+                                        className="bg-transparent rounded-md w-full focus:outline-none cursor-pointer border p-1"
+                                        minDate={new Date()} // Ngày tối thiểu là hôm nay
+                                    />
                                 </div>
-                                {/* Check-out Input with Icon */}
+                                {/* Check-out Input with DatePicker */}
                                 <div>
                                     <div className='text-white font-garamond text-base mb-1'>Ngày kết thúc</div>
-                                    <div className="flex items-center border-r-2 border-r-white mr-8">
-                                        <input
-                                            type="date"
-                                            value={endDate}
-                                            onChange={(e) => setEndDate(e.target.value)}
-                                            className="bg-transparent text-xl rounded-md w-full focus:outline-none mr-8"
-                                        />
-                                    </div>
+                                    <DatePicker
+                                        selected={endDate}
+                                        onChange={(date) => setEndDate(date)}
+                                        dateFormat="dd/MM/yyyy"
+                                        className="bg-transparent rounded-md w-full focus:outline-none cursor-pointer border p-1"
+                                        minDate={startDate || new Date()} // Ngày tối thiểu là ngày bắt đầu
+                                    />
                                 </div>
                             </div>
 

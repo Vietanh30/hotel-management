@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Import CSS cho DatePicker
 
 function FilterRoom() {
     const navigate = useNavigate();
@@ -11,21 +13,31 @@ function FilterRoom() {
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
 
-    const [checkInDate, setCheckInDate] = useState(params.get("startDate") || today.toISOString().split("T")[0]);
-    const [checkOutDate, setCheckOutDate] = useState(params.get("endDate") || tomorrow.toISOString().split("T")[0]);
+    const [checkInDate, setCheckInDate] = useState(params.get("startDate") ? new Date(params.get("startDate")) : today);
+    const [checkOutDate, setCheckOutDate] = useState(params.get("endDate") ? new Date(params.get("endDate")) : tomorrow);
     const [numberRoom, setNumberRoom] = useState(params.get("roomNumber") || "1");
 
-    const handleCheckInChange = (e) => {
-        const selectedDate = e.target.value;
-        setCheckInDate(selectedDate);
+    const handleCheckInChange = (date) => {
+        setCheckInDate(date);
         // Đặt ngày trả phòng tối thiểu là ngày nhận phòng + 1
-        const nextDay = new Date(selectedDate);
+        const nextDay = new Date(date);
         nextDay.setDate(nextDay.getDate() + 1);
-        setCheckOutDate(nextDay.toISOString().split("T")[0]);
+        setCheckOutDate(nextDay);
     };
 
     const handleSearch = () => {
-        navigate(`/booking?startDate=${checkInDate}&endDate=${checkOutDate}&roomNumber=${numberRoom}`);
+        const formattedCheckInDate = `${checkInDate.getFullYear()}-${String(checkInDate.getMonth() + 1).padStart(2, '0')}-${String(checkInDate.getDate()).padStart(2, '0')}`;
+        const formattedCheckOutDate = `${checkOutDate.getFullYear()}-${String(checkOutDate.getMonth() + 1).padStart(2, '0')}-${String(checkOutDate.getDate()).padStart(2, '0')}`;
+        navigate(`/booking?startDate=${formattedCheckInDate}&endDate=${formattedCheckOutDate}&roomNumber=${numberRoom}`);
+    };
+
+    // Hàm chuyển đổi định dạng ngày
+    const formatDateToDDMMYYYY = (date) => {
+        if (!date) return "";
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
     };
 
     return (
@@ -35,14 +47,13 @@ function FilterRoom() {
                     <label htmlFor="check-in" className="font-inter font-semibold mb-2 text-sm">
                         Ngày nhận phòng
                     </label>
-                    <div className="flex items-center mt-3">
-                        <input
-                            id="check-in"
-                            type="date"
-                            min={today.toISOString().split("T")[0]} // Ngày nhỏ nhất là hôm nay
-                            value={checkInDate}
+                    <div className="w-full mt-3 grid">
+                        <DatePicker
+                            selected={checkInDate}
                             onChange={handleCheckInChange}
+                            minDate={today}
                             className="border w-full bg-[#f5f5f5] rounded text-sm p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                            dateFormat="dd/MM/yyyy" // Định dạng hiển thị
                         />
                     </div>
                 </div>
@@ -50,14 +61,13 @@ function FilterRoom() {
                     <label htmlFor="check-out" className="font-inter font-semibold mb-2 text-sm">
                         Ngày trả phòng
                     </label>
-                    <div className="flex items-center mt-3">
-                        <input
-                            id="check-out"
-                            type="date"
-                            min={checkInDate ? new Date(new Date(checkInDate).getTime() + 86400000).toISOString().split("T")[0] : ""}
-                            value={checkOutDate}
-                            onChange={(e) => setCheckOutDate(e.target.value)}
+                    <div className="w-full mt-3 grid">
+                        <DatePicker
+                            selected={checkOutDate}
+                            onChange={(date) => setCheckOutDate(date)}
+                            minDate={new Date(checkInDate.getTime() + 86400000)} // Ngày tối thiểu là ngày nhận phòng + 1
                             className="border w-full bg-[#f5f5f5] rounded text-sm p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                            dateFormat="dd/MM/yyyy" // Định dạng hiển thị
                         />
                     </div>
                 </div>

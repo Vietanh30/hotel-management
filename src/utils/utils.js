@@ -15,8 +15,8 @@ export const getIdFromNameId = (nameId) => {
 
 export const formatDate = (date) => {
   return new Date(date).toLocaleDateString("vi-VN", {
-    day: "2-digit",
     month: "2-digit",
+    day: "2-digit",
     year: "numeric",
   });
 };
@@ -46,4 +46,33 @@ export function convertToTimeValue(timeString) {
 
   // Trả về định dạng HH:mm
   return `${hours}:${minutes}`;
+}
+export function formatDateAndTime(dateString) {
+  const date = new Date(dateString);
+
+  // Lấy các thành phần của ngày
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  // Kết hợp thành chuỗi theo định dạng yêu cầu
+  return `${day}/${month}/${year}, ${hours}:${minutes}`;
+}
+export function formatDateToDDMMYYYY(dateString) {
+  // Tách chuỗi ngày
+  const parts = dateString.split("/");
+  if (parts.length !== 3) {
+    throw new Error(
+      "Định dạng ngày không hợp lệ. Vui lòng sử dụng mm/dd/yyyy."
+    );
+  }
+
+  const month = parts[0];
+  const day = parts[1];
+  const year = parts[2];
+
+  // Trả về định dạng dd/mm/yyyy
+  return `${day}/${month}/${year}`;
 }

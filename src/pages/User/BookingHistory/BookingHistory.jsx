@@ -10,7 +10,7 @@ import DataTable from 'react-data-table-component';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { formatDate } from '../../../utils/utils';
+import { formatDate, formatDateAndTime } from '../../../utils/utils';
 import path from '../../../constants/path';
 
 function BookingHistory() {
@@ -140,7 +140,7 @@ function BookingHistory() {
         <>
             <Header />
             <Navbar />
-            <div className="bg-[#E5E5E5] w-full ">
+            <div className="w-full ">
                 <div className='container mx-auto'>
                     <div className="overflow-x-auto">
                         <div className="my-10">
@@ -233,7 +233,7 @@ function BookingHistory() {
                                         { label: 'Ngày đặt phòng:', value: formatDate(selectedBooking.bookingDate) },
                                         { label: 'Tổng giá phòng:', value: selectedBooking.totalRoomPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) },
                                         { label: 'Tổng giá chính sách:', value: selectedBooking.totalPolicyPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) },
-                                        { label: 'Tổng giá đặt phòng:', value: selectedBooking.totalBookingPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) },
+                                        { label: 'Tổng giá đặt phòng:', value: selectedBooking.totalBookingPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) },                                        
                                         { label: 'Số phòng đặt:', value: selectedBooking.totalRoomBooking },
                                         {
                                             label: 'Trạng thái thanh toán:',
@@ -269,6 +269,12 @@ function BookingHistory() {
                                                 </div>
                                                 <div className="bg-gray-100 p-4 rounded">
                                                     <span className="block font-bold">Số người: {room.adults} người lớn, {room.children} trẻ em, {room.infant} trẻ sơ sinh</span>
+                                                </div>
+                                                <div className="bg-gray-100 p-4 rounded">
+                                                    <span className="block font-bold">Ngày nhận : {formatDateAndTime(room.checkIn)}</span>
+                                                </div>
+                                                <div className="bg-gray-100 p-4 rounded">
+                                                    <span className="block font-bold">Ngày trả : {formatDateAndTime(room.checkOut)}</span>
                                                 </div>
                                                 <div className="bg-gray-100 p-4 rounded">
                                                     <span className="block font-bold">Giá phòng: {room.roomPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>

@@ -5,7 +5,7 @@ import DataTable from 'react-data-table-component';
 import adminApi from "../../../api/adminApi";
 import { getAccessTokenFromLS } from "../../../utils/auth";
 import Swal from 'sweetalert2';
-import { formatDate } from "../../../utils/utils";
+import { formatDate, formatDateAndTime } from "../../../utils/utils";
 import Sidebar from "../Sidebar/Sidebar";
 
 function BookingHistoryAdmin() {
@@ -14,12 +14,12 @@ function BookingHistoryAdmin() {
     const [loading, setLoading] = useState(true);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [showModal, setShowModal] = useState(false);
-
     const fetchBookingHistory = async () => {
         try {
             const accessToken = getAccessTokenFromLS();
             const response = await adminApi.getBookingHistory(accessToken);
             if (response.data.statusCode === 200) {
+                console.log(response)
                 setBookingHistory(response.data.data);
             }
         } catch (error) {
@@ -240,7 +240,7 @@ function BookingHistoryAdmin() {
                             <h3 className="text-lg font-bold mb-2">Thông tin chi tiết các phòng đặt:</h3>
                             {selectedBooking.bookingRoomDetails.map((room, index) => (
                                 <div key={index} className="mb-4">
-                                    <div className="grid grid-cols-4 gap-2">
+                                    <div className="grid grid-cols-6 gap-2">
                                         <div className="bg-gray-100 p-4 rounded">
                                             <span className="block font-bold">Số phòng: {room.roomNumber}</span>
                                         </div>
@@ -249,6 +249,12 @@ function BookingHistoryAdmin() {
                                         </div>
                                         <div className="bg-gray-100 p-4 rounded">
                                             <span className="block font-bold">Số người: {room.adults} người lớn, {room.children} trẻ em, {room.infant} trẻ sơ sinh</span>
+                                        </div>
+                                        <div className="bg-gray-100 p-4 rounded">
+                                            <span className="block font-bold">Ngày nhận : {formatDateAndTime(room.checkIn)}</span>
+                                        </div>
+                                        <div className="bg-gray-100 p-4 rounded">
+                                            <span className="block font-bold">Ngày trả : {formatDateAndTime(room.checkOut)}</span>
                                         </div>
                                         <div className="bg-gray-100 p-4 rounded">
                                             <span className="block font-bold">Giá phòng: {room.roomPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
