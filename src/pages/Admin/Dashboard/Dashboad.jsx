@@ -73,7 +73,7 @@ function Dashboard() {
         <>
             <Sidebar />
             <div className="p-4 sm:ml-60 bg-slate-50 min-h-screen">
-                <div className="grid grid-cols-4 gap-4 mt-20">
+                <div className="grid grid-cols-4 gap-4 mt-20 p-4">
                     <div className="bg-white p-4 rounded-lg shadow">
                         <div className="flex items-center">
                             <div className="bg-blue-100 p-2 rounded-full mr-3">
@@ -135,7 +135,7 @@ function Dashboard() {
                         </div>
                     </div>
                 </div>
-                <div className="mt-10 grid grid-cols-3 gap-4">
+                <div className="mt-10 grid grid-cols-3 gap-4 p-4">
                     <div className='col-span-2'>
                         <h2 className="text-xl font-bold">Doanh thu theo ngày</h2>
                         <div className="flex mb-4 gap-4">
