@@ -260,7 +260,7 @@ function BookingHistory() {
                                     <h3 className="text-lg font-bold mb-2">Thông tin chi tiết các phòng đặt:</h3>
                                     {selectedBooking.bookingRoomDetails.map((room, index) => (
                                         <div key={index} className="mb-4">
-                                            <div className="grid grid-cols-4 gap-2">
+                                            <div className="grid grid-cols-6 gap-2">
                                                 <div className="bg-gray-100 p-4 rounded">
                                                     <span className="block font-bold">Số phòng: {room.roomNumber}</span>
                                                 </div>
