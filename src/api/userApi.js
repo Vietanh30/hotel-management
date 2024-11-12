@@ -12,6 +12,7 @@ export const URL_GET_CHECKOUT = "book/checkout";
 export const URL_BOOKING_ROOM = "user/payment";
 export const URL_BOOKING_HISTORY = "user/history";
 export const URL_STATUS_BOOKING = "book/check_bill";
+export const URL_SEND_FEEDBACK = "book/feedback";
 const userApi = {
   getAllTypeRoom: function () {
     return http.get(URL_GET_ALL_TYPE_ROOM);
@@ -106,6 +107,15 @@ const userApi = {
   statusBookingRoom: function (accessToken, body) {
     console.log(body);
     return http.post(URL_STATUS_BOOKING, body, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  sendFeedback: function (accessToken, body) {
+    console.log("body: ", body);
+    return http.post(URL_SEND_FEEDBACK, body, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,

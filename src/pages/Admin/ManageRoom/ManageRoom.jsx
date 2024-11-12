@@ -25,12 +25,14 @@ function ManageRoom() {
             const accessToken = getAccessTokenFromLS();
             const response = await adminApi.getAllRoom(accessToken);
             if (response.data.statusCode === 200) {
+                console.log("rooms",response.data)
                 setRooms(response.data.data);
             }
 
             const typeResponse = await adminApi.getAllTypeRoom(accessToken);
             if (typeResponse.data.statusCode === 200) {
                 setRoomTypes(typeResponse.data.data);
+                console.log("typeResponse", typeResponse)
             }
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -49,8 +51,8 @@ function ManageRoom() {
                 item.description.toLowerCase().includes(searchText.toLowerCase());
             
             const matchesRoomRank = selectedRoomRank ? 
-                (selectedRoomRank.value === null || item.roomRank === selectedRoomRank.value) : true;
-
+                (selectedRoomRank.value === null || item.roomRankId === selectedRoomRank.value) : true;
+    
             return matchesSearchText && matchesRoomRank;
         });
     }, [searchText, rooms, selectedRoomRank]);
@@ -170,7 +172,7 @@ function ManageRoom() {
                     </div>
                     <div className="mt-6">
                         <div className="flex justify-between">
-                            <Select
+                        <Select
                             options={[
                                 { value: null, label: 'Tất cả' }, // Tùy chọn "Tất cả"
                                 ...roomTypes.map(type => ({ value: type.id, label: type.name })),
@@ -178,7 +180,7 @@ function ManageRoom() {
                             onChange={setSelectedRoomRank}
                             placeholder="Chọn hạng phòng"
                             className="mb-4"
-                            />
+                        />
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm phòng..."

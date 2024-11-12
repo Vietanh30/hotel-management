@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { clearLS, getAccessTokenFromLS } from "../../utils/auth";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import path from "../../constants/path";
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const accessToken = getAccessTokenFromLS();
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Get the current hash from the URL
   const currentHash = location.hash;
@@ -31,34 +33,66 @@ function Navbar() {
     }
   };
 
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
   return (
     <div className="bg-[#F5E8D0] sticky top-0 py-4 z-20">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex space-x-6">
           <a href={`${path.home}#overview`} className={`text-base ${getTextClass('#overview')} hover:text-[#885d37] font-garamond font-medium`}>Tổng quan</a>
-          <a href={`${path.home}#typeRoom`}  className={`text-base ${getTextClass('#typeRoom')} hover:text-[#885d37] font-garamond font-medium`}>Hạng phòng</a>
-          <a href={`${path.home}#rating`}  className={`text-base ${getTextClass('#rating')} hover:text-[#885d37] font-garamond font-medium`}>Đánh giá</a>
+          <a href={`${path.home}#typeRoom`} className={`text-base ${getTextClass('#typeRoom')} hover:text-[#885d37] font-garamond font-medium`}>Hạng phòng</a>
+          <a href={`${path.home}#rating`} className={`text-base ${getTextClass('#rating')} hover:text-[#885d37] font-garamond font-medium`}>Đánh giá</a>
           <a href={`${path.home}#services`} className={`text-base ${getTextClass('#services')} hover:text-[#885d37] font-garamond font-medium`}>Dịch vụ</a>
           <a href={`${path.home}#location`} className={`text-base ${getTextClass('#location')} hover:text-[#885d37] font-garamond font-medium`}>Vị trí</a>
-          <a href={`${path.home}#faqs`}  className={`text-base ${getTextClass('#faqs')} hover:text-[#885d37] font-garamond font-medium`}>Hỏi đáp</a>
+          <a href={`${path.home}#faqs`} className={`text-base ${getTextClass('#faqs')} hover:text-[#885d37] font-garamond font-medium`}>Hỏi đáp</a>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 relative">
           {accessToken && (
+            <div>
+              <button 
+                className="bg-[#B5986D] text-white rounded-md py-[5px] px-4 hover:bg-[#8A6A4E]"
+                onClick={toggleDropdown}
+              >
+                Tùy chọn
+              </button>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm font-semibold hover:text-white hover:bg-yellow-400"
+                    onClick={handleBookingHistory}
+                  >
+                    Lịch sử đặt
+                  </button>
+                  <Link 
+                    to={path.changePassword} 
+                    className="block w-full text-left px-4 py-2 text-sm font-semibold hover:text-white hover:bg-yellow-400"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    Đổi mật khẩu
+                  </Link>
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm font-semibold hover:text-white hover:bg-yellow-400"
+                    onClick={handleAuthToggle}
+                  >
+                    Đăng xuất
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          {!accessToken && (
             <button 
               className="bg-[#B5986D] text-white rounded-md py-[5px] px-4 hover:bg-[#8A6A4E]"
-              onClick={handleBookingHistory}
+              onClick={handleAuthToggle}
             >
-              Lịch sử đặt
+              {accessToken ? 'Đăng xuất' : 'Đăng nhập'}
             </button>
+
           )}
-          <button 
-            className="bg-[#B5986D] text-white rounded-md py-[5px] px-4 hover:bg-[#8A6A4E]"
-            onClick={handleAuthToggle}
-          >
-            {accessToken ? 'Đăng xuất' : 'Đăng nhập'}
-          </button>
           {!accessToken && (
-            <button className="bg-[#B5986D] text-white rounded-md py-2 px-4 hover:bg-[#8A6A4E]">
+            <button className="bg-[#B5986D] text-white rounded-md py-[5px] px-4 hover:bg-[#8A6A4E]">
               Đăng ký
             </button>
           )}

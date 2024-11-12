@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component';
 import { getAccessTokenFromLS, getPaymentIdToLS, getRoleFromLS } from '../../utils/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import path from '../../constants/path';
+import Swal from 'sweetalert2';
 
 function StatusPayment() {
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -12,10 +13,13 @@ function StatusPayment() {
   const [showPolicyModal, setShowPolicyModal] = useState(false);
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [feedback, setFeedback] = useState('');
+  const [feedbackSent, setFeedbackSent] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
   const paymentId = getPaymentIdToLS();
+  const role = getRoleFromLS();
 
   const getQueryParams = (query) => {
     const params = new URLSearchParams(query);
@@ -33,12 +37,11 @@ function StatusPayment() {
         paymentId,
         transId,
       });
-      if (response.data.statusCode === 200) {
-        setPaymentStatus(response.data);
-        setModalOpen(true);
-      }
+      setPaymentStatus(response.data);
+      setModalOpen(true);
     } catch (error) {
       if (error.response.data.statusCode === 400) {
+        console.log(error.response.data);
         setPaymentStatus(error.response.data);
         setModalOpen(true);
       }
@@ -115,11 +118,53 @@ function StatusPayment() {
   };
 
   const handleNavigateHome = () => {
-    const role = getRoleFromLS();
-    if (role === 'ROLE_USER') {
-      navigate(path.home);
-    } else if (role === 'ROLE_ADMINISTRATOR') {
-      navigate(path.dashboard);
+    if (paymentStatus && paymentStatus.statusCode !== 400 && !feedbackSent) {
+      Swal.fire({
+        title: 'Thông báo',
+        text: 'Vui lòng đánh giá trước khi quay về trang chủ!',
+        icon: 'warning',
+        confirmButtonText: 'OK'
+      });
+    } else {
+      const destination = role === 'ROLE_USER' ? path.home : path.dashboard;
+      navigate(destination);
+    }
+  };
+
+  const handleSubmitFeedback = async () => {
+    if (!feedback.trim()) { // Kiểm tra xem feedback không rỗng
+      Swal.fire({
+        title: 'Lỗi',
+        text: 'Vui lòng nhập đánh giá trước khi gửi!',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+
+    try {
+      const accessToken = getAccessTokenFromLS();
+      const body = {
+        paymentId : paymentId,
+        feedback: feedback,
+      };
+      const response = await userApi.sendFeedback(accessToken, body);
+      console.log(response);
+      setFeedbackSent(true); // Đánh dấu đã gửi feedback
+      Swal.fire({
+        title: 'Thành công',
+        text: 'Đánh giá của bạn đã được gửi thành công!',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      });
+    } catch (error) {
+      console.error('Error sending feedback:', error);
+      Swal.fire({
+        title: 'Lỗi',
+        text: 'Đã có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -140,28 +185,51 @@ function StatusPayment() {
               pagination={false}
               customStyles={{
                 headRow: { 
-                    style: { 
-                        fontSize: '15px', 
-                        fontWeight: 'bold', 
-                        backgroundColor: '#edce94', 
-                        borderStartStartRadius: '15px', 
-                        borderStartEndRadius: '15px', 
-                    } 
+                  style: { 
+                    fontSize: '15px', 
+                    fontWeight: 'bold', 
+                    backgroundColor: '#edce94', 
+                    borderStartStartRadius: '15px', 
+                    borderStartEndRadius: '15px', 
+                  } 
                 },
                 rows: { 
-                    style: { 
-                        fontSize: '14px', 
-                        fontWeight: '500', 
-                        fontFamily: 'inter', 
-                        paddingTop: '6px', 
-                        paddingBottom: '6px', 
-                        textOverflow: 'ellipsis', 
-                    } 
+                  style: { 
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    fontFamily: 'inter', 
+                    paddingTop: '6px', 
+                    paddingBottom: '6px', 
+                    textOverflow: 'ellipsis', 
+                  } 
                 },
-            }}
-            noDataComponent={<div className="text-center bg-[#000] w-full p-3 text-white">Không tìm thấy phòng nào.</div>}
+              }}
+              noDataComponent={<div className="text-center bg-[#000] w-full p-3 text-white">Không tìm thấy phòng nào.</div>}
               className="bg-white rounded-lg shadow-md"
             />
+
+            {/* Phần đánh giá */}
+            {paymentStatus && paymentStatus.statusCode !== 400 && role === 'ROLE_USER' && (
+              <div className="mt-4">
+                <h3 className="text-xl font-bold">Đánh giá của bạn</h3>
+                <textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  className={`w-full mt-2 p-2 border rounded-md ${feedbackSent ? 'bg-gray-200' : ''}`}
+                  rows="4"
+                  placeholder="Nhập đánh giá của bạn..."
+                  disabled={feedbackSent} // Vô hiệu hóa nếu đã gửi feedback
+                />
+                <button
+                  onClick={handleSubmitFeedback}
+                  className={`mt-2 px-3 py-2 rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold transition duration-200 ${feedbackSent ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={feedbackSent} // Vô hiệu hóa nếu đã gửi feedback
+                >
+                  Gửi đánh giá
+                </button>
+              </div>
+            )}
+
             <div className="mt-4 flex justify-end">
               <button
                 onClick={handleNavigateHome} // Gọi hàm điều hướng

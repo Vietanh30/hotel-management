@@ -5,7 +5,6 @@ import flagVietnam from "../../../assets/Header/flagsVietnam.svg";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from "react-router-dom";
-import Footer from "../../../components/Footer/Footer";
 import path from "../../../constants/path";
 import authApi from '../../../api/authApi'; // Import your API
 import { setAccessTokenToLS, setRoleTokenToLS } from '../../../utils/auth'; // Ensure this function exists
@@ -183,7 +182,6 @@ function Login({ setUserRole }) {
                     </div>
                 </div>
             </div>
-            <Footer />
         </>
     );
 }

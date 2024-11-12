@@ -4,6 +4,7 @@ const path = {
     about: '/about',
     login: '/login',
     forgotPassword: '/forgot-password',
+    changePassword: '/change-password',
     register: '/register',
     booking: '/booking',
     checkout: '/checkout',
