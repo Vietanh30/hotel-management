@@ -8,6 +8,7 @@ import { getAccessTokenFromLS } from '../../../utils/auth';
 import RoomPolicy from '../../../components/RoomPolicy/RoomPolicy';
 import ServiceChange from '../../Admin/CheckOutAdmin/ServiceChange/ServiceChange';
 import Swal from 'sweetalert2';
+import Navbar from '../../../components/Navbar/Navbar';
 function Checkout() {
     const [bookingData, setBookingData] = useState({
         totalRoomPrice: 0,
@@ -17,7 +18,6 @@ function Checkout() {
         bookingRoomDetails: [],
       });
       const [showDropdown, setShowDropdown] = useState(null);
-      const [selectedCustomer, setSelectedCustomer] = useState(null);
       const [serviceModalIndex, setServiceModalIndex] = useState(null);
       const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
       const [selectedRoomPolicies, setSelectedRoomPolicies] = useState([]);
@@ -30,7 +30,6 @@ function Checkout() {
       const fetchBookingData = useCallback(async () => {
         try {
           const response = await userApi.getCheckout(accessToken);
-          console.log(response)
           setBookingData(response.data.data);
         } catch (error) {
           console.error('Failed to fetch booking data:', error);
@@ -39,6 +38,7 @@ function Checkout() {
     
       useEffect(() => {
         fetchBookingData();
+        window.scrollTo(0, 0);
       }, [ fetchBookingData]);
     
       const handleOccupancyChange = useCallback((index, type, value) => {
@@ -74,7 +74,7 @@ function Checkout() {
         console.log(params);
         try {
             const response = await userApi.editCartItem(accessToken, params);
-            console.log(response);
+            // console.log(response);
             if (response.data.statusCode === 200) {
                 // Hiển thị thông báo thành công
                 Swal.fire({
@@ -112,30 +112,19 @@ function Checkout() {
         }
     };
     const handlePayment = async () => {
-        console.log(selectedCustomer)
-        if (!selectedCustomer) {
-            Swal.fire({
-                title: 'Chưa chọn khách hàng!',
-                text: 'Vui lòng chọn một khách hàng trước khi thanh toán.',
-                icon: 'warning',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-    
         try {
-            const response = await userApi.bookingRoom(accessToken,);
-            console.log(response);
+            const response = await userApi.bookingRoom(accessToken);
+            console.log("payment",response);
             if (response.status === 200) {
                 Swal.fire({
                     title: 'Thành công!',
-                    text: 'Thanh toán thành công!',
+                    text: response.data.description,
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });
                 // Optionally, you can reset the form or redirect the user
                 await fetchBookingData(); // Refresh booking data if necessary
-                window.location.href = response.data.orderurl
+                // window.location.href = response.data.orderurl
             } else {
                 Swal.fire({
                     title: 'Lỗi!',
@@ -252,6 +241,7 @@ function Checkout() {
   return (
     <>
       <Header />
+      <Navbar />
       <div className="bg-[#E5E5E5] w-full">
         <div className='container mx-auto'>
 

@@ -25,6 +25,12 @@ function Navbar() {
     }
   };
 
+  const handleBookingHistory = () => {
+    if (accessToken) {
+      navigate(path.bookingHistory); // Thay đổi đường dẫn tới trang lịch sử đặt
+    }
+  };
+
   return (
     <div className="bg-[#F5E8D0] sticky top-0 py-4 z-20">
       <div className="container mx-auto flex justify-between items-center">
@@ -37,11 +43,14 @@ function Navbar() {
           <a href={`${path.home}#faqs`}  className={`text-base ${getTextClass('#faqs')} hover:text-[#885d37] font-garamond font-medium`}>Hỏi đáp</a>
         </div>
         <div className="flex items-center space-x-4">
-          <input
-            type="text"
-            placeholder="Tìm kiếm..."
-            className="border border-gray-300 rounded-md py-1 px-2 focus:outline-none focus:ring focus:ring-[#B5986D] w-48"
-          />
+          {accessToken && (
+            <button 
+              className="bg-[#B5986D] text-white rounded-md py-[5px] px-4 hover:bg-[#8A6A4E]"
+              onClick={handleBookingHistory}
+            >
+              Lịch sử đặt
+            </button>
+          )}
           <button 
             className="bg-[#B5986D] text-white rounded-md py-[5px] px-4 hover:bg-[#8A6A4E]"
             onClick={handleAuthToggle}

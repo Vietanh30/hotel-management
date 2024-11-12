@@ -7,14 +7,8 @@ const path = {
     register: '/register',
     booking: '/booking',
     checkout: '/checkout',
-    // products: '/products',
-    // historyOrder: '/history-order',
-    // historyOrderDetail: (id) => `history-order/${id}`,
+    bookingHistory: '/booking-history',
 
-    // productDetail: (id)=> `/products/${id}`,
-    // error: '/error',
-    // cart: '/cart',
-    // register: '/register',
 
     //! admin
     loginAdmin: '/login-admin',
