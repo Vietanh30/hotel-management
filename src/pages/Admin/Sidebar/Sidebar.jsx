@@ -122,12 +122,12 @@ function Sidebar() {
                                 <span className="flex-1 ms-3 whitespace-nowrap">Lịch sử đặt phòng</span>
                             </Link>
                         </li>
-                        <li>
+                        {/* <li>
                             <Link to="/report" className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive("/report") ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faChartLine} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Báo cáo, thống kê</span>
                             </Link>
-                        </li>
+                        </li> */}
                         {/* <li>
                             <Link to="/feedback" className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive("/feedback") ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faCommentDots} className="mr-2" />

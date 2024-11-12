@@ -130,7 +130,7 @@ function ManageStaff() {
             name: 'Số điện thoại',
             selector: row => row.phone || 'N/A',
             sortable: true,
-            width: "10%",
+            width: "15%",
         },
         {
             name: 'Ngày sinh',
@@ -138,12 +138,7 @@ function ManageStaff() {
             sortable: true,
             width: "10%",
         },
-        {
-            name: 'Chức vụ',
-            selector: row => row.role.role,
-            sortable: true,
-            width: "10%",
-        },
+       
         {
             name: 'Trạng thái',
             selector: row => row.active === true ? 'Hoạt động' : 'Không hoạt động',

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../Sidebar/Sidebar';
 import adminApi from '../../../api/adminApi';
-import { getAccessTokenFromLS } from '../../../utils/auth';
+import { getAccessTokenFromLS, setPaymentIdToLS } from '../../../utils/auth';
 import Select from 'react-select';
 import AddCustomer from '../ManageCustomer/AddCustomer/AddCustomer';
 import ServiceChange from './ServiceChange/ServiceChange';

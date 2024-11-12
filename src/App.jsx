@@ -66,7 +66,7 @@ function App() {
         <Route
           path={path.statusPayment}
           element={
-            <PrivateRoute element={StatusPayment} roles={["ROLE_USER", "ROLE_ADMINISTRATOR"]} userRole={userRole} />
+            <PrivateRoute element={StatusPayment} roles={["ROLE_USER", "ROLE_ADMINISTRATOR", "ROLE_STAFF"]} userRole={userRole} />
           }
           
         />
@@ -85,61 +85,61 @@ function App() {
         <Route
           path={path.dashboard}
           element={
-            <PrivateRoute element={Dashboard} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+            <PrivateRoute element={Dashboard} roles={["ROLE_ADMINISTRATOR", "ROLE_STAFF"]} userRole={userRole} />
           }
         />
         <Route
           path={path.manageTypeRoom}
           element={
-            <PrivateRoute element={ManageTypeRoom} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+            <PrivateRoute element={ManageTypeRoom} roles={["ROLE_ADMINISTRATOR", "ROLE_STAFF"]} userRole={userRole} />
           }
         />
         <Route
           path={path.manageService}
           element={
-            <PrivateRoute element={ManageService} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+            <PrivateRoute element={ManageService} roles={["ROLE_ADMINISTRATOR", "ROLE_STAFF"]} userRole={userRole} />
           }
         />
         <Route
           path={path.manageRoom}
           element={
-            <PrivateRoute element={ManageRoom} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+            <PrivateRoute element={ManageRoom} roles={["ROLE_ADMINISTRATOR", "ROLE_STAFF"]} userRole={userRole} />
           }
         />
         <Route
           path={path.manageNumberRoom}
           element={
-            <PrivateRoute element={ManageNumberRoom} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+            <PrivateRoute element={ManageNumberRoom} roles={["ROLE_ADMINISTRATOR", "ROLE_STAFF"]} userRole={userRole} />
           }
         />
         <Route
           path={path.manageStaff}
           element={
-            <PrivateRoute element={ManageStaff} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+            <PrivateRoute element={ManageStaff} roles={["ROLE_ADMINISTRATOR", "ROLE_STAFF"]} userRole={userRole} />
           }
         />
         <Route
           path={path.manageCustomer}
           element={
-            <PrivateRoute element={ManageCustomer} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+            <PrivateRoute element={ManageCustomer} roles={["ROLE_ADMINISTRATOR", "ROLE_STAFF"]} userRole={userRole} />
           }
         />
         <Route
           path={path.manageBooking}
           element={
-            <PrivateRoute element={ManageBooking} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+            <PrivateRoute element={ManageBooking} roles={["ROLE_ADMINISTRATOR", "ROLE_STAFF"]} userRole={userRole} />
           }
         />
         <Route
           path={path.checkOutAdmin}
           element={
-            <PrivateRoute element={CheckOutAdmin} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+            <PrivateRoute element={CheckOutAdmin} roles={["ROLE_ADMINISTRATOR", "ROLE_STAFF"]} userRole={userRole} />
           }
         />
         <Route
           path={path.bookingHistoryAdmin}
           element={
-            <PrivateRoute element={BookingHistoryAdmin} roles={["ROLE_ADMINISTRATOR"]} userRole={userRole} />
+            <PrivateRoute element={BookingHistoryAdmin} roles={["ROLE_ADMINISTRATOR", "ROLE_STAFF"]} userRole={userRole} />
           }
         />
       </Routes>

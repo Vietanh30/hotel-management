@@ -54,6 +54,8 @@ export const URL_BOOKING_ROOM = "book/payment";
 export const URL_STATUS_BOOKING = "book/check_bill";
 //! Lịch sử đặt
 export const URL_BOOKING_HISTORY = "book/history";
+//! Thống kế
+export const URL_GET_DASHBOARD = "admin/dashboard";
 
 const adminApi = {
   //! Hạng phòng
@@ -401,13 +403,31 @@ const adminApi = {
     });
   },
   //! Lịch sử đặt phòng
-  getBookingHistory: function (accessToken, body) {
+  getBookingHistory: function (accessToken) {
     return http.get(URL_BOOKING_HISTORY, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
     });
+  },
+  //! Thống kê
+  getDashBoard: function (accessToken, type) {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+
+    // Chỉ thêm params nếu type có giá trị
+    if (type) {
+      config.params = {
+        type: type,
+      };
+    }
+
+    return http.get(URL_GET_DASHBOARD, config);
   },
 };
 
