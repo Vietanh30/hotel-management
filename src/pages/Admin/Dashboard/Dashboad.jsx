@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import Sidebar from "../Sidebar/Sidebar";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserFriends, faShoppingBag, faMoneyBillAlt, faBed, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faUserFriends, faBed, faArrowUp, faUser } from '@fortawesome/free-solid-svg-icons';
 import adminApi from '../../../api/adminApi';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
 import { getAccessTokenFromLS } from '../../../utils/auth';
+import { faServicestack } from '@fortawesome/free-brands-svg-icons';
 
 Chart.register(...registerables); // Register all components
 
@@ -77,45 +78,36 @@ function Dashboard() {
                     <div className="bg-white p-4 rounded-lg shadow">
                         <div className="flex items-center">
                             <div className="bg-blue-100 p-2 rounded-full mr-3">
-                                <FontAwesomeIcon icon={faUserFriends} className="w-6 h-6 text-blue-500" />
+                                <FontAwesomeIcon icon={faUser} className="w-6 h-6 text-blue-500" />
                             </div>
                             <div>
                                 <h3 className="text-lg font-medium">Tổng nhân viên</h3>
                                 <p className="text-3xl font-bold">{dashboardData.totalUsers}</p>
-                                <div className="text-green-500 flex items-center">
-                                    <FontAwesomeIcon icon={faArrowUp} className="w-4 h-4 mr-1" />
-                                    <span>0.95%</span>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow">
                         <div className="flex items-center">
                             <div className="bg-green-100 p-2 rounded-full mr-3">
-                                <FontAwesomeIcon icon={faShoppingBag} className="w-6 h-6 text-green-500" />
+                                <FontAwesomeIcon icon={faUserFriends} className="w-6 h-6 text-green-500" />
                             </div>
                             <div>
                                 <h3 className="text-lg font-medium">Tổng khách hàng</h3>
                                 <p className="text-3xl font-bold">{dashboardData.totalCustomers}</p>
-                                <div className="text-green-500 flex items-center">
-                                    <FontAwesomeIcon icon={faArrowUp} className="w-4 h-4 mr-1" />
-                                    <span>2.59%</span>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow">
                         <div className="flex items-center">
                             <div className="bg-yellow-100 p-2 rounded-full mr-3">
-                                <FontAwesomeIcon icon={faMoneyBillAlt} className="w-6 h-6 text-yellow-500" />
+                                <FontAwesomeIcon icon={faServicestack} className="w-6 h-6 text-yellow-500" />
                             </div>
                             <div>
                                 <h3 className="text-lg font-medium">Tổng dịch vụ</h3>
                                 <p className="text-3xl font-bold">{dashboardData.totalServices}</p>
-                                <div className="text-green-500 flex items-center">
-                                    <FontAwesomeIcon icon={faArrowUp} className="w-4 h-4 mr-1" />
-                                    <span>4.35%</span>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -127,10 +119,7 @@ function Dashboard() {
                             <div>
                                 <h3 className="text-lg font-medium">Tổng phòng</h3>
                                 <p className="text-3xl font-bold">{dashboardData.totalRooms}</p>
-                                <div className="text-green-500 flex items-center">
-                                    <FontAwesomeIcon icon={faArrowUp} className="w-4 h-4 mr-1" />
-                                    <span>0.43%</span>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
