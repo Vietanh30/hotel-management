@@ -3,7 +3,7 @@ import Swal from 'sweetalert2'; // Import SweetAlert2
 import bgLogin from "../../../assets/Login/bg-login.svg";
 import flagVietnam from "../../../assets/Header/flagsVietnam.svg";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faLock, faPhone } from '@fortawesome/free-solid-svg-icons'; // Import phone icon
 import { Link } from "react-router-dom";
 import path from "../../../constants/path";
 import authApi from '../../../api/authApi';
@@ -12,7 +12,8 @@ function Register() {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        phone: '' // Add phone number field
     });
     const [loading, setLoading] = useState(false);
 
@@ -31,6 +32,9 @@ function Register() {
         }
         if (formData.password !== formData.confirmPassword) {
             errors.confirmPassword = "Mật khẩu không khớp!";
+        }
+        if (!formData.phone) {
+            errors.phone = "Số điện thoại không được để trống!";
         }
         return errors;
     };
@@ -52,8 +56,8 @@ function Register() {
 
         setLoading(true);
         try {
-            const { email, password } = formData;
-            const response = await authApi.register(email, password);
+            const { email, password, phone } = formData; 
+            const response = await authApi.register(email, password, phone); 
             console.log(response);
             if (response.data.statusCode === 200) {
                 Swal.fire({
@@ -65,7 +69,8 @@ function Register() {
                 setFormData({
                     email: '',
                     password: '',
-                    confirmPassword: ''
+                    confirmPassword: '',
+                    phone: '' // Reset phone field
                 });
             } else {
                 Swal.fire({
@@ -125,6 +130,20 @@ function Register() {
                                                 type="email"
                                                 placeholder="Email"
                                                 value={formData.email}
+                                                onChange={handleChange}
+                                                autoComplete=''
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="mt-8">
+                                        <div className="relative">
+                                            <FontAwesomeIcon icon={faPhone} className="absolute top-1/2 transform -translate-y-1/2 left-3 text-gray-400" /> {/* Phone icon */}
+                                            <input
+                                                className="border border-[#ccc] appearance-none rounded-lg w-full py-3 pl-10 pr-3 focus:outline-[#F2A900] focus:shadow-orange-400"
+                                                name="phone"
+                                                type="text"
+                                                placeholder="Số điện thoại"
+                                                value={formData.phone}
                                                 onChange={handleChange}
                                                 autoComplete=''
                                             />
