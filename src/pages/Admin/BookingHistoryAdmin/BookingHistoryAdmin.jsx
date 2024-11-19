@@ -108,7 +108,7 @@ function BookingHistoryAdmin() {
         {
             name: 'Ngày đặt',
             selector: (row) => (
-                <div className="text-sm font-semibold text-center">{formatDate(row.bookingDate)}</div>
+                <div className="text-sm font-semibold text-center">{row.bookingDate}</div>
             ),
             sortable: true,
         },
