@@ -10,10 +10,12 @@ import authApi from '../../../api/authApi';
 
 function Register() {
     const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
         confirmPassword: '',
-        phone: '' // Add phone number field
+        phone: ''
     });
     const [loading, setLoading] = useState(false);
 
@@ -24,6 +26,12 @@ function Register() {
 
     const validate = () => {
         const errors = {};
+        if (!formData.firstName) {
+            errors.firstName = "Tên không được để trống!";
+        }
+        if (!formData.lastName) {
+            errors.lastName = "Họ không được để trống!";
+        }
         if (!formData.email) {
             errors.email = "Email không được để trống!";
         }
@@ -56,8 +64,8 @@ function Register() {
 
         setLoading(true);
         try {
-            const { email, password, phone } = formData; 
-            const response = await authApi.register(email, password, phone); 
+            const { firstName, lastName, email, password, phone } = formData; 
+            const response = await authApi.register(firstName, lastName, email, password, phone); 
             console.log(response);
             if (response.data.statusCode === 200) {
                 Swal.fire({
@@ -67,10 +75,12 @@ function Register() {
                     confirmButtonText: 'OK'
                 });
                 setFormData({
+                    firstName: '',
+                    lastName: '',
                     email: '',
                     password: '',
                     confirmPassword: '',
-                    phone: '' // Reset phone field
+                    phone: ''
                 });
             } else {
                 Swal.fire({
@@ -123,6 +133,32 @@ function Register() {
                                 <form onSubmit={handleSubmit}>
                                     <div className="mt-8">
                                         <div className="relative">
+                                            <input
+                                                className="border border-[#ccc] appearance-none rounded-lg w-full py-3 pl-10 pr-3 focus:outline-[#F2A900] focus:shadow-orange-400"
+                                                name="firstName"
+                                                type="text"
+                                                placeholder="Tên"
+                                                value={formData.firstName}
+                                                onChange={handleChange}
+                                                autoComplete=''
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="mt-8">
+                                        <div className="relative">
+                                            <input
+                                                className="border border-[#ccc] appearance-none rounded-lg w-full py-3 pl-10 pr-3 focus:outline-[#F2A900] focus:shadow-orange-400"
+                                                name="lastName"
+                                                type="text"
+                                                placeholder="Họ"
+                                                value={formData.lastName}
+                                                onChange={handleChange}
+                                                autoComplete=''
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="mt-8">
+                                        <div className="relative">
                                             <FontAwesomeIcon icon={faEnvelope} className="absolute top-1/2 transform -translate-y-1/2 left-3 text-gray-400" />
                                             <input
                                                 className="border border-[#ccc] appearance-none rounded-lg w-full py-3 pl-10 pr-3 focus:outline-[#F2A900] focus:shadow-orange-400"
@@ -137,7 +173,7 @@ function Register() {
                                     </div>
                                     <div className="mt-8">
                                         <div className="relative">
-                                            <FontAwesomeIcon icon={faPhone} className="absolute top-1/2 transform -translate-y-1/2 left-3 text-gray-400" /> {/* Phone icon */}
+                                            <FontAwesomeIcon icon={faPhone} className="absolute top-1/2 transform -translate-y-1/2 left-3 text-gray-400" />
                                             <input
                                                 className="border border-[#ccc] appearance-none rounded-lg w-full py-3 pl-10 pr-3 focus:outline-[#F2A900] focus:shadow-orange-400"
                                                 name="phone"

@@ -170,7 +170,7 @@ function AddRoom({ isOpen, onClose, fetchData }) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl relative overflow-auto max-h-[90%]">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl relative overflow-y-auto max-h-[80%]">
                 <button onClick={onClose} className="absolute top-2 right-2 text-gray-600 hover:text-gray-800">
                     <FontAwesomeIcon icon={faTimes} size="lg" />
                 </button>

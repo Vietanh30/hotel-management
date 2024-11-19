@@ -6,10 +6,13 @@ export const URL_CHANGE_PASSWORD = "auth/password";
 export const URL_FORGOT_PASSWORD = "user/check_email";
 
 const authApi = {
-  register: function (email, password) {
+  register: function (firstName, lastName, email, password, phoneNumber) {
     const body = {
+      firstName: firstName,
+      lastName: lastName,
       email: email,
       password: password,
+      phoneNumber: phoneNumber,
     };
     return http.post(URL_REGISTER, body); // Thêm body vào đây
   },
