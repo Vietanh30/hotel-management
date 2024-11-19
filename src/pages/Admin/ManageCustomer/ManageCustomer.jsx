@@ -146,7 +146,7 @@ function ManageCustomer() {
         },
         {
             name: 'Ngày tạo',
-            selector: row => new Date(row.createAt).toLocaleString(),
+            selector: row => row.createAt.toLocaleString(),
             sortable: true,
             width: "15%",
         },
