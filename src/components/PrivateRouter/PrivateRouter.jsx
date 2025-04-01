@@ -1,14 +1,16 @@
-import React, { useEffect } from 'react';
+// Modify your PrivateRoute component to use the AuthContext directly
+import React from 'react';
+import { useAuth } from '../../Contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import path from '../../constants/path';
 
-const PrivateRoute = ({ element: Component, roles, userRole }) => {
+const PrivateRoute = ({ element: Component, roles }) => {
   const navigate = useNavigate();
-
+  const { userRole } = useAuth(); // Get userRole from context
   const isAuthorized = roles.includes(userRole);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isAuthorized) {
       Swal.fire({
         title: 'Thông báo',
@@ -21,21 +23,13 @@ const PrivateRoute = ({ element: Component, roles, userRole }) => {
         allowOutsideClick: false,
       }).then((result) => {
         if (result.isConfirmed) {
-          // Check if the roles include ROLE_USER
-          if (roles.includes('ROLE_USER')) {
-            navigate(path.login); // Redirect to user login
-          } else {
-            navigate(path.loginAdmin); // Redirect to admin login
-          }
+          navigate(path.login);
         }
       });
     }
-  }, [isAuthorized, navigate, roles]); // Track isAuthorized, navigate, and roles
+  }, [isAuthorized, navigate, roles]);
 
-  // If not authorized, return null
   if (!isAuthorized) return null;
-
-  // Render component when authorized
   return <Component />;
 };
 

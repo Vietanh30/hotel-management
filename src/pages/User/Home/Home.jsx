@@ -19,8 +19,8 @@ function Home() {
         { label: 'Dịch vụ', rating: 4 },
         { label: 'Giá tiền', rating: 3.2 },
     ];
-    
-    return ( 
+
+    return (
         <>
             <Header />
             <Navbar />
@@ -39,7 +39,7 @@ function Home() {
                                 <span className="text-white text-2xl font-taprom">of</span> The Whole World
                             </div>
                         </div>
-                    </div>    
+                    </div>
                     <SearchRoom />
                     <div className='absolute z-0 bottom-0 w-full h-24 bg-[#232323] blur-xl'></div>
                 </div>
@@ -50,10 +50,10 @@ function Home() {
                         Mục
                     </div>
                     <div className='text-5xl font-garamond pb-20'>
-                    Yêu Thích
+                        Yêu Thích
                     </div>
-                <CenterModeSlider />
-                <button className="bg-[#B5986D] text-white rounded-md py-2 px-6 font-semibold text-xl hover:bg-[#8A6A4E] mt-10">Xem thêm</button>
+                    <CenterModeSlider />
+                    <button className="bg-[#B5986D] text-white rounded-md py-2 px-6 font-semibold text-xl hover:bg-[#8A6A4E] mt-10">Xem thêm</button>
                 </div>
             </div>
             <div className='bg-[#f4f4f5] w-full' id='typeRoom'>
@@ -66,14 +66,14 @@ function Home() {
             </div>
             <div className='bg-[#f4f4f5] w-full' id='services'>
                 <div className='container mt-10 py-10 mx-auto'>
-                    <div className='font-inter text-4xl font-semibold uppercase px-4'>Dịch vụ và tiện ích của Nhóm 7</div>
+                    <div className='font-inter text-4xl font-semibold uppercase px-4'>Dịch vụ và tiện ích của Hotel Del Luna</div>
                     <div className="mt-5">
                         <ServiceRoom />
                     </div>
                 </div>
             </div>
             <div className='mt-4' >
-                <div className='text-center font-inter font-semibold text-5xl'>Khách sạn Nhóm 7</div>
+                <div className='text-center font-inter font-semibold text-5xl'>Khách sạn Hotel Del Luna</div>
                 <div className='mt-20'>
                     <CenterModeSlider />
                 </div>
@@ -81,12 +81,12 @@ function Home() {
             <div className='my-20' id='rating'>
                 <div className="container mx-auto px-4">
                     <div className='font-inter font-semibold uppercase text-4xl'>
-                    ĐÁNH GIÁ CỦA KHÁCH HÀNG VỀ khách sạn Nhóm 7
+                        ĐÁNH GIÁ CỦA KHÁCH HÀNG VỀ khách sạn Hotel Del Luna
                     </div>
                     <Rating
-                        averageRating={averageRating} 
-                        totalReviews={totalReviews} 
-                        criteriaRatings={criteriaRatings} 
+                        averageRating={averageRating}
+                        totalReviews={totalReviews}
+                        criteriaRatings={criteriaRatings}
                     />
                 </div>
             </div>
@@ -101,12 +101,12 @@ function Home() {
             <div className='mt-10' id='location'>
                 <div className="container mx-auto">
                     <div className='font-inter font-semibold uppercase text-4xl'>
-                    Vị trí tuyệt vời của khách sạn Nhóm 7
+                        Vị trí tuyệt vời của khách sạn Hotel Del Luna
                     </div>
                     <div className='my-10'>
                         <iframe
-                        className='w-full min-h-[500px] rounded-xl'
-                            src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1961.0628136887033!2d106.71713693846525!3d10.569341197391795!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTDCsDM0JzA5LjYiTiAxMDbCsDQzJzA2LjMiRQ!5e0!3m2!1svi!2s!4v1728612882329!5m2!1svi!2s"
+                            className='w-full min-h-[500px] rounded-xl'
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.816939728028!2d105.73938337490307!3d21.040009480612152!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135096b31fa7abb%3A0xff645782804911af!2zVHLGsOG7nW5nIMSR4bqhaSBo4buNYyBDw7RuZyBuZ2jhu4cgxJDDtG5nIMOB!5e0!3m2!1svi!2s!4v1742884670324!5m2!1svi!2s"
                             width="100%"
                             height="100%"
                             style={{ border: 0 }}
@@ -120,7 +120,7 @@ function Home() {
             <Footer />
             <BackToTopButton />
         </>
-     );
+    );
 }
 
 export default Home;

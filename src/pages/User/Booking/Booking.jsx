@@ -136,11 +136,11 @@ function Booking() {
                         <div className="col-span-7">
                             {typeRoom.map((room) => (
                                 <div className="w-full bg-white rounded p-4 mb-8" key={room.id}>
-                                    <CardRoomBooking 
-                                        typeRoom={room} 
-                                        fetchCart={fetchCartDetails} 
-                                        fetchCheckout={fetchCheckout} 
-                                        dataCheckout={getFilteredBookingDetails(room.id)} 
+                                    <CardRoomBooking
+                                        typeRoom={room}
+                                        fetchCart={fetchCartDetails}
+                                        fetchCheckout={fetchCheckout}
+                                        dataCheckout={getFilteredBookingDetails(room.id)}
                                     />
                                 </div>
                             ))}
@@ -151,7 +151,7 @@ function Booking() {
                             </div>
                             <hr className="my-4" />
                             <div>
-                                <div className='font-inter font-semibold text-lg'>Khách sạn nhóm 7</div>
+                                <div className='font-inter font-semibold text-lg'>Hotel Del Luna</div>
                                 <div className='border-b border-dashed my-4 border-2'></div>
                                 <div className="flex justify-between">
                                     {cartDetails && (
@@ -197,11 +197,10 @@ function Booking() {
                             <div className='my-6 border-2 border-dashed'></div>
                             <div className="mt-4">
                                 <button
-                                    className={`w-full text-nowrap font-bold py-3 px-4 rounded ${
-                                        cartDetails && cartDetails.roomCart.length > 0
+                                    className={`w-full text-nowrap font-bold py-3 px-4 rounded ${cartDetails && cartDetails.roomCart.length > 0
                                             ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
                                             : 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                                    }`}
+                                        }`}
                                     disabled={!cartDetails || cartDetails.roomCart.length === 0}
                                     onClick={() => {
                                         if (cartDetails && cartDetails.roomCart.length > 0) {

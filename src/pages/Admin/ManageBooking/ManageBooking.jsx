@@ -56,6 +56,7 @@ function ManageBooking() {
 
     const handleSearchResults = (results) => {
         setSearchResults(results.data);
+        console.log(results.data)
     };
 
     const handleRankClick = (index) => {
@@ -126,10 +127,10 @@ function ManageBooking() {
                 const response = await adminApi.addRoomToCart(accessToken, bookingData);
                 Swal.fire('Đã thêm!', response.data.message || 'Phòng đã được thêm vào giỏ hàng.', 'success');
                 fetchCart();
-                
+
                 if (searchFunction) {
                     // Call the search function if it's defined
-                    await searchFunction(); 
+                    await searchFunction();
                 }
             } catch (error) {
                 console.error("Error adding room to cart:", error);
@@ -163,10 +164,10 @@ function ManageBooking() {
                     </div>
                     <div className="flex gap-8 mt-4">
                         <div className="w-1/3">
-                            <SearchRoomAdmin 
-                                onDateChange={handleDateChange} 
-                                onSearchResults={handleSearchResults} 
-                                onSearch={handleSearch} 
+                            <SearchRoomAdmin
+                                onDateChange={handleDateChange}
+                                onSearchResults={handleSearchResults}
+                                onSearch={handleSearch}
                             />
                             <div className="p-4 rounded border border-[#aeaeae] bg-gray-50 mt-4">
                                 <div className="grid grid-cols-2 gap-4">
@@ -190,9 +191,9 @@ function ManageBooking() {
                             </div>
                         </div>
                         <div className="w-2/3">
-                            <CalenderSearchRoomAdmin 
-                                checkInDate={dates.checkIn} 
-                                checkOutDate={dates.checkOut} 
+                            <CalenderSearchRoomAdmin
+                                checkInDate={dates.checkIn}
+                                checkOutDate={dates.checkOut}
                                 onDateChange={handleDateChange}
                                 results={searchResults}
                             />
@@ -204,7 +205,7 @@ function ManageBooking() {
                             <div className="flex space-x-4 mb-4">
                                 {searchResults.rankList?.map((rank, index) => (
                                     <div className="flex py-2 gap-1 rounded font-semibold" key={rank.id}>
-                                        <button 
+                                        <button
                                             className={`flex px-4 py-2 rounded font-semibold group hover:bg-yellow-500 hover:text-white ${selectedIndex.rank === index ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
                                             onClick={() => handleRankClick(index)}
                                             style={{ whiteSpace: 'nowrap' }}
@@ -254,7 +255,7 @@ function ManageBooking() {
                                                             <td className="py-2 px-4 border-b">{room.roomCode}</td>
                                                             <td className="py-2 px-4 border-b">{room.status === 'AVAILABLE' ? 'Còn trống' : 'Đã khóa'}</td>
                                                             <td className="py-2 px-4 border-b">
-                                                                <button 
+                                                                <button
                                                                     className="relative bg-yellow-500 font-semibold text-white py-1 px-2 rounded hover:bg-yellow-600"
                                                                     onClick={() => handleSelectGuests(room.id)}
                                                                 >
@@ -262,12 +263,12 @@ function ManageBooking() {
                                                                 </button>
                                                             </td>
                                                             <td className="py-2 px-4 border-b">
-                                                                {guestCounts[room.id] ? 
-                                                                    `${guestCounts[room.id].adults} người lớn, ${guestCounts[room.id].children} trẻ em, ${guestCounts[room.id].infants} trẻ sơ sinh` 
+                                                                {guestCounts[room.id] ?
+                                                                    `${guestCounts[room.id].adults} người lớn, ${guestCounts[room.id].children} trẻ em, ${guestCounts[room.id].infants} trẻ sơ sinh`
                                                                     : 'Chưa chọn'}
                                                             </td>
                                                             <td className="py-2 px-4 border-b">
-                                                                <button 
+                                                                <button
                                                                     className="bg-yellow-500 font-semibold text-white py-1 px-2 rounded hover:bg-yellow-600"
                                                                     onClick={() => handleAddRoomToCart(room)}
                                                                 >
@@ -367,16 +368,16 @@ function ManageBooking() {
                 </div>
             </div>
             <InforTypeRoomAdmin
-                isOpen={modalState.show} 
-                onClose={() => setModalState({ ...modalState, show: false })} 
-                roomDetails={modalState.roomDetails} 
+                isOpen={modalState.show}
+                onClose={() => setModalState({ ...modalState, show: false })}
+                roomDetails={modalState.roomDetails}
             />
             {cartData.show && (
-                <CartBooking 
-                    onClose={() => setCartData(prev => ({ ...prev, show: false }))} 
-                    dataCart={cartData.data} 
-                    fetchCart={fetchCart} 
-                    resetSearch={resetSearch} 
+                <CartBooking
+                    onClose={() => setCartData(prev => ({ ...prev, show: false }))}
+                    dataCart={cartData.data}
+                    fetchCart={fetchCart}
+                    resetSearch={resetSearch}
                 />
             )}
         </>

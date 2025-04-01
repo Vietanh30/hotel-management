@@ -18,10 +18,10 @@ function SearchRoomAdmin({ onDateChange, onSearchResults, onSearch }) {
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
-        
+
         const initialCheckInDate = formatDateToYYYYMMDD(today); // Ngày hôm nay
         const initialCheckOutDate = formatDateToYYYYMMDD(tomorrow); // Ngày mai
-    
+
         setFormData((prev) => ({
             ...prev,
             checkInDate: initialCheckInDate,
@@ -58,6 +58,7 @@ function SearchRoomAdmin({ onDateChange, onSearchResults, onSearch }) {
         try {
             const accessToken = getAccessTokenFromLS();
             const response = await adminApi.searchRoomAdmin(accessToken, searchCriteria);
+            console.log(response);
             onSearchResults(response.data);
         } catch (error) {
             console.error('Error searching rooms:', error);

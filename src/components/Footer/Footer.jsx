@@ -13,7 +13,7 @@ const Footer = () => {
                     <div className="flex flex-col items-start">
                         <div className="flex flex-col items-center">
                             <div className='text-white text-4xl font-bold'>
-                                Nhóm 7
+                                Hotel Del Luna
                             </div>
                             <div className='flex gap-5 items-center'>
                                 <div className='w-11 border-b border-white'></div>
@@ -29,7 +29,7 @@ const Footer = () => {
                                 <img className='w-5 h-5' src={be} alt="Biểu tượng" />
                             </div>
                             <Link className="hover:text-gray-400">
-                                <FontAwesomeIcon  className='w-5 h-5' icon={faInstagram} /> {/* Biểu tượng Instagram */}
+                                <FontAwesomeIcon className='w-5 h-5' icon={faInstagram} /> {/* Biểu tượng Instagram */}
                             </Link>
                         </div>
                         <div className="mt-10 font-garamond text-gray-300">Chính sách bảo mật</div>

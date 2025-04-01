@@ -13,18 +13,17 @@ const path = {
 
 
     //! admin
-    loginAdmin: '/login-admin',
     dashboard: '/dashboard',
     manageTypeRoom: '/manage-type-room',
     manageService: '/manage-service',
     manageRoom: '/manage-room',
+    manageRoomService: '/manage-room-service',
     manageNumberRoom: '/manage-number-room',
     manageStaff: '/manage-staff',
     manageCustomer: '/manage-customer',
     manageBooking: '/manage-booking',
     checkOutAdmin: '/checkout-admin',
     bookingHistoryAdmin: '/booking-history-admin',
-
-
+    statusBoookingServiceHotel: '/status-boooking-service-hotel',
 };
 export default path;

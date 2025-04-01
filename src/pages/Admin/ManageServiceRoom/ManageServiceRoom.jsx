@@ -3,37 +3,32 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import DataTable from 'react-data-table-component';
 import React, { useState, useMemo, useEffect } from 'react';
-import adminApi from "../../../api/adminApi"; // Giả sử có API quản lý phòng
+import adminApi from "../../../api/adminApi";
 import { getAccessTokenFromLS, getRoleFromLS } from "../../../utils/auth";
 import Swal from 'sweetalert2';
-import AddNumberRoom from "./AddNumberRoom/AddNumberRoom";
-import EditNumberRoom from "./EditNumberRoom/EditNumberRoom";
+import AddServiceRoom from "./AddServiceRoom/AddServiceRoom";
+import EditServiceRoom from "./EditServiceRoom/EditServiceRoom";
 
-function ManageNumberRoom() {
+function ManageServiceRoom() {
     const [searchText, setSearchText] = useState('');
-    const [selectedNumberRoom, setSelectedNumberRoom] = useState(null);
+    const [selectedServiceRoom, setSelectedServiceRoom] = useState(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [numberRoomList, setNumberRoomList] = useState([]);
+    const [serviceRooms, setServiceRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const userRole = getRoleFromLS(); // Get the user role
 
     const fetchData = async () => {
         try {
             const accessToken = getAccessTokenFromLS();
-            const response = await adminApi.getAllNumberRoom(accessToken); // API lấy danh sách số phòng
+            const response = await adminApi.getAllServiceRoom(accessToken);
+            console.log(response);
             if (response.data.statusCode === 200) {
-                setNumberRoomList(response.data.data);
-                console.log(response.data.data);
+
+                setServiceRooms(response.data.data);
             }
         } catch (error) {
             console.error("Error fetching data:", error);
-            Swal.fire({
-                title: 'Lỗi!',
-                text: 'Không thể tải danh sách số phòng.',
-                icon: 'error',
-                confirmButtonText: 'OK',
-            });
         } finally {
             setLoading(false);
         }
@@ -44,28 +39,26 @@ function ManageNumberRoom() {
     }, []);
 
     const filteredData = useMemo(() => {
-        return numberRoomList.filter(item =>
-            item.roomNumber.toString().includes(searchText) ||
-            (item.roomCode && item.roomCode.toLowerCase().includes(searchText.toLowerCase())) ||
-            item.location.toLowerCase().includes(searchText.toLowerCase())
+        return serviceRooms.filter(item =>
+            item.name.toLowerCase().includes(searchText.toLowerCase())
         );
-    }, [searchText, numberRoomList]);
+    }, [searchText, serviceRooms]);
 
     const openAddModal = () => setIsAddModalOpen(true);
     const closeAddModal = () => setIsAddModalOpen(false);
 
-    const openEditModal = (numberRoom) => {
-        setSelectedNumberRoom(numberRoom);
+    const openEditModal = (serviceRoom) => {
+        setSelectedServiceRoom(serviceRoom);
         setIsEditModalOpen(true);
     };
     const closeEditModal = () => setIsEditModalOpen(false);
 
-    const handleDelete = async (numberRoom) => {
-        const action = numberRoom.status === 'AVAILABLE' ? 'dừng hoạt động' : 'khôi phục';
-        const apiAction = numberRoom.status === 'AVAILABLE' ? 'dừng' : 'khôi phục';
+    const handleDelete = async (serviceRoom) => {
+        const action = serviceRoom.active ? 'dừng hoạt động' : 'khôi phục';
+        const apiAction = serviceRoom.active ? 'Dừng' : 'Khôi phục';
 
         const result = await Swal.fire({
-            title: `Bạn có chắc chắn muốn ${action} số phòng này?`,
+            title: `Bạn có chắc chắn muốn ${action} dịch vụ phòng này?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Có',
@@ -75,21 +68,18 @@ function ManageNumberRoom() {
         if (result.isConfirmed) {
             try {
                 const accessToken = getAccessTokenFromLS();
-                const response = await adminApi.activeNumberRoom(numberRoom.id, accessToken);
-                console.log(response.data);
-                if (response.data.statusCode === 200) {
-                    Swal.fire(
-                        'Thành công!',
-                        `Số phòng đã được ${apiAction} thành công.`,
-                        'success'
-                    );
-                    fetchData();
-                }
+                await adminApi.activeServiceRoom(serviceRoom.id, accessToken);
+                fetchData();
+                Swal.fire(
+                    'Thành công!',
+                    `Dịch vụ phòng đã được ${apiAction} thành công.`,
+                    'success'
+                );
             } catch (error) {
-                console.error("Error updating number room:", error);
+                console.error("Error updating service room:", error);
                 Swal.fire(
                     'Lỗi!',
-                    'Có lỗi xảy ra khi cập nhật trạng thái số phòng.',
+                    'Có lỗi xảy ra khi cập nhật trạng thái dịch vụ phòng.',
                     'error'
                 );
             }
@@ -110,28 +100,52 @@ function ManageNumberRoom() {
                         </button>
                     </div>
                 ),
+                width: '15%',
             },
         ] : []),
+
         {
-            name: 'Số phòng',
-            selector: row => row.roomNumber,
+            name: 'STT',
+            selector: (row, index) => index + 1,
             sortable: true,
+            width: '8%',
+            center: true,
         },
         {
-            name: 'Tầng',
-            selector: row => row.capacity,
-            sortable: true,
+            name: 'Biểu tượng',
+            cell: row => (
+                <div className="flex justify-center">
+                    <img
+                        src={row.icon}
+                        alt={row.name}
+                        className="w-10 h-10 object-cover rounded"
+                    />
+                </div>
+            ),
+            width: '12%',
+            center: true,
         },
         {
-            name: 'Địa điểm',
-            selector: row => row.location,
+            name: 'Tên dịch vụ',
+            selector: row => row.name,
             sortable: true,
+            width: '20%',
+            cell: row => <div className="text-center w-full">{row.name}</div>
+        },
+        {
+            name: 'Mô tả',
+            selector: row => row.description,
+            sortable: true,
+            width: '25%',
+            cell: row => <div className="text-center w-full truncate">{row.description}</div>
         },
         {
             name: 'Trạng thái',
-            selector: row => row.status,
+            selector: row => row.active === true ? 'Hoạt động' : 'Tạm dừng',
             sortable: true,
-        },
+            width: '10%',
+            center: true,
+        }
     ];
 
     if (loading) {
@@ -141,25 +155,24 @@ function ManageNumberRoom() {
     return (
         <>
             <Sidebar />
-            <div className="p-4 sm:ml-60 overflow-x-auto">
+            <div className="p-4 sm:ml-60">
                 <div className="p-4 mt-20">
                     <div className="w-full flex justify-between items-center">
                         <div className="font-semibold text-2xl font-inter">
-                            Quản lý số phòng
+                            Quản lý dịch vụ phòng
                         </div>
                         <div>
                             {userRole === 'ROLE_ADMINISTRATOR' && (
-
                                 <button onClick={openAddModal} className="px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold">
-                                    Thêm số phòng
+                                    Thêm dịch vụ phòng
                                 </button>
                             )}
                         </div>
                     </div>
-                    <div className="mt-6">
+                    <div className="mt-6 overflow-x-auto w-full">
                         <input
                             type="text"
-                            placeholder="Tìm kiếm số phòng..."
+                            placeholder="Tìm kiếm dịch vụ phòng..."
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
                             className="p-2 border border-gray-500 rounded w-56 flex float-end mb-4 text-sm"
@@ -167,7 +180,6 @@ function ManageNumberRoom() {
                         <DataTable
                             columns={columns}
                             data={filteredData}
-                            className="min-w-full"
                             pagination
                             highlightOnHover
                             striped
@@ -179,6 +191,19 @@ function ManageNumberRoom() {
                                         backgroundColor: '#edce94',
                                         borderStartStartRadius: '15px',
                                         borderStartEndRadius: '15px',
+                                        display: 'flex',
+                                        width: '100%',
+                                    }
+                                },
+                                headCells: {
+                                    style: {
+                                        flex: '1',
+                                        justifyContent: 'center',
+                                        textAlign: 'center',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        padding: '10px 5px',
                                     }
                                 },
                                 rows: {
@@ -186,15 +211,23 @@ function ManageNumberRoom() {
                                         fontSize: '14px',
                                         fontWeight: '500',
                                         fontFamily: 'inter',
-                                        paddingTop: '6px',
-                                        paddingBottom: '6px',
-                                        // overflow: 'hidden', // Prevent overflow
-                                        textOverflow: 'ellipsis', // Add ellipsis for overflowing text
-                                        // whiteSpace: 'nowrap' // Prevent text from wrapping
+                                        display: 'flex',
+                                        width: '100%',
                                     }
                                 },
+                                cells: {
+                                    style: {
+                                        flex: '1',
+                                        justifyContent: 'center',
+                                        textAlign: 'center',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        padding: '6px 5px',
+                                    }
+                                }
                             }}
-                            noDataComponent={<div className="text-center bg-[#000] w-full p-3 text-white">Không tìm thấy số phòng nào.</div>}
+                            noDataComponent={<div className="text-center bg-[#000] w-full p-3 text-white">Không tìm thấy dịch vụ phòng nào.</div>}
                             paginationComponentOptions={{
                                 rowsPerPageText: 'Hiển thị',
                                 rangeSeparatorText: 'trên',
@@ -209,11 +242,10 @@ function ManageNumberRoom() {
                 </div>
             </div>
 
-            {/* Modal cho thêm và chỉnh sửa số phòng */}
-            <AddNumberRoom isOpen={isAddModalOpen} onClose={closeAddModal} fetchData={fetchData} />
-            <EditNumberRoom isOpen={isEditModalOpen} onClose={closeEditModal} numberRoomData={selectedNumberRoom} fetchData={fetchData} />
+            <AddServiceRoom isOpen={isAddModalOpen} onClose={closeAddModal} fetchData={fetchData} />
+            <EditServiceRoom isOpen={isEditModalOpen} onClose={closeEditModal} initialData={selectedServiceRoom} fetchData={fetchData} />
         </>
     );
 }
 
-export default ManageNumberRoom;
+export default ManageServiceRoom;

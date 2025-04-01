@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Slider from 'react-slick';
 import CardService from "../../../../components/CardService/CardService";
 import InforService from "../../../../components/CardService/InforService/InforService";
+import BookingModal from './BookingModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import userApi from '../../../../api/userApi';
 
 const NextButton = ({ onClick }) => (
-    <button 
+    <button
         className="absolute z-10 top-1/2 -right-3 transform -translate-y-1/2 bg-[#f2a900] text-white font-semibold px-5 py-4 rounded-full shadow-md hover:bg-yellow-500 transition duration-300"
         onClick={onClick}
     >
@@ -16,7 +17,7 @@ const NextButton = ({ onClick }) => (
 );
 
 const PrevButton = ({ onClick }) => (
-    <button 
+    <button
         className="absolute z-10 top-1/2 -left-3 transform -translate-y-1/2 bg-[#f2a900] text-white font-semibold px-5 py-4 rounded-full shadow-md hover:bg-yellow-500 transition duration-300"
         onClick={onClick}
     >
@@ -26,6 +27,7 @@ const PrevButton = ({ onClick }) => (
 
 function ServiceRoom() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
     const [selectedService, setSelectedService] = useState(null);
     const [serviceCategories, setServiceCategories] = useState([]);
     const [activeTab, setActiveTab] = useState(null);
@@ -56,6 +58,11 @@ function ServiceRoom() {
         setIsModalOpen(true);
     };
 
+    const handleServiceBooking = (serviceDetails) => {
+        setSelectedService(serviceDetails);
+        setIsBookingModalOpen(true);
+    };
+
     const handleTabClick = (categoryName) => {
         setActiveTab(categoryName);
     };
@@ -68,6 +75,20 @@ function ServiceRoom() {
         slidesToScroll: 1,
         nextArrow: <NextButton />,
         prevArrow: <PrevButton />,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                }
+            },
+            {
+                breakpoint: 640,
+                settings: {
+                    slidesToShow: 1,
+                }
+            }
+        ]
     };
 
     if (loading) {
@@ -84,7 +105,7 @@ function ServiceRoom() {
     return (
         <>
             <div className="flex flex-col gap-8">
-                <div className="flex justify-start gap-5 mb-4 px-4">
+                <div className="flex flex-wrap justify-start gap-5 mb-4 px-4">
                     {serviceCategories.map((category) => (
                         <button
                             key={category.id}
@@ -105,6 +126,7 @@ function ServiceRoom() {
                                         <CardService
                                             serviceDetails={service}
                                             onServiceClick={handleServiceClick}
+                                            onServiceBooking={handleServiceBooking}
                                         />
                                     </div>
                                 ))}
@@ -118,9 +140,17 @@ function ServiceRoom() {
                 )}
             </div>
 
+            {/* Service Details Modal */}
             <InforService
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                serviceDetails={selectedService}
+            />
+
+            {/* Service Booking Modal */}
+            <BookingModal
+                isOpen={isBookingModalOpen}
+                onClose={() => setIsBookingModalOpen(false)}
                 serviceDetails={selectedService}
             />
         </>

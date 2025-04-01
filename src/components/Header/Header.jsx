@@ -11,7 +11,7 @@ function Header() {
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
 
-    return ( 
+    return (
         <div className="container mx-auto">
             <div className="flex justify-between items-center py-7">
                 <div className="flex items-center gap-8 w-1/3">
@@ -27,7 +27,7 @@ function Header() {
                 </div>
                 <Link to={path.home} className="flex flex-col items-center cursor-pointer">
                     <div className='text-[#B5986D] text-4xl font-bold'>
-                        Nhóm 7
+                        Hotel Del Luna
                     </div>
                     <div className='flex gap-5 items-center'>
                         <div className='w-11 border-b border-[#B5986D]'></div>
@@ -37,7 +37,7 @@ function Header() {
                 </Link>
                 <div className='flex items-center gap-4 w-1/3 justify-end'>
                     <img src={iconVietNam} alt="Vietnam Icon" />
-                    <div className='flex items-center gap-4 relative'>
+                    {/* <div className='flex items-center gap-4 relative'>
                         <FontAwesomeIcon icon={faGlobe} size="lg" onClick={toggleDropdown} className="cursor-pointer" />
                         {isDropdownOpen && (
                             <div className="absolute -left-8 top-5 mt-2 w-32 bg-white border rounded-lg shadow-lg z-30">
@@ -47,7 +47,7 @@ function Header() {
                                 </ul>
                             </div>
                         )}
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

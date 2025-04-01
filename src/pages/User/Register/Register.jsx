@@ -64,8 +64,8 @@ function Register() {
 
         setLoading(true);
         try {
-            const { firstName, lastName, email, password, phone } = formData; 
-            const response = await authApi.register(firstName, lastName, email, password, phone); 
+            const { firstName, lastName, email, password, phone } = formData;
+            const response = await authApi.register(firstName, lastName, email, password, phone);
             console.log(response);
             if (response.data.statusCode === 200) {
                 Swal.fire({
@@ -114,7 +114,7 @@ function Register() {
                     <div className="col-span-7">
                         <img className="w-full min-h-screen relative" src={bgLogin} alt="" />
                         <div className="absolute top-[10%] left-[22%] transform -translate-x-1/2 -translate-y-1/2 text-white">
-                            <div className="text-4xl font-bold mb-4">Trải nghiệm du lịch đẳng cấp tại Nhóm 7</div>
+                            <div className="text-4xl font-bold mb-4">Trải nghiệm du lịch đẳng cấp tại Hotel Del Luna</div>
                             <div className="text-2xl">Hưởng nhiều ưu đãi và tích lũy điểm thưởng khi đăng ký thành viên</div>
                         </div>
                     </div>
@@ -122,7 +122,7 @@ function Register() {
                         <div className="flex items-center justify-center mt-12">
                             <div className="rounded-lg w-full px-12">
                                 <div className="flex flex-col items-center">
-                                    <div className='text-[#B5986D] text-4xl font-bold'>Nhóm 7</div>
+                                    <div className='text-[#B5986D] text-4xl font-bold'>Hotel Del Luna</div>
                                     <div className='flex gap-5 items-center'>
                                         <div className='w-11 border-b border-[#B5986D]'></div>
                                         <img src={flagVietnam} alt="Vietnam Flag" />
@@ -225,7 +225,7 @@ function Register() {
                                 </form>
                                 <div className="mt-4 text-end font-inter text-sm">
                                     <Link to={path.login}>
-                                        Đã có tài khoản? <span className="text-yellow-500 font-semibold hover:text-yellow-600">Đăng nhập ngay</span> 
+                                        Đã có tài khoản? <span className="text-yellow-500 font-semibold hover:text-yellow-600">Đăng nhập ngay</span>
                                     </Link>
                                 </div>
                             </div>

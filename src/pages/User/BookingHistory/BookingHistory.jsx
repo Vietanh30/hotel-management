@@ -55,7 +55,7 @@ function BookingHistory() {
 
     const handleViewDetails = (booking) => {
         setSelectedBooking(booking);
-        console.log("slect",booking);
+        console.log("slect", booking);
         setShowModal(true);
     };
 
@@ -74,16 +74,15 @@ function BookingHistory() {
             ),
         },
         {
-            name: 'Trạng thái',
+            name: 'Trạng thái thanh toán',
             selector: (row) => (
                 <div
-                    className={`px-2 py-1 rounded-full text-white text-sm font-bold ${
-                        row.paymentStatus === 'BOOKED'
+                    className={`px-2 py-1 rounded-full text-white text-sm font-bold ${row.paymentStatus === 'BOOKED'
                             ? 'bg-green-500'
                             : row.paymentStatus === 'CANCELLED'
                                 ? 'bg-red-500'
                                 : 'bg-yellow-500'
-                    } text-center`}
+                        } text-center`}
                 >
                     {row.paymentStatus}
                 </div>
@@ -165,8 +164,8 @@ function BookingHistory() {
                                 {filteredData.length === 0 ? (
                                     <div className="text-center text-gray-500 text-2xl font-semibold py-6">
                                         Chưa đặt phòng nào. <br />
-                                        <button 
-                                            onClick={() => navigate(path.booking)} 
+                                        <button
+                                            onClick={() => navigate(path.booking)}
                                             className="mt-4 px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold">
                                             Đặt phòng ngay
                                         </button>
@@ -242,13 +241,12 @@ function BookingHistory() {
                                             {
                                                 label: 'Trạng thái thanh toán:',
                                                 value: (
-                                                    <div className={`px-2 py-1 rounded-full text-white text-sm font-bold ${
-                                                        selectedBooking.paymentStatus === 'BOOKED'
+                                                    <div className={`px-2 py-1 rounded-full text-white text-sm font-bold ${selectedBooking.paymentStatus === 'BOOKED'
                                                             ? 'bg-green-500'
                                                             : selectedBooking.paymentStatus === 'CANCELLED'
                                                                 ? 'bg-red-500'
                                                                 : 'bg-yellow-500'
-                                                    }`}>
+                                                        }`}>
                                                         {selectedBooking.paymentStatus}
                                                     </div>
                                                 ),
@@ -261,61 +259,61 @@ function BookingHistory() {
                                         ))}
                                     </div>
                                     <div className="mt-6">
-                            <h3 className="text-lg font-bold mb-2">Thông tin chi tiết các phòng đặt:</h3>
-                            {selectedBooking.bookingRoomDetails.map((room, index) => (
-                                <>
-                                    <div key={index} className="mt-6">
-                                        <div className="grid grid-cols-6 gap-2">
-                                            <div className="bg-gray-100 p-4 rounded">
-                                                <span className="block font-bold">Số phòng: {room.roomNumber}</span>
-                                            </div>
-                                            <div className="bg-gray-100 p-4 rounded">
-                                                <span className="block font-bold">Loại phòng: {room.roomType}</span>
-                                            </div>
-                                            <div className="bg-gray-100 p-4 rounded">
-                                                <span className="block font-bold">Số người: {room.adults} người lớn, {room.children} trẻ em, {room.infant} trẻ sơ sinh</span>
-                                            </div>
-                                            <div className="bg-gray-100 p-4 rounded">
-                                                <span className="block font-bold">Ngày nhận : {formatDateAndTime(room.checkIn)}</span>
-                                            </div>
-                                            <div className="bg-gray-100 p-4 rounded">
-                                                <span className="block font-bold">Ngày trả : {formatDateAndTime(room.checkOut)}</span>
-                                            </div>
-                                            <div className="bg-gray-100 p-4 rounded">
-                                                <span className="block font-bold">Giá phòng: {room.roomPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="pb-6 border-b-2 border-dashed">
-                                        <h3 className="text-lg font-bold my-2">Dịch vụ đã chọn:</h3>
-                                        {room.serviceList?.length > 0 ? (
-                                            room.serviceList.map((service, index) => (
-                                                <div key={index} className="bg-gray-100 p-4 rounded mb-2 flex justify-between">
-                                                    <span className="font-semibold">{service.name}</span>
-                                                    <span className="font-semibold">{service.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                        <h3 className="text-lg font-bold mb-2">Thông tin chi tiết các phòng đặt:</h3>
+                                        {selectedBooking.bookingRoomDetails.map((room, index) => (
+                                            <>
+                                                <div key={index} className="mt-6">
+                                                    <div className="grid grid-cols-6 gap-2">
+                                                        <div className="bg-gray-100 p-4 rounded">
+                                                            <span className="block font-bold">Số phòng: {room.roomNumber}</span>
+                                                        </div>
+                                                        <div className="bg-gray-100 p-4 rounded">
+                                                            <span className="block font-bold">Loại phòng: {room.roomType}</span>
+                                                        </div>
+                                                        <div className="bg-gray-100 p-4 rounded">
+                                                            <span className="block font-bold">Số người: {room.adults} người lớn, {room.children} trẻ em, {room.infant} trẻ sơ sinh</span>
+                                                        </div>
+                                                        <div className="bg-gray-100 p-4 rounded">
+                                                            <span className="block font-bold">Ngày nhận : {formatDateAndTime(room.checkIn)}</span>
+                                                        </div>
+                                                        <div className="bg-gray-100 p-4 rounded">
+                                                            <span className="block font-bold">Ngày trả : {formatDateAndTime(room.checkOut)}</span>
+                                                        </div>
+                                                        <div className="bg-gray-100 p-4 rounded">
+                                                            <span className="block font-bold">Giá phòng: {room.roomPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            ))
-                                        ) : (
-                                            <div className="bg-gray-100 p-4 rounded mb-2 text-center">
-                                                <span className="font-semibold">Không chọn dịch vụ nào</span>
-                                            </div>
-                                        )}
+                                                <div className="pb-6 border-b-2 border-dashed">
+                                                    <h3 className="text-lg font-bold my-2">Dịch vụ đã chọn:</h3>
+                                                    {room.serviceList?.length > 0 ? (
+                                                        room.serviceList.map((service, index) => (
+                                                            <div key={index} className="bg-gray-100 p-4 rounded mb-2 flex justify-between">
+                                                                <span className="font-semibold">{service.name}</span>
+                                                                <span className="font-semibold">{service.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <div className="bg-gray-100 p-4 rounded mb-2 text-center">
+                                                            <span className="font-semibold">Không chọn dịch vụ nào</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {selectedBooking.feedback && (
+                                                    <>
+                                                        <h3 className="text-lg font-bold mb-2">Đánh giá:</h3>
+                                                        <div className="bg-gray-100 p-4 rounded">
+                                                            <span className="block font-bold">{selectedBooking.feedback}</span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </>
+                                        ))}
                                     </div>
-                                    {selectedBooking.feedback && (
-                                        <>
-                                        <h3 className="text-lg font-bold mb-2">Đánh giá:</h3>
-                                        <div className="bg-gray-100 p-4 rounded">
-                                            <span className="block font-bold">{selectedBooking.feedback}</span>
-                                        </div>
-                                        </>
-                                    )}
-                                </>
-                            ))}
-                        </div>
                                 </div>
                             </div>
                         )}
-                        
+
                     </div>
                 </div>
                 <Footer />

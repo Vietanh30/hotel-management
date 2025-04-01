@@ -13,6 +13,11 @@ export const URL_ADD_SERVICE = "service_hotel/create";
 export const URL_EDIT_SERVICE = "service_hotel/edit";
 export const URL_ACTIVE_SERVICE = "service_hotel/active";
 export const URL_GET_ALL_CATEGORY = "service_hotel/category/getAll";
+//! ServiceRoom
+export const URL_GET_ALL_SERVICE_ROOM_ADMIN = "admin/service_room";
+export const URL_ADD_SERVICE_ROOM = "admin/service_room";
+export const URL_EDIT_SERVICE_ROOM = "admin/service_room";
+export const URL_ACTIVE_SERVICE_ROOM = "admin/service_room/active";
 //!NumberRoom
 export const URL_GET_ALL_NUMBEROOM = "room/admin/room_number/all";
 export const URL_GET_NUMBEROOM_NO_BOOKED = "room/admin/room_number/get";
@@ -237,6 +242,38 @@ const adminApi = {
   },
   getAllCategory: function (accessToken) {
     return http.get(URL_GET_ALL_CATEGORY, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  //! ServiceRoom
+  getAllServiceRoom: function (accessToken) {
+    console.log(accessToken);
+    return http.get(URL_GET_ALL_SERVICE_ROOM_ADMIN, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  addServieRoom: function (accessToken, formData) {
+    return http.post(URL_ADD_SERVICE_ROOM, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  editServiceRoom: function (accessToken, formData) {
+    return http.put(URL_EDIT_SERVICE_ROOM, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  activeServiceRoom: function (idServiceRoom, accessToken) {
+    return http.get(`${URL_ACTIVE_SERVICE_ROOM}/${idServiceRoom}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

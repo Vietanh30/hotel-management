@@ -18,7 +18,7 @@ const CalendarModal = ({ isOpen, onClose, idTypeRoom }) => {
       const today = new Date();
       const tomorrow = new Date();
       tomorrow.setDate(today.getDate() + 1);
-      
+
       setStartDate(today);
       setEndDate(tomorrow);
 
@@ -57,7 +57,7 @@ const CalendarModal = ({ isOpen, onClose, idTypeRoom }) => {
           <FontAwesomeIcon icon={faTimes} />
         </button>
         <div className="flex justify-between px-5 items-start my-6">
-          <div className="text-3xl font-bold">Khách sạn Nhóm 7</div>
+          <div className="text-3xl font-bold">Hotel Del Luna</div>
           <div className="">
             {startDate && (
               <p className="">

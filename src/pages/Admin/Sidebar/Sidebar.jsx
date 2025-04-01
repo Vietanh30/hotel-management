@@ -5,7 +5,7 @@ import path from "../../../constants/path";
 import { Link, useNavigate } from "react-router-dom";
 import flagVietnam from "../../../assets/Header/flagsVietnam.svg";
 import { useLocation } from "react-router-dom";
-import { clearLS } from "../../../utils/auth";
+import { clearLS, getRoleFromLS } from "../../../utils/auth";
 
 function Sidebar() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -14,11 +14,12 @@ function Sidebar() {
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     };
+    const userRole = getRoleFromLS(); // Get the user role
 
     const isActive = (targetPath) => location.pathname === targetPath;
     const handleLogOut = () => {
         clearLS();
-        navigate(path.loginAdmin);
+        navigate(path.login);
     };
 
     return (
@@ -28,7 +29,7 @@ function Sidebar() {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center justify-start rtl:justify-end">
                             <Link to={path.dashboard} className="flex flex-col items-center cursor-pointer">
-                                <div className="text-[#B5986D] text-4xl font-bold">Nhóm 7</div>
+                                <div className="text-[#B5986D] text-4xl font-bold">Hotel Del Luna</div>
                                 <div className="flex gap-5 items-center">
                                     <div className="w-11 border-b border-[#B5986D]"></div>
                                     <img src={flagVietnam} alt="Vietnam Flag" />
@@ -51,7 +52,7 @@ function Sidebar() {
                                     />
                                 </button>
                                 {dropdownOpen && (
-                                    <div className="absolute z-50 my-4 text-base min-w-40 list-none bg-[#a27b41] hover:bg-[#885d37] divide-y divide-gray-100 rounded shadow-md right-[40%] top-[55%]">
+                                    <div className="absolute z-50 my-4 text-sm min-w-40 list-none bg-[#a27b41] hover:bg-[#885d37] divide-y divide-gray-100 rounded shadow-md right-[40%] top-[55%]">
                                         <ul>
                                             <li>
                                                 <button className="block w-full py-2 text-sm text-white shadow-md font-semibold" onClick={handleLogOut}>Đăng xuất</button>
@@ -69,71 +70,69 @@ function Sidebar() {
                 <div className="h-full px-3 py-6 overflow-y-auto bg-[#F5E8D0] text-black">
                     <ul className="space-y-2 font-medium">
                         <li>
-                            <Link to={path.dashboard} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.dashboard) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                            <Link to={path.dashboard} className={`flex items-center p-2 rounded-lg font-semibold text-sm group ${isActive(path.dashboard) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faHome} className="mr-2" />
                                 <span className="ms-3">Trang chủ</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageTypeRoom} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageTypeRoom) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                            <Link to={path.manageTypeRoom} className={`flex items-center p-2 rounded-lg font-semibold text-sm group ${isActive(path.manageTypeRoom) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faList} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý hạng phòng</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageService} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageService) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                            <Link to={path.manageService} className={`flex items-center p-2 rounded-lg font-semibold text-sm group ${isActive(path.manageService) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faConciergeBell} className="mr-2" />
-                                <span className="flex-1 ms-3 whitespace-nowrap">Quản lý dịch vụ</span>
+                                <span className="flex-1 ms-3 whitespace-nowrap">Quản lý dịch vụ khách sạn</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageRoom} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageRoom) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                            <Link to={path.manageRoom} className={`flex items-center p-2 rounded-lg font-semibold text-sm group ${isActive(path.manageRoom) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faBed} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý phòng</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageNumberRoom} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageNumberRoom) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                            <Link to={path.manageNumberRoom} className={`flex items-center p-2 rounded-lg font-semibold text-sm group ${isActive(path.manageNumberRoom) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faDoorOpen} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý số phòng</span>
                             </Link>
                         </li>
+                        {/* Add the new Room Service Management link */}
                         <li>
-                            <Link to={path.manageStaff} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageStaff) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
-                                <FontAwesomeIcon icon={faUserGroup} className="mr-2" />
-                                <span className="flex-1 ms-3 whitespace-nowrap">Quản lý nhân viên</span>
+                            <Link to={path.manageRoomService} className={`flex items-center p-2 rounded-lg font-semibold text-sm group ${isActive(path.manageRoomService) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                                <FontAwesomeIcon icon={faConciergeBell} className="mr-2" />
+                                <span className="flex-1 ms-3 whitespace-nowrap">Quản lý dịch vụ phòng</span>
                             </Link>
                         </li>
+                        {userRole === 'ROLE_ADMINISTRATOR' && (
+                            <li>
+                                <Link to={path.manageStaff} className={`flex items-center p-2 rounded-lg font-semibold text-sm group ${isActive(path.manageStaff) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                                    <FontAwesomeIcon icon={faUserGroup} className="mr-2" />
+                                    <span className="flex-1 ms-3 whitespace-nowrap">Quản lý nhân viên</span>
+                                </Link>
+                            </li>
+                        )}
                         <li>
-                            <Link to={path.manageCustomer} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageCustomer) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                            <Link to={path.manageCustomer} className={`flex items-center p-2 rounded-lg font-semibold text-sm group ${isActive(path.manageCustomer) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faUser} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý khách hàng</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.manageBooking} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.manageBooking) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                            <Link to={path.manageBooking} className={`flex items-center p-2 rounded-lg font-semibold text-sm group ${isActive(path.manageBooking) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faCalendarCheck} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý đặt phòng</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to={path.bookingHistoryAdmin} className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive(path.bookingHistory) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
+                            <Link to={path.bookingHistoryAdmin} className={`flex items-center p-2 rounded-lg font-semibold text-sm group ${isActive(path.bookingHistory) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faHistory} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Lịch sử đặt phòng</span>
                             </Link>
                         </li>
-                        {/* <li>
-                            <Link to="/report" className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive("/report") ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
-                                <FontAwesomeIcon icon={faChartLine} className="mr-2" />
-                                <span className="flex-1 ms-3 whitespace-nowrap">Báo cáo, thống kê</span>
-                            </Link>
-                        </li> */}
-                        {/* <li>
-                            <Link to="/feedback" className={`flex items-center p-2 rounded-lg font-semibold text-base group ${isActive("/feedback") ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
-                                <FontAwesomeIcon icon={faCommentDots} className="mr-2" />
-                                <span className="flex-1 ms-3 whitespace-nowrap">Quản lý phản hồi</span>
-                            </Link>
-                        </li> */}
+
                     </ul>
                 </div>
             </aside>

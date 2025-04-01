@@ -6,7 +6,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import AddTypeRoom from "./AddTypeRoom/AddTypeRoom";
 import EditTypeRoom from "./EditTypeRoom/EditTypeRoom";
 import adminApi from "../../../api/adminApi";
-import { getAccessTokenFromLS } from "../../../utils/auth";
+import { getAccessTokenFromLS, getRoleFromLS } from "../../../utils/auth";
 import Swal from 'sweetalert2';
 
 function ManageTypeRoom() {
@@ -16,6 +16,8 @@ function ManageTypeRoom() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [typeRoom, setTypeRoom] = useState([]);
     const [loading, setLoading] = useState(true);
+    const userRole = getRoleFromLS(); // Get the user role
+
 
     const fetchData = async () => {
         try {
@@ -84,20 +86,22 @@ function ManageTypeRoom() {
     };
 
     const columns = [
-        {
-            name: 'Hành động',
-            cell: row => (
-                <div>
-                    <button onClick={() => openEditModal(row)} className="text-yellow-500 hover:underline mx-2">
-                        <FontAwesomeIcon icon={faPencilAlt} />
-                    </button>
-                    <button onClick={() => handleDelete(row)} className="text-red-500 hover:underline">
-                        <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                </div>
-            ),
-            width: '110px'
-        },
+        ...(userRole === 'ROLE_ADMINISTRATOR' ? [
+            {
+                name: 'Hành động',
+                cell: row => (
+                    <div>
+                        <button onClick={() => openEditModal(row)} className="text-yellow-500 hover:underline mx-2">
+                            <FontAwesomeIcon icon={faPencilAlt} />
+                        </button>
+                        <button onClick={() => handleDelete(row)} className="text-red-500 hover:underline">
+                            <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                    </div>
+                ),
+                width: '10%'
+            },
+        ] : []),
         {
             name: 'STT',
             selector: (row, index) => index + 1,
@@ -154,9 +158,12 @@ function ManageTypeRoom() {
                             Quản lý hạng phòng
                         </div>
                         <div>
-                            <button onClick={openAddModal} className="px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold">
-                                Thêm hạng phòng
-                            </button>
+                            {userRole === 'ROLE_ADMINISTRATOR' && (
+
+                                <button onClick={openAddModal} className="px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold">
+                                    Thêm hạng phòng
+                                </button>
+                            )}
                         </div>
                     </div>
                     <div className="mt-6">

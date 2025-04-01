@@ -8,9 +8,11 @@ import { Link, useNavigate } from "react-router-dom";
 import path from "../../../constants/path";
 import authApi from '../../../api/authApi'; // Import your API
 import { setAccessTokenToLS, setRoleTokenToLS } from '../../../utils/auth'; // Ensure this function exists
+import { useAuth } from '../../../Contexts/AuthContext';
 
 function Login({ setUserRole }) {
     const navigate = useNavigate()
+    const { login } = useAuth()
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -36,7 +38,7 @@ function Login({ setUserRole }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = validate();
-    
+
         if (Object.keys(validationErrors).length > 0) {
             const errorMessages = Object.values(validationErrors).join('\n');
             Swal.fire({
@@ -45,7 +47,7 @@ function Login({ setUserRole }) {
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
-    
+
             // Focus on the first input with an error
             if (validationErrors.email) {
                 document.querySelector('input[name="email"]').focus();
@@ -54,21 +56,14 @@ function Login({ setUserRole }) {
             }
             return;
         }
-    
+
         setLoading(true);
         try {
-            const response = await authApi.login(formData.email, formData.password);
-            console.log(response);
-            if (response.data.statusCode === 200) {
-                setAccessTokenToLS(response.data.data.accessToken);
-                setRoleTokenToLS(response.data.data.roles[0])   
-                setUserRole(response.data.data.roles[0])         
-                // Uncomment the line below to navigate to the home page after login
-                navigate(path.home);
-            }
+            await login(formData.email, formData.password);
+
         } catch (error) {
             let errorMessage = 'Đăng nhập không thành công! Vui lòng kiểm tra lại thông tin.';
-    
+
             // Check if error.response exists
             if (error.response) {
                 // If response exists, check status code and set appropriate message
@@ -82,7 +77,7 @@ function Login({ setUserRole }) {
                 // Something happened in setting up the request that triggered an Error
                 errorMessage = error.message;
             }
-    
+
             Swal.fire({
                 title: 'Lỗi!',
                 text: errorMessage,
@@ -101,7 +96,7 @@ function Login({ setUserRole }) {
                     <div className="col-span-7">
                         <img className="w-full min-h-screen relative" src={bgLogin} alt="" />
                         <div className="absolute top-[10%] left-[22%] transform -translate-x-1/2 -translate-y-1/2 text-white">
-                            <div className="text-4xl font-bold mb-4">Trải nghiệm du lịch đẳng cấp tại Nhóm 7</div>
+                            <div className="text-4xl font-bold mb-4">Trải nghiệm du lịch đẳng cấp tại Hotel Del Luna</div>
                             <div className="text-2xl">Hưởng nhiều ưu đãi và tích lũy điểm thưởng khi đăng ký thành viên</div>
                         </div>
                     </div>
@@ -109,7 +104,7 @@ function Login({ setUserRole }) {
                         <div className="flex items-center justify-center mt-12">
                             <div className="rounded-lg w-full px-12">
                                 <div className="flex flex-col items-center">
-                                    <div className='text-[#B5986D] text-4xl font-bold'>Nhóm 7</div>
+                                    <div className='text-[#B5986D] text-4xl font-bold'>Hotel Del Luna</div>
                                     <div className='flex gap-5 items-center'>
                                         <div className='w-11 border-b border-[#B5986D]'></div>
                                         <img src={flagVietnam} alt="Vietnam Flag" />
@@ -171,9 +166,9 @@ function Login({ setUserRole }) {
                                         </button>
                                     </div>
                                     <div className="mt-4 text-end font-inter text-sm">
-                                        Chưa có tài khoản? 
+                                        Chưa có tài khoản?
                                         <Link to={path.register}>
-                                            <span className="text-yellow-500 font-semibold hover:text-yellow-600 ms-1">Đăng ký ngay</span> 
+                                            <span className="text-yellow-500 font-semibold hover:text-yellow-600 ms-1">Đăng ký ngay</span>
                                         </Link>
                                     </div>
                                 </form>
