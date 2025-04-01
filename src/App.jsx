@@ -25,6 +25,7 @@ import StatusPayment from "./components/StatusPayment/StatusPayment";
 import ChangePassword from "./pages/User/ChangePassword/ChangePassword";
 import { AuthProvider } from "./Contexts/AuthContext";
 import ManageServiceRoom from "./pages/Admin/ManageServiceRoom/ManageServiceRoom";
+import CheckStatusBookingServiceHotel from "./pages/User/Home/ServiceRoom/CheckStatusBookingServiceHotel";
 
 function App() {
   const [userRole, setUserRole] = useState(getRoleFromLS()); // Lấy userRole từ localStorage
@@ -70,6 +71,13 @@ function App() {
             path={path.checkout}
             element={
               <PrivateRoute element={Checkout} roles={["ROLE_USER"]} userRole={userRole} />
+            }
+
+          />
+          <Route
+            path={path.statusBoookingServiceHotel}
+            element={
+              <PrivateRoute element={CheckStatusBookingServiceHotel} roles={["ROLE_USER"]} userRole={userRole} />
             }
 
           />

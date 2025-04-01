@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import userApi from '../../api/userApi';
 import DataTable from 'react-data-table-component';
-import { getAccessTokenFromLS, getPaymentIdToLS, getRoleFromLS } from '../../utils/auth';
+import { getAccessTokenFromLS, getBookingIdToLS, getPaymentIdToLS, getRoleFromLS } from '../../utils/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import path from '../../constants/path';
 import Swal from 'sweetalert2';
@@ -15,16 +15,17 @@ function StatusPayment() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [feedback, setFeedback] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
   const paymentId = getPaymentIdToLS();
+  const bookingHotelId = getBookingIdToLS();
+  console.log('Booking Hotel ID:', bookingHotelId);
   const role = getRoleFromLS();
 
   const getQueryParams = (query) => {
     const params = new URLSearchParams(query);
     return {
-      paymentId: paymentId,
       transId: params.get('apptransid'),
     };
   };
@@ -32,18 +33,45 @@ function StatusPayment() {
   const handleGetPaymentStatus = async () => {
     try {
       const accessToken = getAccessTokenFromLS();
-      const { paymentId, transId } = getQueryParams(location.search);
-      const response = await userApi.statusBookingRoom(accessToken, {
+      const { transId } = getQueryParams(location.search);
+
+      // Try getting room booking status first
+      const roomResponse = await userApi.statusBookingRoom(accessToken, {
         paymentId,
         transId,
       });
-      setPaymentStatus(response.data);
+      setPaymentStatus(roomResponse.data);
       setModalOpen(true);
     } catch (error) {
-      if (error.response.data.statusCode === 400) {
-        console.log(error.response.data);
-        setPaymentStatus(error.response.data);
-        setModalOpen(true);
+      // If room booking API fails, try the service booking API
+      if (error.response?.data?.statusCode === 404) {
+        console.log('Room booking failed, trying service booking API...');
+        try {
+          const accessToken = getAccessTokenFromLS();
+          const { transId } = getQueryParams(location.search);
+          const serviceResponse = await userApi.statusBookingServiceHotel(
+            accessToken,
+            bookingHotelId,
+            transId
+          );
+          console.log(serviceResponse)
+          setPaymentStatus(serviceResponse.data);
+          setModalOpen(true);
+          // Navigate to home after successful service booking status retrieval
+          navigate(path.home);
+        } catch (serviceError) {
+          console.error('Service booking also failed:', serviceError);
+          await Swal.fire({
+            title: 'Error',
+            text: serviceError.response.data.description,
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+          navigate(path.home);
+
+        }
+      } else {
+        console.error('Error fetching room status:', error);
       }
     }
   };
@@ -132,7 +160,7 @@ function StatusPayment() {
   };
 
   const handleSubmitFeedback = async () => {
-    if (!feedback.trim()) { // Kiểm tra xem feedback không rỗng
+    if (!feedback.trim()) {
       Swal.fire({
         title: 'Lỗi',
         text: 'Vui lòng nhập đánh giá trước khi gửi!',
@@ -145,12 +173,12 @@ function StatusPayment() {
     try {
       const accessToken = getAccessTokenFromLS();
       const body = {
-        paymentId : paymentId,
+        paymentId: paymentId,
         feedback: feedback,
       };
       const response = await userApi.sendFeedback(accessToken, body);
       console.log(response);
-      setFeedbackSent(true); // Đánh dấu đã gửi feedback
+      setFeedbackSent(true);
       Swal.fire({
         title: 'Thành công',
         text: 'Đánh giá của bạn đã được gửi thành công!',
@@ -184,31 +212,31 @@ function StatusPayment() {
               highlightOnHover
               pagination={false}
               customStyles={{
-                headRow: { 
-                  style: { 
-                    fontSize: '15px', 
-                    fontWeight: 'bold', 
-                    backgroundColor: '#edce94', 
-                    borderStartStartRadius: '15px', 
-                    borderStartEndRadius: '15px', 
-                  } 
+                headRow: {
+                  style: {
+                    fontSize: '15px',
+                    fontWeight: 'bold',
+                    backgroundColor: '#edce94',
+                    borderStartStartRadius: '15px',
+                    borderStartEndRadius: '15px',
+                  }
                 },
-                rows: { 
-                  style: { 
-                    fontSize: '14px', 
-                    fontWeight: '500', 
-                    fontFamily: 'inter', 
-                    paddingTop: '6px', 
-                    paddingBottom: '6px', 
-                    textOverflow: 'ellipsis', 
-                  } 
+                rows: {
+                  style: {
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    fontFamily: 'inter',
+                    paddingTop: '6px',
+                    paddingBottom: '6px',
+                    textOverflow: 'ellipsis',
+                  }
                 },
               }}
               noDataComponent={<div className="text-center bg-[#000] w-full p-3 text-white">Không tìm thấy phòng nào.</div>}
               className="bg-white rounded-lg shadow-md"
             />
 
-            {/* Phần đánh giá */}
+            {/* Feedback Section */}
             {paymentStatus && paymentStatus.statusCode !== 400 && role === 'ROLE_USER' && (
               <div className="mt-4">
                 <h3 className="text-xl font-bold">Đánh giá của bạn</h3>
@@ -218,12 +246,12 @@ function StatusPayment() {
                   className={`w-full mt-2 p-2 border rounded-md ${feedbackSent ? 'bg-gray-200' : ''}`}
                   rows="4"
                   placeholder="Nhập đánh giá của bạn..."
-                  disabled={feedbackSent} // Vô hiệu hóa nếu đã gửi feedback
+                  disabled={feedbackSent}
                 />
                 <button
                   onClick={handleSubmitFeedback}
                   className={`mt-2 px-3 py-2 rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold transition duration-200 ${feedbackSent ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  disabled={feedbackSent} // Vô hiệu hóa nếu đã gửi feedback
+                  disabled={feedbackSent}
                 >
                   Gửi đánh giá
                 </button>
@@ -232,7 +260,7 @@ function StatusPayment() {
 
             <div className="mt-4 flex justify-end">
               <button
-                onClick={handleNavigateHome} // Gọi hàm điều hướng
+                onClick={handleNavigateHome}
                 className="px-3 py-2 rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold transition duration-200"
               >
                 Quay về trang chủ
@@ -241,7 +269,6 @@ function StatusPayment() {
           </div>
         </div>
       )}
-
       {/* Modal xem người */}
       {showPeopleModal && selectedRoom && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

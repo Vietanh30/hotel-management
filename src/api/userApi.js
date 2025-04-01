@@ -13,6 +13,8 @@ export const URL_BOOKING_ROOM = "user/payment";
 export const URL_BOOKING_HISTORY = "user/history";
 export const URL_STATUS_BOOKING = "book/check_bill";
 export const URL_SEND_FEEDBACK = "book/feedback";
+export const URL_STATUS_BOOKING_SERVICE_HOTEL =
+  "service_hotel/check_status_booking";
 //! Đặt dịch vụ khách sạn
 export const URL_BOOKING_SERVIECE_HOTEL = "service_hotel/booking";
 const userApi = {
@@ -132,6 +134,24 @@ const userApi = {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+  },
+  //! Check staus đặt ddihcj vụ khách sạn
+  statusBookingServiceHotel: function (accessToken, bookingHotelId, transId) {
+    const params = new URLSearchParams({
+      bookingHotelId: bookingHotelId,
+      transId: transId,
+    }).toString();
+
+    return http.get(
+      `${URL_STATUS_BOOKING_SERVICE_HOTEL}?${params}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
   },
 };
 export default userApi;

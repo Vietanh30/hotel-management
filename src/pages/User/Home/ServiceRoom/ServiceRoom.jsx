@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Slider from 'react-slick';
 import CardService from "../../../../components/CardService/CardService";
 import InforService from "../../../../components/CardService/InforService/InforService";
-import BookingModal from './BookingModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import userApi from '../../../../api/userApi';
+import { BookingModal } from './BookingModal';
 
 const NextButton = ({ onClick }) => (
     <button

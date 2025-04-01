@@ -1,28 +1,31 @@
 import React, { useState } from 'react';
 import userApi from '../../../../api/userApi';
-import { getAccessTokenFromLS } from '../../../../utils/auth';
+import { getAccessTokenFromLS, setBookingIdToLS, setPaymentIdToLS } from '../../../../utils/auth';
 import Swal from 'sweetalert2'; // Import SweetAlert2
 
-function BookingModal({ isOpen, onClose, serviceDetails }) {
+export function BookingModal({ isOpen, onClose, serviceDetails }) {
     const [note, setNote] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const accessToken = getAccessTokenFromLS();
 
     if (!isOpen) return null;
 
+    const handleError = (message) => {
+        Swal.fire('Error', message, 'error');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Validation
         if (!note.trim()) {
-            Swal.fire('Error', 'Ghi chú không được để trống.', 'error');
+            handleError('Ghi chú không được để trống.');
             setIsSubmitting(false);
             return;
         }
 
         if (note.length > 200) {
-            Swal.fire('Error', 'Ghi chú không được vượt quá 200 ký tự.', 'error');
+            handleError('Ghi chú không được vượt quá 200 ký tự.');
             setIsSubmitting(false);
             return;
         }
@@ -33,16 +36,18 @@ function BookingModal({ isOpen, onClose, serviceDetails }) {
                 note: note,
             };
             const response = await userApi.bookingServiceHotel(accessToken, requestBody);
-
+            console.log(response);
             if (response.data.statusCode === 200) {
                 Swal.fire('Success', 'Đặt dịch vụ thành công!', 'success');
                 setNote('');
-                window.location.href = response.data.data.orderurl; // Redirect
+                setPaymentIdToLS(response.data.data.payment_id)
+                setBookingIdToLS(response.data.data.booking_id)
+                window.location.href = response.data.data.orderurl;
             } else {
-                Swal.fire('Error', response.data.message || 'Có lỗi xảy ra khi đặt dịch vụ.', 'error');
+                handleError(response.data.message || 'Có lỗi xảy ra khi đặt dịch vụ.');
             }
         } catch (error) {
-            Swal.fire('Error', error.response?.data?.message || 'Có lỗi xảy ra khi đặt dịch vụ.', 'error');
+            handleError(error.response?.data?.message || 'Có lỗi xảy ra khi đặt dịch vụ.');
         } finally {
             setIsSubmitting(false);
         }
@@ -55,7 +60,11 @@ function BookingModal({ isOpen, onClose, serviceDetails }) {
                     <h2 className="text-xl font-semibold text-gray-800">
                         Đặt dịch vụ: {serviceDetails?.name}
                     </h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                    <button
+                        onClick={onClose}
+                        aria-label="Close modal"
+                        className="text-gray-500 hover:text-gray-700"
+                    >
                         &times;
                     </button>
                 </div>
@@ -106,5 +115,3 @@ function BookingModal({ isOpen, onClose, serviceDetails }) {
         </div>
     );
 }
-
-export default BookingModal;

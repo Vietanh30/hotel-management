@@ -6,7 +6,15 @@ export const setAccessTokenToLS = (access_token) => {
 export const setPaymentIdToLS = (paymentId) => {
   localStorage.setItem("paymentId", paymentId);
 };
-
+export const setBookingIdToLS = (bookingId) => {
+  localStorage.setItem("bookingId", bookingId);
+};
+export const getBookingIdToLS = () => {
+  return localStorage.getItem("bookingId"); // or whatever key you used
+};
+export const removeBookingIdToLS = () => {
+  localStorage.removeItem("bookingId");
+};
 export const setRoleTokenToLS = (role) => {
   localStorage.setItem("role", role);
 };
