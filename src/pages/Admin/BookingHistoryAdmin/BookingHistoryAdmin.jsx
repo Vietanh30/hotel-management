@@ -392,15 +392,23 @@ function BookingHistoryAdmin() {
                                     <div className="pb-6 border-b-2 border-dashed">
                                         <h3 className="text-lg font-bold my-2">Dịch vụ đã chọn:</h3>
                                         {room.serviceList?.length > 0 ? (
-                                            room.serviceList.map((service, index) => (
-                                                <div key={index} className="bg-gray-100 p-4 rounded mb-2 flex justify-between">
-                                                    <span className="font-semibold">{service.name}</span>
-                                                    <span className="font-semibold">{service.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                            room.serviceList.some(service => service.selected) ? (
+                                                room.serviceList.map((service, index) => (
+                                                    service.selected && (
+                                                        <div key={index} className="bg-gray-100 p-4 rounded mb-2 flex justify-between">
+                                                            <span className="font-semibold">{service.name}</span>
+                                                            <span className="font-semibold">{service.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                                        </div>
+                                                    )
+                                                ))
+                                            ) : (
+                                                <div className="bg-gray-100 p-4 rounded mb-2 text-center">
+                                                    <span className="font-semibold">Không có dịch vụ đã chọn</span>
                                                 </div>
-                                            ))
+                                            )
                                         ) : (
                                             <div className="bg-gray-100 p-4 rounded mb-2 text-center">
-                                                <span className="font-semibold">Không chọn dịch vụ nào</span>
+                                                <span className="font-semibold">Không có dịch vụ đã chọn</span>
                                             </div>
                                         )}
                                     </div>
