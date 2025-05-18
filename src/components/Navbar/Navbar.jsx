@@ -92,7 +92,9 @@ function Navbar() {
 
           )}
           {!accessToken && (
-            <button className="bg-[#B5986D] text-white rounded-md py-[5px] px-4 hover:bg-[#8A6A4E]">
+            <button className="bg-[#B5986D] text-white rounded-md py-[5px] px-4 hover:bg-[#8A6A4E]"
+              onClick={() => navigate(path.register)}
+            >
               Đăng ký
             </button>
           )}

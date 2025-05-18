@@ -36,17 +36,24 @@ export function BookingModal({ isOpen, onClose, serviceDetails }) {
                 note: note,
             };
             const response = await userApi.bookingServiceHotel(accessToken, requestBody);
-            console.log(response);
-            if (response.data.statusCode === 200) {
-                Swal.fire('Success', 'Đặt dịch vụ thành công!', 'success');
+            if (response.data.statusCode === 200 && response.data.data) {
                 setNote('');
-                setPaymentIdToLS(response.data.data.payment_id)
-                setBookingIdToLS(response.data.data.booking_id)
-                window.location.href = response.data.data.orderurl;
+                console.log("response.data.data", response.data.data);
+                setBookingIdToLS(response.data.data.booking_id);
+                // Lưu thông tin vào localStorage
+
+                if (response.data.data.orderurl) {
+                    // Chuyển hướng đến trang thanh toán
+                    window.location.replace(response.data.data.orderurl);
+                } else {
+                    handleError('Không tìm thấy URL thanh toán.');
+                }
             } else {
+                console.error("Invalid response format:", response);
                 handleError(response.data.message || 'Có lỗi xảy ra khi đặt dịch vụ.');
             }
         } catch (error) {
+            console.error("Error details:", error);
             handleError(error.response?.data?.message || 'Có lỗi xảy ra khi đặt dịch vụ.');
         } finally {
             setIsSubmitting(false);

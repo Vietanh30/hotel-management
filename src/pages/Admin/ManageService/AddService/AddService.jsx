@@ -15,6 +15,7 @@ function AddService({ isOpen, onClose, fetchData }) {
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [description, setDescription] = useState('');
+    const [price, setPrice] = useState('');
     const [image, setImage] = useState(null); // Chỉ lưu một hình ảnh
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -33,7 +34,7 @@ function AddService({ isOpen, onClose, fetchData }) {
     }, [accessToken]);
 
     const handleAdd = async () => {
-        if (!name || !location || !capacity || !startTime || !endTime || !description || !selectedCategory || !image) {
+        if (!name || !location || !capacity || !startTime || !endTime || !description || !selectedCategory || !image || !price) {
             Swal.fire({
                 title: 'Lỗi!',
                 text: 'Vui lòng điền tất cả các trường bắt buộc!',
@@ -51,6 +52,7 @@ function AddService({ isOpen, onClose, fetchData }) {
         formData.append('endTime', endTime);
         formData.append('description', description);
         formData.append('categoryId', selectedCategory.value);
+        formData.append('price', price);
         formData.append('image', image.file); // Chỉ thêm một hình ảnh
 
         try {
@@ -71,6 +73,7 @@ function AddService({ isOpen, onClose, fetchData }) {
                 setStartTime('');
                 setEndTime('');
                 setDescription('');
+                setPrice('');
                 setImage(null); // Reset hình ảnh
                 setSelectedCategory(null);
             }
@@ -86,7 +89,7 @@ function AddService({ isOpen, onClose, fetchData }) {
     };
 
     const handleImageChange = (newImages, files) => {
-            setImage(newImages[0]); // Chỉ lưu một hình ảnh
+        setImage(newImages[0]); // Chỉ lưu một hình ảnh
     };
 
     const handleRemoveImage = () => {
@@ -98,8 +101,8 @@ function AddService({ isOpen, onClose, fetchData }) {
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl relative">
-                <button 
-                    onClick={onClose} 
+                <button
+                    onClick={onClose}
                     className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
                 >
                     <FontAwesomeIcon icon={faTimes} size="lg" />
@@ -107,39 +110,46 @@ function AddService({ isOpen, onClose, fetchData }) {
                 <div className="text-xl font-inter font-semibold mb-4">Thêm dịch vụ</div>
                 <div className="grid grid-cols-5 gap-6">
                     <div className="col-span-3">
-                        <input 
-                            type="text" 
-                            placeholder="Tên dịch vụ" 
-                            value={name} 
-                            onChange={(e) => setName(e.target.value)} 
+                        <input
+                            type="text"
+                            placeholder="Tên dịch vụ"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
                         />
-                        <input 
-                            type="text" 
-                            placeholder="Vị trí" 
-                            value={location} 
-                            onChange={(e) => setLocation(e.target.value)} 
+                        <input
+                            type="text"
+                            placeholder="Vị trí"
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
                         />
-                        <input 
-                            type="number" 
-                            placeholder="Sức chứa" 
-                            value={capacity} 
-                            onChange={(e) => setCapacity(e.target.value)} 
+                        <input
+                            type="number"
+                            placeholder="Sức chứa"
+                            value={capacity}
+                            onChange={(e) => setCapacity(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
                         />
-                        <input 
-                            type="time" 
-                            placeholder="Thời gian bắt đầu" 
-                            value={startTime} 
-                            onChange={(e) => setStartTime(e.target.value)} 
+                        <input
+                            type="number"
+                            placeholder="Giá"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
                         />
-                        <input 
-                            type="time" 
-                            placeholder="Thời gian kết thúc" 
-                            value={endTime} 
-                            onChange={(e) => setEndTime(e.target.value)} 
+                        <input
+                            type="time"
+                            placeholder="Thời gian bắt đầu"
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
+                            className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
+                        />
+                        <input
+                            type="time"
+                            placeholder="Thời gian kết thúc"
+                            value={endTime}
+                            onChange={(e) => setEndTime(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
                         />
                         <Select
@@ -149,10 +159,10 @@ function AddService({ isOpen, onClose, fetchData }) {
                             className="mb-4"
                             isClearable={true}
                         />
-                        <textarea 
-                            placeholder="Mô tả" 
-                            value={description} 
-                            onChange={(e) => setDescription(e.target.value)} 
+                        <textarea
+                            placeholder="Mô tả"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4 resize-none h-24"
                         />
                     </div>
@@ -186,8 +196,8 @@ function AddService({ isOpen, onClose, fetchData }) {
                     </div>
                 </div>
                 <div className="mt-4 flex justify-end space-x-2">
-                    <button 
-                        onClick={handleAdd} 
+                    <button
+                        onClick={handleAdd}
                         className="px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold"
                     >
                         Thêm dịch vụ

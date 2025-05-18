@@ -1,19 +1,19 @@
 import { faTimesCircle, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import path from "../../../../constants/path";
 import { formatDate } from "../../../../utils/utils";
 import adminApi from "../../../../api/adminApi";
-import { getAccessTokenFromLS } from "../../../../utils/auth"; 
-import Swal from "sweetalert2"; 
+import { getAccessTokenFromLS } from "../../../../utils/auth";
+import Swal from "sweetalert2";
 
 const CartBooking = ({ onClose, dataCart, fetchCart, resetSearch }) => {
     const accessToken = getAccessTokenFromLS();
     const [cartOptions, setCartOptions] = useState(dataCart.roomCart || []);
     const [totalAmount, setTotalAmount] = useState(dataCart.totalPrice || 0);
     const [policyPrice, setPolicyPrice] = useState(dataCart.policyPrice || 0);
-
+    const navigate = useNavigate();
     // This effect runs only when dataCart changes
     useEffect(() => {
         if (dataCart) {
@@ -60,7 +60,7 @@ const CartBooking = ({ onClose, dataCart, fetchCart, resetSearch }) => {
             });
         } else {
             // Redirect to checkout page if there are rooms in the cart
-            window.location.href = path.checkOutAdmin;
+            navigate(path.checkOutAdmin);
         }
     };
 
@@ -94,7 +94,7 @@ const CartBooking = ({ onClose, dataCart, fetchCart, resetSearch }) => {
                                         </td>
                                         <td className="py-2 px-4 border-b">{option.price.toLocaleString()} đ</td>
                                         <td className="py-2 px-4 border-b">
-                                            <button 
+                                            <button
                                                 className="text-red-500 hover:text-red-700"
                                                 onClick={() => handleRemoveItem(option.bookingRoomId)}
                                             >
@@ -126,7 +126,7 @@ const CartBooking = ({ onClose, dataCart, fetchCart, resetSearch }) => {
                     </>
                 )}
                 <div className='flex justify-end mt-3'>
-                    <button 
+                    <button
                         onClick={handleCheckout}
                         className="bg-yellow-500 font-semibold text-white py-2 px-4 rounded hover:bg-yellow-600 mt-2"
                     >

@@ -25,7 +25,7 @@ const CheckOutAdmin = () => {
   const [serviceModalIndex, setServiceModalIndex] = useState(null);
   const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
   const [selectedRoomPolicies, setSelectedRoomPolicies] = useState([]);
-  const [originalRoomValues, setOriginalRoomValues] = useState(null); 
+  const [originalRoomValues, setOriginalRoomValues] = useState(null);
 
   const accessToken = getAccessTokenFromLS();
 
@@ -64,19 +64,19 @@ const CheckOutAdmin = () => {
 
     // Save original values when changing occupancy for the first time
     if (!originalRoomValues) {
-        setOriginalRoomValues({
-            adults: room.adults,
-            children: room.children,
-            infant: room.infant,
-        });
+      setOriginalRoomValues({
+        adults: room.adults,
+        children: room.children,
+        infant: room.infant,
+      });
     }
 
     newBookingRoomDetails[index] = {
-        ...room,
-        [type]: value,
+      ...room,
+      [type]: value,
     };
     setBookingData((prev) => ({ ...prev, bookingRoomDetails: newBookingRoomDetails }));
-}, [bookingData, originalRoomValues]);
+  }, [bookingData, originalRoomValues]);
 
   const handleAddCustomer = useCallback(() => {
     setIsAddCustomerOpen(true);
@@ -94,82 +94,118 @@ const CheckOutAdmin = () => {
   const updateBookingRoom = async (index, params) => {
     console.log(params);
     try {
-        const response = await adminApi.editCartItem(accessToken, params);
-        console.log(response);
-        if (response.data.statusCode === 200) {
-            // Hiển thị thông báo thành công
-            Swal.fire({
-                title: 'Thành công!',
-                text: 'Cập nhật phòng đặt thành công.',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            });
-
-            await fetchBookingData(); // Lấy dữ liệu đặt phòng đã cập nhật
-            setOriginalRoomValues(null); // Reset original values after a successful update
-        }
-    } catch (error) {
-        console.error('Cập nhật phòng đặt thất bại:', error);
-        
-        // Hiển thị thông báo lỗi
+      const response = await adminApi.editCartItem(accessToken, params);
+      console.log(response);
+      if (response.data.statusCode === 200) {
+        // Hiển thị thông báo thành công
         Swal.fire({
-            title: 'Lỗi!',
-            text: error.response?.data?.description || 'Cập nhật phòng đặt thất bại. Vui lòng thử lại.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        }).then(() => {
-            // Reset số lượng khách về giá trị gốc khi cập nhật thất bại
-            if (originalRoomValues) {
-                const newBookingRoomDetails = [...bookingData.bookingRoomDetails];
-                newBookingRoomDetails[index] = {
-                    ...newBookingRoomDetails[index],
-                    adults: originalRoomValues.adults,
-                    children: originalRoomValues.children,
-                    infant: originalRoomValues.infant,
-                };
-                setBookingData((prev) => ({ ...prev, bookingRoomDetails: newBookingRoomDetails }));
-            }
+          title: 'Thành công!',
+          text: 'Cập nhật phòng đặt thành công.',
+          icon: 'success',
+          confirmButtonText: 'OK'
         });
+
+        await fetchBookingData(); // Lấy dữ liệu đặt phòng đã cập nhật
+        setOriginalRoomValues(null); // Reset original values after a successful update
+      }
+    } catch (error) {
+      console.error('Cập nhật phòng đặt thất bại:', error);
+
+      // Hiển thị thông báo lỗi
+      Swal.fire({
+        title: 'Lỗi!',
+        text: error.response?.data?.description || 'Cập nhật phòng đặt thất bại. Vui lòng thử lại.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        // Reset số lượng khách về giá trị gốc khi cập nhật thất bại
+        if (originalRoomValues) {
+          const newBookingRoomDetails = [...bookingData.bookingRoomDetails];
+          newBookingRoomDetails[index] = {
+            ...newBookingRoomDetails[index],
+            adults: originalRoomValues.adults,
+            children: originalRoomValues.children,
+            infant: originalRoomValues.infant,
+          };
+          setBookingData((prev) => ({ ...prev, bookingRoomDetails: newBookingRoomDetails }));
+        }
+      });
     }
-};
-const handlePayment = async () => {
+  };
+  const handlePayment = async () => {
     console.log(selectedCustomer)
     if (!selectedCustomer) {
-        Swal.fire({
-            title: 'Chưa chọn khách hàng!',
-            text: 'Vui lòng chọn một khách hàng trước khi thanh toán.',
-            icon: 'warning',
-            confirmButtonText: 'OK'
-        });
-        return;
+      Swal.fire({
+        title: 'Chưa chọn khách hàng!',
+        text: 'Vui lòng chọn một khách hàng trước khi thanh toán.',
+        icon: 'warning',
+        confirmButtonText: 'OK'
+      });
+      return;
     }
 
     try {
-        const response = await adminApi.bookingRoom(accessToken, selectedCustomer.value);
-        console.log(response);
-        if (response.status === 200) {
-            // Optionally, you can reset the form or redirect the user
-            setPaymentIdToLS(response.data.paymentId)
-            await fetchBookingData(); // Refresh booking data if necessary
-            window.location.href = response.data.orderurl
-        } else {
-            Swal.fire({
-                title: 'Lỗi!',
-                text: response.data.description || 'Có lỗi xảy ra trong quá trình thanh toán.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-        }
-    } catch (error) {
-        console.error('Thanh toán thất bại:', error);
+      const response = await adminApi.bookingRoom(accessToken, selectedCustomer.value);
+      console.log(response);
+      if (response.status === 200) {
+        // Lưu paymentId để kiểm tra sau
+        setPaymentIdToLS(response.data.paymentId);
+
+        // Mở URL thanh toán trong tab mới
+        const newWindow = window.open(response.data.orderurl, '_blank');
+
+        // Kiểm tra trạng thái thanh toán sau mỗi 5 giây
+        const checkPaymentStatus = async () => {
+          try {
+            const paymentId = localStorage.getItem('paymentId');
+            const transId = response.data.apptransid;
+
+            if (paymentId && transId) {
+              const statusResponse = await adminApi.checkBillBooking(accessToken, paymentId, transId);
+              console.log("statusResponse", statusResponse)
+              if (statusResponse.data.statusCode === 200) {
+                // Thanh toán thành công
+                Swal.fire({
+                  title: 'Thành công!',
+                  text: 'Thanh toán thành công.',
+                  icon: 'success',
+                  confirmButtonText: 'OK'
+                });
+                await fetchBookingData(); // Refresh booking data
+                clearInterval(intervalId);
+                localStorage.removeItem('paymentId');
+              }
+            }
+          } catch (error) {
+            console.error('Error checking payment status:', error);
+          }
+        };
+
+        const intervalId = setInterval(checkPaymentStatus, 5000);
+
+        // Dừng kiểm tra sau 5 phút
+        setTimeout(() => {
+          clearInterval(intervalId);
+          localStorage.removeItem('paymentId');
+        }, 500000);
+      } else {
         Swal.fire({
-            title: 'Lỗi!',
-            text: error.response?.data?.description || 'Có lỗi xảy ra trong quá trình thanh toán.',
-            icon: 'error',
-            confirmButtonText: 'OK'
+          title: 'Lỗi!',
+          text: response.data.description || 'Có lỗi xảy ra trong quá trình thanh toán.',
+          icon: 'error',
+          confirmButtonText: 'OK'
         });
+      }
+    } catch (error) {
+      console.error('Thanh toán thất bại:', error);
+      Swal.fire({
+        title: 'Lỗi!',
+        text: error.response?.data?.description || 'Có lỗi xảy ra trong quá trình thanh toán.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
-};
+  };
   const renderOccupancyModal = (room, index) => {
     if (showDropdown !== index) return null;
 
@@ -286,7 +322,7 @@ const handlePayment = async () => {
                     <th className="py-2 px-4 border-b text-left font-semibold">Số người</th>
                     <th className="py-2 px-4 border-b text-left font-semibold">Phụ phí</th>
                     <th className="py-2 px-4 border-b text-left font-semibold">Giá phòng</th>
-                    <th className="py-2 px-4 border-b text-left font-semibold">Tổng</th>
+                    <th className="py-2 px-4 border-b text-left font-semibold">Số tiền cọc</th>
                     <th className="py-2 px-4 border-b text-left font-semibold">Dịch vụ</th>
                     <th className="py-2 px-4 border-b text-left font-semibold">Chính sách</th>
                   </tr>
@@ -371,13 +407,13 @@ const handlePayment = async () => {
           </div>
 
           <div className="w-full mt-4">
-          <div className="flex justify-end">
-                <button
-                    onClick={handlePayment}
-                    className="px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold"
-                >
-                    Thanh toán ngay
-                </button>
+            <div className="flex justify-end">
+              <button
+                onClick={handlePayment}
+                className="px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold"
+              >
+                Thanh toán ngay
+              </button>
             </div>
           </div>
         </div>

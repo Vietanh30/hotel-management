@@ -59,7 +59,8 @@ function Login({ setUserRole }) {
 
         setLoading(true);
         try {
-            await login(formData.email, formData.password);
+            const response = await login(formData.email, formData.password);
+            console.log(response);
 
         } catch (error) {
             let errorMessage = 'Đăng nhập không thành công! Vui lòng kiểm tra lại thông tin.';

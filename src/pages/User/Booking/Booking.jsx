@@ -43,7 +43,7 @@ function Booking() {
         try {
             const response = await userApi.getCart(accessToken);
             if (response.data.statusCode === 200) {
-                console.log(response.data)
+                console.log("GetCart", response.data.data)
                 setCartDetails(response.data.data);
             } else {
                 console.error("Failed to fetch cart details:", response.data.message);
@@ -198,8 +198,8 @@ function Booking() {
                             <div className="mt-4">
                                 <button
                                     className={`w-full text-nowrap font-bold py-3 px-4 rounded ${cartDetails && cartDetails.roomCart.length > 0
-                                            ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                                            : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                                        ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                                        : 'bg-gray-400 text-gray-700 cursor-not-allowed'
                                         }`}
                                     disabled={!cartDetails || cartDetails.roomCart.length === 0}
                                     onClick={() => {

@@ -8,14 +8,18 @@ import ServiceChange from '../../Admin/CheckOutAdmin/ServiceChange/ServiceChange
 import Swal from 'sweetalert2';
 import Navbar from '../../../components/Navbar/Navbar';
 import BackToTopButton from '../../../components/BackToTopButton/BackToTopButton';
-
+import { useNavigate } from 'react-router-dom';
+import path from '../../../constants/path';
 function Checkout() {
-    const [bookingData, setBookingData] = useState({
-        totalRoomPrice: 0,
-        totalPolicyPrice: 0,
-        totalBookingPrice: 0,
-        totalRoomBooking: 0,
-        bookingRoomDetails: [],
+    const [bookingData, setBookingData] = useState(() => {
+        const savedData = localStorage.getItem('checkout_booking_data');
+        return savedData ? JSON.parse(savedData) : {
+            totalRoomPrice: 0,
+            totalPolicyPrice: 0,
+            totalBookingPrice: 0,
+            totalRoomBooking: 0,
+            bookingRoomDetails: [],
+        };
     });
     const [showDropdown, setShowDropdown] = useState(null);
     const [serviceModalIndex, setServiceModalIndex] = useState(null);
@@ -24,10 +28,12 @@ function Checkout() {
     const [originalRoomValues, setOriginalRoomValues] = useState(null);
 
     const accessToken = getAccessTokenFromLS();
+    const navigate = useNavigate();
 
     const fetchBookingData = useCallback(async () => {
         try {
             const response = await userApi.getCheckout(accessToken);
+            console.log("response", response)
             setBookingData(response.data.data);
         } catch (error) {
             console.error('Failed to fetch booking data:', error);
@@ -38,6 +44,11 @@ function Checkout() {
         fetchBookingData();
         window.scrollTo(0, 0);
     }, [fetchBookingData]);
+
+    // Lưu bookingData vào localStorage mỗi khi nó thay đổi
+    useEffect(() => {
+        localStorage.setItem('checkout_booking_data', JSON.stringify(bookingData));
+    }, [bookingData]);
 
     const handleOccupancyChange = useCallback((index, type, value) => {
         const newBookingRoomDetails = [...bookingData.bookingRoomDetails];
@@ -85,14 +96,17 @@ function Checkout() {
 
     const handlePayment = async () => {
         try {
-          console.log(accessToken)
             const response = await userApi.bookingRoom(accessToken);
-            
+            console.log("response", response)
             if (response.status === 200) {
-                // await fetchBookingData();
-                setPaymentIdToLS(response.data.paymentId)
-                window.location.href = response.data.orderurl
-              }
+                const paymentId = response.data.paymentId;
+                const orderurl = response.data.orderurl;
+                setPaymentIdToLS(paymentId);
+                // Lưu thông tin vào localStorage
+                localStorage.setItem('paymentId', paymentId);
+                // Chuyển hướng đến trang thanh toán và ngăn quay lại
+                window.location.replace(orderurl);
+            }
         } catch (error) {
             console.error('Thanh toán thất bại:', error);
             Swal.fire({
@@ -102,6 +116,16 @@ function Checkout() {
             });
         }
     };
+
+    // Cleanup khi component unmount
+    useEffect(() => {
+        return () => {
+            // Chỉ xóa data khi thanh toán thành công hoặc người dùng rời khỏi trang checkout
+            if (!localStorage.getItem('booking_paymentId')) {
+                localStorage.removeItem('checkout_booking_data');
+            }
+        };
+    }, []);
 
     const renderOccupancyModal = (room, index) => {
         if (showDropdown !== index) return null;
@@ -184,6 +208,22 @@ function Checkout() {
         setServiceModalIndex(null);
     };
 
+    // Tính toán số tiền cần cọc
+    const calculateDepositAmount = useCallback(() => {
+        if (!bookingData.bookingRoomDetails || bookingData.bookingRoomDetails.length === 0) return 0;
+
+        const totalDeposit = bookingData.bookingRoomDetails.reduce((total, room) => {
+            const paymentPolicy = room.policyList.find(policy => policy.type === 'Thanh toán');
+            if (paymentPolicy) {
+                const depositPercentage = parseInt(paymentPolicy.content);
+                return total + (room.totalPrice * depositPercentage / 100);
+            }
+            return total;
+        }, 0);
+
+        return totalDeposit;
+    }, [bookingData]);
+
     return (
         <>
             <Header />
@@ -258,7 +298,10 @@ function Checkout() {
                                         ))}
                                     </tbody>
                                 </table>
-                                <div className="flex justify-end mt-4 p-5">
+                                <div className="flex justify-between mt-4 p-5">
+                                    <div className="text-lg font-semibold">
+                                        Số tiền cần cọc: {calculateDepositAmount().toLocaleString('vi-VN')} đ
+                                    </div>
                                     <button
                                         onClick={handlePayment}
                                         className="px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold"

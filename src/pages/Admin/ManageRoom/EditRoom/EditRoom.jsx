@@ -22,7 +22,8 @@ function EditRoom({ isOpen, onClose, roomData, fetchData }) {
         value: policy.typeId,
         label: policy.type,
         content: policy.content,
-        description: policy.description
+        description: policy.description,
+        type: policy.type
     })) || []);
     const [allServices, setAllServices] = useState([]);
     const [allPolicies, setAllPolicies] = useState([]);
@@ -61,8 +62,163 @@ function EditRoom({ isOpen, onClose, roomData, fetchData }) {
         fetchAvailableRooms();
     }, [accessToken]);
 
+    const validatePolicyInput = (policy, value) => {
+        if (!value) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Vui lòng nhập đầy đủ thông tin!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+
+        switch (policy.type) {
+            case 'Thanh toán':
+                const paymentValue = parseFloat(value);
+                if (isNaN(paymentValue)) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Giá trị thanh toán phải là số!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                if (paymentValue < 0 || paymentValue > 100) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Giá trị thanh toán phải từ 0 đến 100!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                if (paymentValue % 10 !== 0) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Giá trị thanh toán phải chia hết cho 10!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                break;
+
+            case 'Phụ thu người lớn':
+            case 'Phụ thu trẻ em':
+                const surchargeValue = parseFloat(value);
+                if (isNaN(surchargeValue)) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Giá trị phụ thu phải là số!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                if (surchargeValue < 0) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Giá trị phụ thu phải là số dương!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                break;
+
+            case 'Nhận phòng':
+            case 'Trả phòng':
+                // Validate time format HH:mm
+                const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+                if (!timeRegex.test(value)) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Vui lòng nhập đúng định dạng thời gian (HH:mm)!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                break;
+
+            default:
+                if (!value.trim()) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Vui lòng nhập nội dung!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                break;
+        }
+        return true;
+    };
+
+    const handlePolicyContentChange = (index, value) => {
+        const policy = selectedPolicies[index];
+        if (!validatePolicyInput(policy, value)) {
+            return;
+        }
+        const updatedPolicies = [...selectedPolicies];
+        updatedPolicies[index].content = value;
+        setSelectedPolicies(updatedPolicies);
+    };
+
+    const getPolicyInputProps = (policyType) => {
+        switch (policyType) {
+            case 'Thanh toán':
+                return {
+                    type: 'number',
+                    min: '0',
+                    max: '100',
+                    step: '10',
+                    placeholder: 'Nhập phần trăm thanh toán (0-100, chia hết cho 10) *'
+                };
+            case 'Phụ thu người lớn':
+            case 'Phụ thu trẻ em':
+                return {
+                    type: 'number',
+                    min: '0',
+                    placeholder: 'Nhập số tiền phụ thu *'
+                };
+            case 'Nhận phòng':
+            case 'Trả phòng':
+                return {
+                    type: 'time',
+                    placeholder: 'Nhập giờ *'
+                };
+            default:
+                return {
+                    type: 'text',
+                    placeholder: 'Nhập nội dung *'
+                };
+        }
+    };
+
+    const getPolicyDescriptionPlaceholder = (policyType) => {
+        switch (policyType) {
+            case 'Thanh toán':
+                return 'Mô tả phương thức thanh toán *';
+            case 'Phụ thu người lớn':
+                return 'Mô tả chính sách phụ thu người lớn *';
+            case 'Phụ thu trẻ em':
+                return 'Mô tả chính sách phụ thu trẻ em *';
+            case 'Nhận phòng':
+                return 'Mô tả quy định nhận phòng *';
+            case 'Trả phòng':
+                return 'Mô tả quy định trả phòng *';
+            default:
+                return 'Mô tả chi tiết *';
+        }
+    };
+
     const handleEditRoom = async () => {
-        if (!name || !description || !price || !adultNumber || !adultMax || !roomRank || selectedServices.length === 0 || selectedPolicies.length === 0 || selectedAvailableRooms.length === 0) {
+        // Validate required fields
+        if (!name || !description || !price || !adultNumber || !adultMax || !roomRank) {
             Swal.fire({
                 title: 'Lỗi!',
                 text: 'Vui lòng điền tất cả các trường bắt buộc!',
@@ -71,6 +227,7 @@ function EditRoom({ isOpen, onClose, roomData, fetchData }) {
             });
             return;
         }
+
         // Validate selected services
         if (selectedServices.length === 0 || selectedServices.some(service => !service.customPrice)) {
             Swal.fire({
@@ -83,10 +240,52 @@ function EditRoom({ isOpen, onClose, roomData, fetchData }) {
         }
 
         // Validate selected policies
-        if (selectedPolicies.length === 0 || selectedPolicies.some(policy => !policy.content || !policy.description)) {
+        if (selectedPolicies.length === 0) {
             Swal.fire({
                 title: 'Lỗi!',
-                text: 'Vui lòng chọn ít nhất một chính sách và điền nội dung cũng như mô tả cho tất cả các chính sách đã chọn!',
+                text: 'Vui lòng chọn ít nhất một chính sách!',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
+
+        // Validate payment policy is required
+        const hasPaymentPolicy = selectedPolicies.some(policy => policy.type === 'Thanh toán');
+        if (!hasPaymentPolicy) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Vui lòng chọn chính sách thanh toán!',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
+
+        // Validate all policies have content and description
+        const invalidPolicies = selectedPolicies.filter(policy => {
+            if (!policy.content || !policy.description) return true;
+
+            switch (policy.type) {
+                case 'Thanh toán':
+                    const paymentValue = parseFloat(policy.content);
+                    return isNaN(paymentValue) || paymentValue < 0 || paymentValue > 100 || paymentValue % 10 !== 0;
+                case 'Phụ thu người lớn':
+                case 'Phụ thu trẻ em':
+                    const surchargeValue = parseFloat(policy.content);
+                    return isNaN(surchargeValue) || surchargeValue < 0;
+                case 'Nhận phòng':
+                case 'Trả phòng':
+                    return !policy.content.match(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/);
+                default:
+                    return !policy.content.trim();
+            }
+        });
+
+        if (invalidPolicies.length > 0) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Vui lòng kiểm tra lại thông tin các chính sách!',
                 icon: 'error',
                 confirmButtonText: 'OK',
             });
@@ -103,6 +302,7 @@ function EditRoom({ isOpen, onClose, roomData, fetchData }) {
             });
             return;
         }
+
         const updatedRoomData = {
             roomId: roomData.id,
             name,
@@ -118,15 +318,13 @@ function EditRoom({ isOpen, onClose, roomData, fetchData }) {
             policyList: selectedPolicies.map(policy => ({
                 typeId: policy.value,
                 content: policy.content,
-                description: policy.description,
+                description: policy.description
             })),
             roomList: selectedAvailableRooms.map(room => room.value),
         };
 
         try {
-            console.log(updatedRoomData);
             const response = await adminApi.editRoom(accessToken, updatedRoomData);
-            console.log(response);
             if (response.data.statusCode === 200) {
                 fetchData();
                 Swal.fire({
@@ -149,11 +347,17 @@ function EditRoom({ isOpen, onClose, roomData, fetchData }) {
     };
 
     const handlePolicyChange = (selectedPolicy) => {
-        setSelectedPolicies(prev => [...prev, { ...selectedPolicy, content: '', description: '' }]);
+        setSelectedPolicies((prev) => [...prev, {
+            ...selectedPolicy,
+            content: '',
+            description: '',
+            typeId: selectedPolicy.value,
+            type: selectedPolicy.label
+        }]);
     };
 
     const handleRemovePolicy = (index) => {
-        setSelectedPolicies(prev => prev.filter((_, i) => i !== index));
+        setSelectedPolicies((prev) => prev.filter((_, i) => i !== index));
     };
 
     const handleServiceChange = (selectedOptions) => {
@@ -250,33 +454,32 @@ function EditRoom({ isOpen, onClose, roomData, fetchData }) {
                     </div>
                     <div>
                         <Select
-                            options={availablePolicies.map(policy => ({ value: policy.id, label: policy.type }))}
+                            options={availablePolicies.map(policy => ({ value: policy.id, label: policy.name }))}
                             onChange={handlePolicyChange}
                             placeholder="Chọn chính sách"
                             className="mb-4"
                         />
                         {selectedPolicies.map((policy, index) => (
-                            <div key={policy.value} className="mb-4 ml-2">
+                            <div key={index} className="mb-4 ml-2">
                                 <div className="flex items-center mb-2">
-                                    <span className="mr-2">{policy.label}</span>
-                                    <button onClick={() => handleRemovePolicy(index)} className="text-red-500">
+                                    <span className="mr-2">{policy.type}</span>
+                                    <button
+                                        onClick={() => handleRemovePolicy(index)}
+                                        className="text-red-500"
+                                        type="button"
+                                    >
                                         Xóa
                                     </button>
                                 </div>
                                 <input
-                                    type="text"
-                                    placeholder="Nội dung"
+                                    {...getPolicyInputProps(policy.type)}
                                     value={policy.content}
-                                    onChange={(e) => {
-                                        const updatedPolicies = [...selectedPolicies];
-                                        updatedPolicies[index].content = e.target.value;
-                                        setSelectedPolicies(updatedPolicies);
-                                    }}
+                                    onChange={(e) => handlePolicyContentChange(index, e.target.value)}
                                     className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-2"
                                 />
                                 <input
                                     type="text"
-                                    placeholder="Mô tả"
+                                    placeholder={getPolicyDescriptionPlaceholder(policy.type)}
                                     value={policy.description}
                                     onChange={(e) => {
                                         const updatedPolicies = [...selectedPolicies];

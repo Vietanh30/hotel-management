@@ -126,12 +126,12 @@ function Sidebar() {
                                 <span className="flex-1 ms-3 whitespace-nowrap">Quản lý đặt phòng</span>
                             </Link>
                         </li>
-                        <li>
+                        {/* <li>
                             <Link to={path.bookingHistoryAdmin} className={`flex items-center p-2 rounded-lg font-semibold text-sm group ${isActive(path.bookingHistory) ? 'bg-yellow-500 text-white' : 'text-gray-900 hover:bg-yellow-500 hover:text-white'}`}>
                                 <FontAwesomeIcon icon={faHistory} className="mr-2" />
                                 <span className="flex-1 ms-3 whitespace-nowrap">Lịch sử đặt phòng</span>
                             </Link>
-                        </li>
+                        </li> */}
 
                     </ul>
                 </div>

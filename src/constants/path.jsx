@@ -10,6 +10,7 @@ const path = {
     checkout: '/checkout',
     bookingHistory: '/booking-history',
     statusPayment: '/success/payment',
+    statusBoookingServiceHotel: '/success/service',
 
 
     //! admin
@@ -24,6 +25,5 @@ const path = {
     manageBooking: '/manage-booking',
     checkOutAdmin: '/checkout-admin',
     bookingHistoryAdmin: '/booking-history-admin',
-    statusBoookingServiceHotel: '/status-boooking-service-hotel',
 };
 export default path;

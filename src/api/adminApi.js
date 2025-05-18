@@ -57,8 +57,15 @@ export const URL_GET_CHECKOUT = "book/checkout";
 //! Đặt phòng
 export const URL_BOOKING_ROOM = "book/payment";
 export const URL_STATUS_BOOKING = "book/check_bill";
+export const URL_CHECK_BILL_BOOKING = "book/check_bill";
 //! Lịch sử đặt
 export const URL_BOOKING_HISTORY = "book/history";
+//! Checkin
+export const URL_CHECK_IN_ROOM = "book/checkin";
+export const URL_CHECK_OUT_ROOM = "book/checkout";
+export const URL_CHECK_BILL_CHECKOUT = "book/check_bill_checkout";
+//! Lịch sử đặt dịch vụ
+export const URL_BOOKING_SERVICE_HISTORY = "service_hotel/history";
 //! Thống kế
 export const URL_GET_DASHBOARD = "admin/dashboard";
 
@@ -413,7 +420,7 @@ const adminApi = {
       },
     });
   },
-  //! checkouty
+  //! checkout
   getCheckout: function (accessToken) {
     return http.get(URL_GET_CHECKOUT, {
       headers: {
@@ -439,9 +446,64 @@ const adminApi = {
       },
     });
   },
+  checkBillBooking: function (accessToken, paymentId, transId) {
+    return http.post(
+      URL_CHECK_BILL_BOOKING,
+      {
+        paymentId,
+        transId,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+  },
   //! Lịch sử đặt phòng
   getBookingHistory: function (accessToken) {
     return http.get(URL_BOOKING_HISTORY, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  checkInRoom: function (accessToken, idBooking) {
+    return http.get(`${URL_CHECK_IN_ROOM}/${idBooking}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  checkOutRoom: function (accessToken, idBooking) {
+    return http.get(`${URL_CHECK_OUT_ROOM}/${idBooking}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+  checkBillCheckout: function (accessToken, paymentId, transId) {
+    return http.post(
+      URL_CHECK_BILL_CHECKOUT,
+      {
+        paymentId,
+        transId,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+  },
+  //! Lịch sử đặt dịch vụ
+  getBookingServiceHistory: function (accessToken) {
+    return http.get(URL_BOOKING_SERVICE_HISTORY, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,

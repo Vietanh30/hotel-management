@@ -8,6 +8,7 @@ import EditService from "./EditService/EditService";
 import adminApi from "../../../api/adminApi";
 import { getAccessTokenFromLS, getRoleFromLS } from "../../../utils/auth";
 import Swal from 'sweetalert2';
+import { formatPrice } from "../../../utils/utils";
 
 function ManageService() {
   const [searchText, setSearchText] = useState('');
@@ -130,6 +131,14 @@ function ManageService() {
       sortable: true,
       width: '8%',
       center: "true",
+    },
+    {
+      name: 'Giá',
+      selector: row => row.price,
+      sortable: true,
+      width: '8%',
+      center: "true",
+      cell: row => <div className="text-center w-full">{formatPrice(row?.price)}</div>
     },
     {
       name: 'Bắt đầu',

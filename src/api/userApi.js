@@ -17,6 +17,8 @@ export const URL_STATUS_BOOKING_SERVICE_HOTEL =
   "service_hotel/check_status_booking";
 //! Đặt dịch vụ khách sạn
 export const URL_BOOKING_SERVIECE_HOTEL = "service_hotel/booking";
+//! Check bill
+export const URL_CHECK_BILL_BOOKING = "book/check_bill";
 const userApi = {
   getAllTypeRoom: function () {
     return http.get(URL_GET_ALL_TYPE_ROOM);
@@ -126,6 +128,21 @@ const userApi = {
       },
     });
   },
+  checkBillBooking: function (accessToken, paymentId, transId) {
+    return http.post(
+      URL_CHECK_BILL_BOOKING,
+      {
+        paymentId,
+        transId,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+  },
   //! Đặt dịch vụ khách sạn
   bookingServiceHotel: function (accessToken, body) {
     return http.post(URL_BOOKING_SERVIECE_HOTEL, body, {
@@ -135,6 +152,7 @@ const userApi = {
       },
     });
   },
+
   //! Check staus đặt ddihcj vụ khách sạn
   statusBookingServiceHotel: function (accessToken, bookingHotelId, transId) {
     const params = new URLSearchParams({

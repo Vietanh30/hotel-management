@@ -78,10 +78,10 @@ function BookingHistory() {
             selector: (row) => (
                 <div
                     className={`px-2 py-1 rounded-full text-white text-sm font-bold ${row.paymentStatus === 'BOOKED'
-                            ? 'bg-green-500'
-                            : row.paymentStatus === 'CANCELLED'
-                                ? 'bg-red-500'
-                                : 'bg-yellow-500'
+                        ? 'bg-green-500'
+                        : row.paymentStatus === 'CANCELLED'
+                            ? 'bg-red-500'
+                            : 'bg-yellow-500'
                         } text-center`}
                 >
                     {row.paymentStatus}
@@ -242,10 +242,10 @@ function BookingHistory() {
                                                 label: 'Trạng thái thanh toán:',
                                                 value: (
                                                     <div className={`px-2 py-1 rounded-full text-white text-sm font-bold ${selectedBooking.paymentStatus === 'BOOKED'
-                                                            ? 'bg-green-500'
-                                                            : selectedBooking.paymentStatus === 'CANCELLED'
-                                                                ? 'bg-red-500'
-                                                                : 'bg-yellow-500'
+                                                        ? 'bg-green-500'
+                                                        : selectedBooking.paymentStatus === 'CANCELLED'
+                                                            ? 'bg-red-500'
+                                                            : 'bg-yellow-500'
                                                         }`}>
                                                         {selectedBooking.paymentStatus}
                                                     </div>

@@ -16,7 +16,8 @@ function EditService({ isOpen, onClose, initialData, fetchData }) {
     const [openTime, setOpenTime] = useState(initialData?.openTime || '');
     const [closeTime, setCloseTime] = useState(initialData?.closeTime || '');
     const [description, setDescription] = useState(initialData?.description || '');
-    const [image, setImage] = useState(initialData?.image? {
+    const [price, setPrice] = useState(initialData?.price || '');
+    const [image, setImage] = useState(initialData?.image ? {
         name: 'Hình 1',
         url: initialData.image,
     } : null);
@@ -48,7 +49,8 @@ function EditService({ isOpen, onClose, initialData, fetchData }) {
             setOpenTime(initialData.openTime || '');
             setCloseTime(initialData.closeTime || '');
             setDescription(initialData.description || '');
-            setImage(initialData.image?  {
+            setPrice(initialData.price || '');
+            setImage(initialData.image ? {
                 name: 'Hình 1',
                 url: initialData.image,
             } : null);
@@ -60,7 +62,7 @@ function EditService({ isOpen, onClose, initialData, fetchData }) {
     }, [initialData]);
 
     const handleEdit = async () => {
-        if (!name || !location || !capacity || !openTime || !closeTime || !description || !selectedCategory || image.length ===0) {
+        if (!name || !location || !capacity || !openTime || !closeTime || !description || !selectedCategory || image.length === 0 || !price) {
             Swal.fire({
                 title: 'Lỗi!',
                 text: 'Vui lòng điền tất cả các trường bắt buộc!',
@@ -78,6 +80,7 @@ function EditService({ isOpen, onClose, initialData, fetchData }) {
         formData.append('endTime', closeTime);
         formData.append('description', description);
         formData.append('categoryId', selectedCategory.value);
+        formData.append('price', price);
         // Chỉ thêm hình ảnh nếu có tệp hình ảnh mới
         if (image && image.file) {
             formData.append('image', image.file); // Chỉ thêm hình ảnh nếu có
@@ -88,7 +91,7 @@ function EditService({ isOpen, onClose, initialData, fetchData }) {
             console.log(image.file)
             for (const [key, value] of formData.entries()) {
                 console.log(key, value);
-            }   
+            }
             const response = await adminApi.editService(accessToken, formData);
             console.log(response)
             fetchData();
@@ -100,6 +103,7 @@ function EditService({ isOpen, onClose, initialData, fetchData }) {
             });
             onClose();
         } catch (error) {
+            console.log(error)
             console.error('Error editing service:', error);
             Swal.fire({
                 title: 'Lỗi!',
@@ -124,8 +128,8 @@ function EditService({ isOpen, onClose, initialData, fetchData }) {
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl relative">
-                <button 
-                    onClick={onClose} 
+                <button
+                    onClick={onClose}
                     className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
                 >
                     <FontAwesomeIcon icon={faTimes} size="lg" />
@@ -133,39 +137,46 @@ function EditService({ isOpen, onClose, initialData, fetchData }) {
                 <div className="text-xl font-semibold mb-4">Chỉnh sửa dịch vụ</div>
                 <div className="grid grid-cols-5 gap-6">
                     <div className="col-span-3">
-                        <input 
-                            type="text" 
-                            placeholder="Tên dịch vụ" 
-                            value={name} 
-                            onChange={(e) => setName(e.target.value)} 
+                        <input
+                            type="text"
+                            placeholder="Tên dịch vụ"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
                         />
-                        <input 
-                            type="text" 
-                            placeholder="Vị trí" 
-                            value={location} 
-                            onChange={(e) => setLocation(e.target.value)} 
+                        <input
+                            type="text"
+                            placeholder="Vị trí"
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
                         />
-                        <input 
-                            type="number" 
-                            placeholder="Sức chứa" 
-                            value={capacity} 
-                            onChange={(e) => setCapacity(e.target.value)} 
+                        <input
+                            type="number"
+                            placeholder="Sức chứa"
+                            value={capacity}
+                            onChange={(e) => setCapacity(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
                         />
-                        <input 
-                            type="time" 
-                            placeholder="Thời gian bắt đầu" 
-                            value={openTime} 
-                            onChange={(e) => setOpenTime(e.target.value)} 
+                        <input
+                            type="number"
+                            placeholder="Giá"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
                         />
-                        <input 
-                            type="time" 
-                            placeholder="Thời gian kết thúc" 
-                            value={closeTime} 
-                            onChange={(e) => setCloseTime(e.target.value)} 
+                        <input
+                            type="time"
+                            placeholder="Thời gian bắt đầu"
+                            value={openTime}
+                            onChange={(e) => setOpenTime(e.target.value)}
+                            className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
+                        />
+                        <input
+                            type="time"
+                            placeholder="Thời gian kết thúc"
+                            value={closeTime}
+                            onChange={(e) => setCloseTime(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4"
                         />
                         <Select
@@ -176,10 +187,10 @@ function EditService({ isOpen, onClose, initialData, fetchData }) {
                             className="mb-4"
                             isClearable={true}
                         />
-                        <textarea 
-                            placeholder="Mô tả" 
-                            value={description} 
-                            onChange={(e) => setDescription(e.target.value)} 
+                        <textarea
+                            placeholder="Mô tả"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                             className="w-full p-2 border focus:border-yellow-500 hover:border-yellow-500 rounded mb-4 resize-none h-24"
                         />
                     </div>
@@ -213,8 +224,8 @@ function EditService({ isOpen, onClose, initialData, fetchData }) {
                     </div>
                 </div>
                 <div className="mt-4 flex justify-end space-x-2">
-                    <button 
-                        onClick={handleEdit} 
+                    <button
+                        onClick={handleEdit}
                         className="px-3 py-2 text-base rounded-md bg-yellow-500 text-white hover:bg-yellow-600 font-semibold"
                     >
                         Chỉnh sửa dịch vụ

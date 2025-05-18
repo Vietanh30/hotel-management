@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import AddRoom from "./AddRoom/AddRoom";
 import EditRoom from "./EditRoom/EditRoom";
 import Select from 'react-select';
+import { formatPrice } from "../../../utils/utils";
 
 function ManageRoom() {
     const [searchText, setSearchText] = useState('');
@@ -136,7 +137,7 @@ function ManageRoom() {
             selector: row => row.price,
             sortable: true,
             cell: row => (
-                <div className="whitespace-normal">{row.price}</div>
+                <div className="whitespace-normal">{formatPrice(row?.price)}</div>
             ),
             width: '10%', // Adjust width as needed
         },
