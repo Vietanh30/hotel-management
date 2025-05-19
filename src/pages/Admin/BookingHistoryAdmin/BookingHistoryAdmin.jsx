@@ -109,7 +109,7 @@ function BookingHistoryAdmin() {
                     clearInterval(intervalId);
                     localStorage.removeItem('checkout_paymentId');
                     localStorage.removeItem('checkout_bookingId');
-                }, 300000);
+                }, 1000000);
             }
         } catch (error) {
             console.error('Error checking out:', error);

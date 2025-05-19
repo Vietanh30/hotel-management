@@ -1,6 +1,7 @@
 import React from "react";
 import area from "../../assets/Home/area.svg";
 import bed from "../../assets/Home/bed.svg";
+import { formatPrice } from "../../utils/utils";
 
 function CardRoom({ roomDetails, onClick, onCalendarClick }) {
   return (
@@ -39,7 +40,7 @@ function CardRoom({ roomDetails, onClick, onCalendarClick }) {
             <div className="font-bold">
               Chỉ từ{" "}
               <span className="text-[#FFC745] font-medium text-3xl">
-                {roomDetails.price}
+                {formatPrice(roomDetails.price)}
               </span>{" "}
               / đêm
             </div>
