@@ -340,7 +340,8 @@ function BookingHistoryAdmin() {
                                 { label: 'Khách hàng:', value: selectedBooking.customer },
                                 { label: 'Ngày đặt phòng:', value: selectedBooking.bookingDate },
                                 { label: 'Tổng giá phòng:', value: selectedBooking.totalRoomPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) },
-                                { label: 'Tổng giá chính sách:', value: selectedBooking.totalPolicyPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) },
+                                { label: 'Số tiền còn lại cần phải thanh toán:', value: selectedBooking?.remainingPrice === "null" ? '0đ' : selectedBooking.remainingPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) },
+                                // { label: 'Tổng giá chính sách:', value: selectedBooking.totalPolicyPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) },
                                 { label: 'Tổng giá đặt phòng:', value: selectedBooking.totalBookingPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) },
                                 { label: 'Số phòng đặt:', value: selectedBooking.totalRoomBooking },
                                 {
